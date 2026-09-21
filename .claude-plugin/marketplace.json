@@ -1,11 +1,20 @@
 {
-  "name": "3echo-creative-studio-post",
-  "description": "Sibling to creative-studio-pipeline: post-production plugin turning shot footage plus the pre-prod release into a Premiere-ready first cut. OpenMontage lib as engine, 3echo AgentC MCP for image/video generation, FCPXML handoff.",
+  "name": "3echo-post",
+  "owner": {
+    "name": "3echo",
+    "url": "https://github.com/3echo-dev"
+  },
   "plugins": [
     {
       "name": "creative-studio-post",
-      "source": ".",
-      "description": "Turns shot footage plus the pre-prod release package into a Premiere-ready first cut. 12 states, 2 gates, ffmpeg + Remotion + CLIP retrieval as engine."
+      "displayName": "Creative Studio Post",
+      "source": "./",
+      "description": "Footage in, Premiere bundle out. The studio's post-production pipeline: ten director agents, eight XX items a person declares, two gates decided on the Post Control board.",
+      "version": "0.1.0",
+      "author": {
+        "name": "3echo"
+      }
     }
-  ]
+  ],
+  "description": "Post-production tooling from 3echo for the studio. Sibling to the 3echo-studio pre-production marketplace."
 }
