@@ -9,7 +9,7 @@ This plugin depends on OpenMontage as a Python + Node library. It does not depen
 | `lib/clip_embedder.py` | `sequence-first-cut` | CLIP ViT-L/14 embedding of storyboard panels and footage frames; nearest-neighbour retrieval to match panel → clip. |
 | `lib/checkpoint.py` | `board-sync`, gate scripts | Writes a checkpoint per stage. The checkpoint format is theirs; we validate against a mirror in `schemas/checkpoint.schema.json`. |
 | `lib/media_profiles.py` | `ingest-footage` | Codec / container presets for ProRes, DNxHD, H.264, AAC, WAV. |
-| `lib/delivery_promise.py` | `export-premiere-bundle` | Validates the bundle contract before Gate B releases. |
+| `lib/delivery_promise.py` | (not used) | A promise classifier (motion-led, source-led ...), not a bundle validator. The bundle contract is checked by `scripts/build-bundle.js` on the Gate A hashes instead. |
 | `schemas/artifacts/` | test suite | Reused as fixtures for our own artefact validation harness. |
 | `remotion-composer/` (Node) | `mograph-generate` | Five templates: Cinematic, Explainer, TalkingHead, CollageBurst, LyricOverlay. Rendered to ProRes 4444 with alpha. |
 

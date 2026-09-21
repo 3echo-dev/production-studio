@@ -464,7 +464,7 @@ async function createProject(form){
   if(!await write(base, doc)) return;
   for(const it of ITEMS) await write(base+'/items/'+it.id, {status:'pending', version:0, summary:'', updatedAt:now(), updatedBy:me});
   await write(base+'/messages/'+Date.now().toString(36), {by:me, text:'Project opened. Waiting for the shoot folder and the pre-prod release to be read.', at:now()});
-  signalPipeline('New post project opened: '+title+(doc.client?' for '+doc.client:'')+(doc.driveFolder?', footage '+doc.driveFolder:'')+(doc.preRelease?', release '+doc.preRelease:'')+', '+doc.aspectRatio+(doc.deliverableDurationSec?', '+doc.deliverableDurationSec+'s':'')+(doc.audioLed?', audio-led':', picture-led'));
+  await signalPipeline('New post project opened: '+title+(doc.client?' for '+doc.client:'')+(doc.driveFolder?', footage '+doc.driveFolder:'')+(doc.preRelease?', release '+doc.preRelease:'')+', '+doc.aspectRatio+(doc.deliverableDurationSec?', '+doc.deliverableDurationSec+'s':'')+(doc.audioLed?', audio-led':', picture-led'));
   location.hash='#/p/'+encodeURIComponent(id);
 }
 

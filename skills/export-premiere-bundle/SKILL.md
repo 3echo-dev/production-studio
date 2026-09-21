@@ -1,7 +1,7 @@
 ---
 name: export-premiere-bundle
 description: >-
-  Builds bundle/project.fcpxml plus the bundle/ folder tree Premiere Pro imports in one step. Validates against OpenMontage's delivery_promise before Gate B. Writes bundle/README.md naming what the editor picks up. Use at the package stage.
+  Builds bundle/project.fcpxml plus the bundle/ folder tree Premiere Pro imports in one step, through scripts/build-bundle.js, which refuses unless the Gate A lock still covers the files. Writes bundle/README.md naming what the editor picks up and bundle/.pipeline/manifest.json. Use at the package stage.
 metadata:
   version: 0.1.0
 user-invocable: false

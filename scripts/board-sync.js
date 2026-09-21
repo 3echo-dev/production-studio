@@ -253,7 +253,9 @@ if (cmd === 'land') {
     if (chosen) {
       const out = path.join(jobDir, '.board', 'bgm-choice.json');
       fs.writeFileSync(out, JSON.stringify({ schemaVersion: '1.0', jobId, client, candidateId: chosen.id, title: chosen.title || '', source: chosen.source || '', chosenBy: chosen.chosenBy || '', chosenAt: chosen.chosenAt || '', channel: 'board' }, null, 2));
-      changed.push('bgm choice landed at .board/bgm-choice.json (' + chosen.id + ')');
+      // gate-a-check.js and the sync guard read the signed choice at the job root.
+      fs.writeFileSync(path.join(jobDir, 'bgm-choice.json'), JSON.stringify({ schemaVersion: '1.0', jobId, client, candidateId: chosen.id, title: chosen.title || '', source: chosen.source || '', file: chosen.file || null, signedBy: chosen.chosenBy || '', signedAt: chosen.chosenAt || '', channel: 'board' }, null, 2) + String.fromCharCode(10));
+      changed.push('bgm choice landed at bgm-choice.json, signed by ' + (chosen.chosenBy || '?') + ' (' + chosen.id + ')');
     }
   }
   // A quoted B-roll request the person approved can proceed.

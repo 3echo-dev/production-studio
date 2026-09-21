@@ -10,6 +10,7 @@
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const ws = require('./lib-workspace.js');
 
 const CONFIG_DIR = '.creative-studio-post';
 const CONFIG_FILE = 'config.json';
@@ -21,8 +22,10 @@ function sha256File(p) {
 
 function ensureDir(d) { fs.mkdirSync(d, { recursive: true }); }
 
+// The job folder, from the workspace resolver (--root, CREATIVE_STUDIO_POST_ROOT, the config,
+// else the current folder). The cwd argument is kept for callers; the resolver decides.
 function jobRoot(cwd, client, jobId) {
-  return path.join(cwd, 'workspaces', client, 'jobs', jobId);
+  return ws.jobDir(client, jobId, process.argv);
 }
 
 function dbRoot(cwd, client, jobId) {

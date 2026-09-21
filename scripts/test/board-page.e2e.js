@@ -89,6 +89,8 @@ assert.ok(/request b-1 approved/.test(r.stdout), 'approved b-roll request report
 assert.ok(/bgm choice landed/.test(r.stdout), 'bgm choice landed');
 const choice = JSON.parse(fs.readFileSync(path.join(jobDir, '.board', 'bgm-choice.json'), 'utf8'));
 assert.strictEqual(choice.candidateId, 'c2'); assert.strictEqual(choice.channel, 'board');
+const signed = JSON.parse(fs.readFileSync(path.join(jobDir, 'bgm-choice.json'), 'utf8'));
+assert.strictEqual(signed.signedBy, 'creative-director', 'root bgm-choice.json is signed for gate-a-check');
 assert.ok(fs.readFileSync(path.join(jobDir, '.board', 'inbox.jsonl'), 'utf8').includes('Take 2 everywhere'), 'inbox projected');
 r = run('board-sync.js', ['pull', client, jobId, '--gate', 'A'], { cwd: tmp, env });
 assert.strictEqual(r.status, 0, 'pull binds the landed gate:\n' + r.stderr + r.stdout);
