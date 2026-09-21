@@ -3,7 +3,7 @@
 //
 // Commands (positionals or --client/--job flags, both accepted):
 //   open  {client} {job-id}                          project + ten item rows on the board
-//   push  {client} {job-id} [--json] [--ack]         drain .board/outbox.jsonl to the board
+//   push  {client} {job-id} [--json|--files] [--ack] drain .board/outbox.jsonl to the board
 //   ask   {client} {job-id} --item X --text "..." [--options "a|b|c"] [--blocks <request id>]
 //   land  {client} {job-id} [<landed.json>]          what the person decided, back on disk
 //   pull  {client} {job-id} --gate A|B               bind a locked gate to the file hashes
@@ -137,6 +137,20 @@ if (cmd === 'push') {
   // may have touched (items, gates) is listed as a pin the orchestrator reads first.
   const pins = all.filter(w => w.op === 'update' || /\/(items|gates)$/.test(w.collection)).map(w => ({ collection: w.collection, doc_id: w.doc_id, ...(w.op === 'set' ? { mayExist: true } : {}) }));
   const out = { url: lib.boardUrl(), project: jobId, count: all.length, pins, batches };
+  // --files: each document body goes to .board/push/<n>.json and the batch names the file, so a
+  // preview thumbnail or a run output never has to be retyped into the tool call.
+  if (flags.files) {
+    const pushDir = path.join(jobDir, '.board', 'push');
+    fs.rmSync(pushDir, { recursive: true, force: true }); lib.ensureDir(pushDir);
+    let n = 0;
+    const fileBatches = batches.map(batch => batch.map(w => {
+      const f = path.join(pushDir, String(n++) + '.json');
+      fs.writeFileSync(f, JSON.stringify(w.data));
+      const { data, ...rest } = w; return { ...rest, file_path: lib.fwd(f) };
+    }));
+    console.log(JSON.stringify({ ...out, batches: fileBatches }, null, 2));
+    process.exit(0);
+  }
   if (flags.json) console.log(JSON.stringify(out, null, 2));
   else {
     console.log(all.length + ' write(s) in ' + batches.length + ' batch(es) for project ' + jobId + ' (' + pins.length + ' pin(s)).');
