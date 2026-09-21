@@ -133,7 +133,10 @@ def main(argv: list[str]) -> int:
         offset += dur
 
     # Audio: one mixdown reference to synced-track.wav on lane -1.
+    # Every src is relative to bundle/, so the leading bundle/ of the recorded wavPath goes.
     wav_rel = sync["output"]["wavPath"]
+    if wav_rel.startswith("bundle/"):
+        wav_rel = wav_rel[len("bundle/"):]
     wav_id = f"r{next_id}"
     SubElement(
         resources, "asset",

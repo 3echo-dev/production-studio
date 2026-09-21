@@ -32,6 +32,26 @@ if (check.status !== 0) {
   process.exit(1);
 }
 
+// Stage the takes the first cut uses under bundle/footage/, so every src in the FCPXML resolves
+// inside the bundle and Premiere never shows offline media. Same basename, bytes compared by size.
+{
+  const stageEdl = (() => { try { return JSON.parse(fs.readFileSync(path.join(dir, 'rough-edl.json'), 'utf8')); } catch { return null; } })();
+  const stageMan = (() => { try { return JSON.parse(fs.readFileSync(path.join(dir, 'manifest.json'), 'utf8')); } catch { return null; } })();
+  if (!stageEdl || !stageMan) { console.error('rough-edl.json or manifest.json is missing; nothing to stage.'); process.exit(1); }
+  const footageDir = path.join(dir, 'bundle', 'footage'); fs.mkdirSync(footageDir, { recursive: true });
+  const bySha = new Map((stageMan.clips || []).map(c => [c.sha256, c]));
+  const staged = new Set();
+  for (const cut of stageEdl.cuts || []) {
+    const clip = bySha.get(cut.clipSha256);
+    if (!clip) { console.error('cut ' + cut.panelId + ' references a clip not in manifest.json (' + String(cut.clipSha256).slice(0, 12) + ').'); process.exit(1); }
+    if (!fs.existsSync(clip.path)) { console.error('take not on disk: ' + clip.path); process.exit(1); }
+    const dest = path.join(footageDir, path.basename(clip.path));
+    if (!fs.existsSync(dest) || fs.statSync(dest).size !== fs.statSync(clip.path).size) fs.copyFileSync(clip.path, dest);
+    staged.add(path.basename(clip.path));
+  }
+  if (staged.size) console.log('Staged ' + staged.size + ' take(s) under bundle/footage/: ' + [...staged].join(', '));
+}
+
 // build-fcpxml.py reads workspaces/{client}/jobs/{job}/... relative to its cwd, so it runs at the root.
 const rootDir = ws.root(argv);
 const build = spawnSync('python', [path.join(__dirname, 'build-fcpxml.py'), client, jobId], { cwd: rootDir, encoding: 'utf8', env: { ...process.env, PYTHONUTF8: '1' } });
