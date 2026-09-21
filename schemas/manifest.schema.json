@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "IngestManifest v1 (creative-studio-post)",
+  "type": "object",
+  "required": ["schemaVersion", "jobId", "createdAt", "clips", "audio"],
+  "properties": {
+    "schemaVersion": { "const": "1.0" },
+    "jobId": { "type": "string" },
+    "createdAt": { "type": "string" },
+    "shootDays": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["day", "date"],
+        "properties": {
+          "day": { "type": "integer", "minimum": 1 },
+          "date": { "type": "string" }
+        }
+      }
+    },
+    "clips": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "sha256", "bytes", "durationSec", "codec", "width", "height", "fps", "day"],
+        "properties": {
+          "path": { "type": "string" },
+          "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "bytes": { "type": "integer" },
+          "durationSec": { "type": "number", "minimum": 0 },
+          "codec": { "type": "string" },
+          "width": { "type": "integer" },
+          "height": { "type": "integer" },
+          "fps": { "type": "number" },
+          "timecodeStart": { "type": ["string", "null"] },
+          "day": { "type": "integer", "minimum": 1 },
+          "scene": { "type": ["string", "null"] },
+          "take": { "type": ["integer", "null"] },
+          "slate": { "type": ["string", "null"] },
+          "proxyPath": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "audio": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "sha256", "bytes", "durationSec", "kind"],
+        "properties": {
+          "path": { "type": "string" },
+          "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "bytes": { "type": "integer" },
+          "durationSec": { "type": "number", "minimum": 0 },
+          "kind": { "enum": ["lav", "boom", "ambient", "wild", "vo"] },
+          "channels": { "type": "integer" },
+          "sampleRateHz": { "type": "integer" },
+          "day": { "type": ["integer", "null"] }
+        }
+      }
+    },
+    "warnings": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  }
+}

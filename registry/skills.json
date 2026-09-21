@@ -1,0 +1,18 @@
+{
+  "skills": [
+    { "id": "post", "file": "skills/post/SKILL.md", "role": "Entry command. Starts or resumes a post-production project. Invoked as /creative-studio-post:post." },
+    { "id": "new-post-project", "file": "skills/new-post-project/SKILL.md", "role": "Creates a project.json from a Drive folder + pre-prod release package path + project id." },
+    { "id": "resume-post-project", "file": "skills/resume-post-project/SKILL.md", "role": "Resumes a stalled project by reading state + artefacts on disk." },
+    { "id": "ingest-footage", "file": "skills/ingest-footage/SKILL.md", "role": "Catalogs footage + audio from the Drive folder, writes manifest.json with checksums." },
+    { "id": "sequence-first-cut", "file": "skills/sequence-first-cut/SKILL.md", "role": "Frame-matches storyboard against manifest, emits rough EDL." },
+    { "id": "bgm-options", "file": "skills/bgm-options/SKILL.md", "role": "Requests three BGM candidates from suggest_bgm_options MCP tool, presents to human." },
+    { "id": "vo-drop-in", "file": "skills/vo-drop-in/SKILL.md", "role": "Places VO tracks on timeline against script markers." },
+    { "id": "audio-sync", "file": "skills/audio-sync/SKILL.md", "role": "Runs sync_audio_track MCP tool. Emits synced-track.json + waveform.png." },
+    { "id": "broll-generate", "file": "skills/broll-generate/SKILL.md", "role": "Handles a single B-roll request via render_broll_variant. Saves to bundle/broll/." },
+    { "id": "mograph-generate", "file": "skills/mograph-generate/SKILL.md", "role": "Builds an infographic or motion-graphic alpha via Remotion, saves to bundle/mograph/." },
+    { "id": "export-premiere-bundle", "file": "skills/export-premiere-bundle/SKILL.md", "role": "Runs export_premiere_bundle MCP tool. Emits project.fcpxml + bundle/ tree." },
+    { "id": "board-setup", "file": "skills/board-setup/SKILL.md", "role": "Publishes this account's own Post Control board artifact (db, artifact, comments) and records its address." },
+    { "id": "board-sync", "file": "skills/board-sync/SKILL.md", "role": "Keeps the Post Control board and the job folder agreeing: push batches, land decisions, hash-bound gate pull." },
+    { "id": "review-pass", "file": "skills/review-pass/SKILL.md", "role": "Runs a rubric against a gate. Emits review.md verdict." }
+  ]
+}

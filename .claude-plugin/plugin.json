@@ -1,0 +1,24 @@
+{
+  "name": "creative-studio-post",
+  "displayName": "Creative Studio Post",
+  "description": "Runs the studio's post-production pipeline end to end: shot footage + audio files + the pre-prod release package (script, storyboard, concept breakdown) become a first cut, three BGM options, a synced audio track, on-demand B-roll variants and motion-graphic alphas, delivered as an FCPXML bundle the editor drops straight into Premiere Pro. Sibling to creative-studio-pipeline; extends the AgentC MCP with sequence, BGM, sync, B-roll and export tools.",
+  "version": "0.1.0",
+  "keywords": [
+    "post-production",
+    "first cut",
+    "audio sync",
+    "ffmpeg",
+    "remotion",
+    "fcpxml",
+    "premiere pro",
+    "b-roll",
+    "motion graphics",
+    "creative studio"
+  ],
+  "author": {
+    "name": "3echo"
+  },
+  "homepage": "https://github.com/3echo-dev/creative-studio-post",
+  "repository": "https://github.com/3echo-dev/creative-studio-post",
+  "license": "MIT"
+}

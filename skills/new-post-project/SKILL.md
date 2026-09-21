@@ -1,0 +1,50 @@
+---
+name: new-post-project
+description: >-
+  Creates a project.json for a new post-production job by validating the pre-prod release package plus the shoot Drive folder plus the human XX declarations. Emits workspaces/{client}/jobs/{job-id}/job.json. Use at intake, once per job.
+metadata:
+  version: 0.1.0
+user-invocable: false
+---
+
+# Skill: New post project
+
+## Inputs
+
+- `--client {slug}`, `--title "..."`.
+- `--drive-folder {path}` — shoot output with `footage/` and optional `audio/` subtrees.
+- `--pre-release {path}` — pre-prod release package (script.md, storyboard.json, concept-breakdown.xlsx, call-sheet-day-*.pdf, storyboard/v{n}/P*.png).
+- Human XX: `--aspect-ratio`, `--deliverable-duration-sec`, `--audio-led`, optional `--reference-cut-path`, optional `--colour-direction`.
+
+## Steps
+
+1. `job-id` = `job-{YYYYMMDD}-{slug of title}`.
+2. Validate `--pre-release` contains every required file. Missing = hard stop.
+3. Compute `prePipelineReleaseHash` = sha256 over sorted list of required file sha256s.
+4. Validate `--drive-folder` exists and has at least one clip in `footage/`.
+5. If any XX flag is unset, park at `needs_input` and ask on the board via `board-sync.js ask`.
+6. Fill `templates/job.json` with the values. Validate against `schemas/job.schema.json`.
+7. Write `workspaces/{client}/jobs/{job-id}/job.json`.
+8. Report the path, the release hash, and any open XX. Nothing else.
+
+## Rules
+
+- Never guess an aspect ratio or duration from the storyboard.
+- Never modify anything under `--pre-release`.
+- Never write past a validation failure.
+
+## Output contract
+
+`workspaces/{client}/jobs/{job-id}/job.json` valid against schema.
+
+## Boundary
+
+Does not open the board (that is `board-sync.js open`), does not walk the workflow (that is the orchestrator), does not ingest footage (that is `ingest-footage`).
+
+## Failure modes
+
+| Failure | Fix |
+|---|---|
+| Missing script.md, storyboard.json, breakdown or call sheet | Stop; the pre-prod job is not yet released |
+| `--drive-folder` empty | Stop; the shoot has not been ingested to Drive yet |
+| XX flag invalid enum | Ask again with the enum values from the schema |

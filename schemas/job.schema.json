@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PostProjectSpec v1 (creative-studio-post)",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "jobId",
+    "client",
+    "title",
+    "kind",
+    "driveFolder",
+    "prePipelineReleaseFolder",
+    "aspectRatio",
+    "deliverableDurationSec",
+    "audioLed",
+    "approvers",
+    "requestedAt"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "1.0" },
+    "jobId": {
+      "type": "string",
+      "pattern": "^job-\\d{8}-[a-z0-9][a-z0-9-]*$"
+    },
+    "client": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*$"
+    },
+    "brand": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*$"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "kind": {
+      "const": "postproduction"
+    },
+    "driveFolder": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Root Drive folder holding footage/ and audio/ subtrees from the shoot."
+    },
+    "prePipelineReleaseFolder": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Path to the pre-prod release package: script.md, storyboard.json, concept-breakdown.xlsx, call-sheet-day-*.pdf, storyboard/v{n}/P*.png."
+    },
+    "prePipelineReleaseHash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "sha256 over the pre-prod release manifest, bound at intake."
+    },
+    "aspectRatio": {
+      "enum": ["16:9", "9:16", "1:1", "4:5", "2.39:1"]
+    },
+    "deliverableDurationSec": {
+      "type": "integer",
+      "minimum": 5,
+      "maximum": 900
+    },
+    "audioLed": {
+      "type": "boolean",
+      "description": "true when the cut follows the VO track (interview, doc); false when picture leads."
+    },
+    "referenceCutPath": {
+      "type": ["string", "null"],
+      "description": "Optional: path to a reference edit the sequencer should study for pacing."
+    },
+    "colourDirection": {
+      "type": ["string", "null"],
+      "description": "LUT name, grade brief or 'client will grade' — human-declared at intake."
+    },
+    "approvers": {
+      "type": "object",
+      "required": ["cut", "delivery"],
+      "properties": {
+        "cut": { "type": "string", "minLength": 1 },
+        "delivery": { "type": "string", "minLength": 1 }
+      }
+    },
+    "requestedAt": {
+      "type": "string",
+      "minLength": 1
+    },
+    "notes": {
+      "type": "string"
+    }
+  }
+}

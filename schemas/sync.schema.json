@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SyncedTrack v1 (creative-studio-post)",
+  "type": "object",
+  "required": ["schemaVersion", "jobId", "version", "picture", "vo", "bgm", "sfx", "output"],
+  "properties": {
+    "schemaVersion": { "const": "1.0" },
+    "jobId": { "type": "string" },
+    "version": { "type": "integer", "minimum": 1 },
+    "picture": {
+      "type": "object",
+      "required": ["edlPath", "edlSha256", "totalDurationSec"],
+      "properties": {
+        "edlPath": { "type": "string" },
+        "edlSha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "totalDurationSec": { "type": "number", "minimum": 0 }
+      }
+    },
+    "vo": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["clipSha256", "startSec", "endSec"],
+        "properties": {
+          "clipSha256": { "type": "string" },
+          "startSec": { "type": "number", "minimum": 0 },
+          "endSec": { "type": "number", "minimum": 0 },
+          "scriptMarker": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "bgm": {
+      "type": "object",
+      "required": ["choiceId", "choicePath", "duckDb"],
+      "properties": {
+        "choiceId": { "type": "string" },
+        "choicePath": { "type": "string" },
+        "startSec": { "type": "number", "minimum": 0 },
+        "duckDb": { "type": "number", "description": "Ducking amount under VO in dB." }
+      }
+    },
+    "sfx": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["clipSha256", "startSec"],
+        "properties": {
+          "clipSha256": { "type": "string" },
+          "startSec": { "type": "number", "minimum": 0 },
+          "levelDb": { "type": "number" }
+        }
+      }
+    },
+    "output": {
+      "type": "object",
+      "required": ["wavPath", "wavSha256", "waveformPngPath"],
+      "properties": {
+        "wavPath": { "type": "string" },
+        "wavSha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "waveformPngPath": { "type": "string" }
+      }
+    }
+  }
+}
