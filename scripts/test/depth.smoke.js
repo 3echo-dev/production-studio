@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Every director names a playbook that exists, and every playbook ends with a checklist.
-// The review rubric covers Gate A. (Gate B has no rubric — it's a delivery_promise check.)
+// The review rubric covers Gate A. (Gate B has no rubric — it's a build-bundle.js check.)
 const assert = require('assert');
 const fs = require('fs');
 const path = require('path');

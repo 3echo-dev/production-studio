@@ -24,7 +24,7 @@ Read left to right. `State after` is the next state on a clean pass. `Rollback t
 - Every `State after` and `Rollback to` value points at a real state in this table.
 - Every gate (`GATE A`, `GATE B`) is a state on its own row.
 - Gate A is preceded by the combined cut+audio review row.
-- Gate B has no review row — delivery is a mechanical `delivery_promise.validate('bundle')` check plus the human's release call.
+- Gate B has no review row — delivery is a mechanical `build-bundle.js` check plus the human's release call.
 - No stage runs without the prior stage's output artefact on disk. The orchestrator reads the artefact set to decide the next state.
 - Human holds (`XX`) block the orchestrator until the item lands on the Post Control board.
 
@@ -55,4 +55,4 @@ Gate B release payload:
 ## Notes for the review pass
 
 - Cut+audio review (state 7) checks: shot order matches storyboard, best takes selected, no orphan clips, VO in sync with picture, BGM level ducked under VO, EDL sha256 bound to synced track.
-- Gate B has no review — `delivery_promise.validate('bundle')` is the mechanical check, and the human's editor-handoff acknowledgement is the sign-off.
+- Gate B has no review — `build-bundle.js` is the mechanical check, and the human's editor-handoff acknowledgement is the sign-off.

@@ -13,7 +13,7 @@ For the package stage. Owned by `premiere-packager`. FCPXML + bundle folder tree
 7. **V2: mograph parked at time** if `mograph-requests/{n}.json` specifies; otherwise floating in a bin.
 8. **B-roll in a bin, not on V1.** The editor drags B-roll onto the timeline as needed.
 9. **Colour direction is a note, not a LUT applied.** Editor's colour session is a separate pass.
-10. **`delivery_promise.validate('bundle')` must exit 0** before Gate B is asked. Any failure is a hard stop with the reason printed.
+10. **`build-bundle.js` must exit 0** before Gate B is asked. Any failure is a hard stop with the reason printed.
 11. **`bundle/README.md` names what the editor picks up:** timeline structure, unmatched panels, mograph placement notes, colour direction, any known gaps.
 12. **`bundle/.pipeline/manifest.json`** carries the full sha256 index for the Gate B hash-binding.
 13. **Nothing outside `bundle/`.** A relative path escape (`../`) is a hard stop.
@@ -28,4 +28,4 @@ For the package stage. Owned by `premiere-packager`. FCPXML + bundle folder tree
 - [ ] B-roll in bin, not on V1
 - [ ] `bundle/README.md` written with all four required sections
 - [ ] `bundle/.pipeline/manifest.json` has sha256 for every file in bundle
-- [ ] `delivery_promise.validate('bundle')` exit 0
+- [ ] `build-bundle.js` exit 0

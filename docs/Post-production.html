@@ -387,12 +387,14 @@ table.workflow tr:last-child td{border-bottom:0}
   </div>
   <dl class="slate-plate" aria-label="Plugin metadata">
     <dt>Plugin</dt><dd>creative-studio-post</dd>
-    <dt>Version</dt><dd>0.1.0 · draft</dd>
+    <dt>Version</dt><dd>0.1.0 · built, unproven on real footage</dd>
     <dt>Repo</dt><dd>3echo-dev/creative-studio-post</dd>
     <dt>MCP</dt><dd>agentc (extended, not forked)</dd>
     <dt>Editor target</dt><dd>Adobe Premiere Pro</dd>
     <dt>Handoff format</dt><dd>FCPXML + asset bundle</dd>
     <dt>Gates</dt><dd>2 · picture+audio, delivery</dd>
+    <dt>Board</dt><dd><a href="https://claude.ai/artifact/5q9DJ3KAjiZ6KQqapY5gzG">Post Control</a> · published, private</dd>
+    <dt>Tests</dt><dd>15 files · all green · 21 Sep 2026</dd>
     <dt>Engine</dt><dd>OpenMontage lib</dd>
     <dt>Frame</dt><dd>our directors + gates</dd>
     <dt>Video engine</dt><dd>SeeDance (via AgentC)</dd>
@@ -468,7 +470,7 @@ table.workflow tr:last-child td{border-bottom:0}
         <tr><td class="n">04</td><td class="state">BGM</td><td class="dir">bgm-supervisor</td><td class="produces">3 candidate tracks with tempo, mood, licensing metadata</td><td class="hu">XX</td></tr>
         <tr><td class="n">05</td><td class="state">VO drop</td><td class="dir">audio-engineer</td><td class="produces">vo-track.json placed against script markers</td><td class="hu">XX</td></tr>
         <tr><td class="n">06</td><td class="state">Sync</td><td class="dir">audio-engineer</td><td class="produces">synced-track.wav + waveform.png — VO, BGM, SFX aligned to picture</td><td class="hu"></td></tr>
-        <tr class="review"><td class="n">07</td><td class="state">Cut + audio review</td><td class="dir">review-director</td><td class="produces">review.md against combined picture+audio rubric</td><td class="hu">XX</td></tr>
+        <tr class="review"><td class="n">07</td><td class="state">Cut + audio review</td><td class="dir">review-director</td><td class="produces">validation/review-a-{n}.md against the combined picture+audio rubric</td><td class="hu"></td></tr>
         <tr class="gate"><td class="n">08</td><td class="state">Gate A · Picture + audio lock</td><td class="dir">orchestrator</td><td class="produces">approval.json — hash-bound to rough-edl + synced-track</td><td class="hu">XX</td></tr>
         <tr><td class="n">09</td><td class="state">B-roll</td><td class="dir">broll-director</td><td class="produces">bundle/broll/*.mp4 — on-demand shot requests</td><td class="hu">XX</td></tr>
         <tr><td class="n">10</td><td class="state">Mograph</td><td class="dir">mograph-director</td><td class="produces">bundle/mograph/*.mov — alpha-channel lower thirds and reveals</td><td class="hu">XX</td></tr>
@@ -502,7 +504,7 @@ table.workflow tr:last-child td{border-bottom:0}
 <section>
   <div class="sec-h">
     <span class="n">04</span>
-    <h2>Skills · Thirteen</h2>
+    <h2>Skills · Fourteen</h2>
     <p class="lede">Skills are the leaf-level playbooks each director invokes. Grouped by workflow stage.</p>
   </div>
   <div class="roster">
@@ -511,13 +513,14 @@ table.workflow tr:last-child td{border-bottom:0}
     <div class="seat"><span class="num">S3</span><div><h4>resume-post-project</h4><p>Reads state and artefacts on disk to resume a stalled job.</p></div></div>
     <div class="seat"><span class="num">S4</span><div><h4>ingest-footage</h4><p>ffprobe over every clip + audio file. Writes manifest with checksums.</p></div></div>
     <div class="seat"><span class="num">S5</span><div><h4>sequence-first-cut</h4><p>Storyboard-to-footage frame match. Emits rough EDL.</p></div></div>
-    <div class="seat"><span class="num">S6</span><div><h4>bgm-options</h4><p>Calls suggest_bgm_options MCP tool. Returns 3 candidates.</p></div></div>
+    <div class="seat"><span class="num">S6</span><div><h4>bgm-options</h4><p>Shortlists 3 candidates locally from the supplied tracks; the person picks one on the board. No MCP tool.</p></div></div>
     <div class="seat"><span class="num">S7</span><div><h4>vo-drop-in</h4><p>Places VO tracks against script markers on the timeline.</p></div></div>
-    <div class="seat"><span class="num">S8</span><div><h4>audio-sync</h4><p>Runs sync_audio_track MCP tool. Emits synced WAV + waveform PNG.</p></div></div>
-    <div class="seat"><span class="num">S9</span><div><h4>broll-generate</h4><p>One B-roll request via render_broll_variant. Saves to bundle.</p></div></div>
+    <div class="seat"><span class="num">S8</span><div><h4>audio-sync</h4><p>Local ffmpeg sync. Emits synced WAV + waveform PNG. No MCP tool.</p></div></div>
+    <div class="seat"><span class="num">S9</span><div><h4>broll-generate</h4><p>One B-roll request, quoted on the board, then create_video_job on AgentC. Saves to bundle.</p></div></div>
     <div class="seat"><span class="num">S10</span><div><h4>mograph-generate</h4><p>Remotion render for infographic or motion-graphic alpha.</p></div></div>
-    <div class="seat"><span class="num">S11</span><div><h4>export-premiere-bundle</h4><p>FCPXML build + folder tree assembly for Premiere import.</p></div></div>
-    <div class="seat"><span class="num">S12</span><div><h4>board-sync</h4><p>Syncs project state to the Post Control artifact board.</p></div></div>
+    <div class="seat"><span class="num">S11</span><div><h4>export-premiere-bundle</h4><p>build-bundle.js: Gate A lock check, FCPXML 1.10, README, hash manifest.</p></div></div>
+    <div class="seat"><span class="num">S12</span><div><h4>board-sync</h4><p>Push batches to the Post Control board, land decisions, hash-bound gate pull.</p></div></div>
+    <div class="seat"><span class="num">S14</span><div><h4>board-setup</h4><p>Publishes this account's own Post Control board and records its address.</p></div></div>
     <div class="seat"><span class="num">S13</span><div><h4>review-pass</h4><p>Runs the rubric against a gate. Emits review verdict.</p></div></div>
   </div>
 </section>
@@ -536,7 +539,7 @@ table.workflow tr:last-child td{border-bottom:0}
         <li>9 image refs / job <span class="role">continuity</span></li>
         <li>3 video refs, 3 audio refs <span class="role">per job</span></li>
       </ul>
-      <p class="note">create_video_job on the same AgentC MCP pre-prod uses. Wrapped by render_broll_variant which tags output as B-roll. Whatever engines AgentC adds later, we inherit for free.</p>
+      <p class="note">create_video_job on the same AgentC MCP pre-prod uses. The B-roll skill tags the output in the manifest; there is no separate server tool. Whatever engines AgentC adds later, we inherit for free.</p>
     </div>
     <div class="rack">
       <div class="head"><h4>Image generation</h4><span class="badge">MCP · 3echo AgentC</span></div>
@@ -551,10 +554,9 @@ table.workflow tr:last-child td{border-bottom:0}
       <div class="head"><h4>Audio generation</h4><span class="badge">MCP · external</span></div>
       <ul>
         <li>ElevenLabs <span class="role">VO · scratch + final</span></li>
-        <li>Suno v4 <span class="role">BGM · original</span></li>
-        <li>Musicbed / Artlist <span class="role">BGM · licensed library</span></li>
+        <li>Suno / Musicbed / Artlist <span class="role">not wired · client supplies BGM</span></li>
       </ul>
-      <p class="note">Scratch VO uses the eleven MCP; final VO uses talent takes from the shoot.</p>
+      <p class="note">ElevenLabs is connected for scratch VO and transcription; final VO uses talent takes from the shoot. No music service is wired: the client supplies the BGM files and the supervisor shortlists three.</p>
     </div>
     <div class="rack">
       <div class="head"><h4>Sequence retrieval</h4><span class="badge">OM · lib/clip_embedder</span></div>
@@ -581,25 +583,25 @@ table.workflow tr:last-child td{border-bottom:0}
         <li>ffmpeg <span class="role">transcode · concat · sync</span></li>
         <li>ffprobe <span class="role">clip metadata · timecode</span></li>
         <li>lib/media_profiles <span class="role">codec presets · OM</span></li>
-        <li>librosa <span class="role">tempo · beat detection</span></li>
+        <li>librosa <span class="role">tempo · planned, not wired</span></li>
       </ul>
       <p class="note">Runs on your machine. No cloud round-trip. The money shot Ken flagged.</p>
     </div>
     <div class="rack">
-      <div class="head"><h4>Checkpoint + review</h4><span class="badge">OM · lib/checkpoint</span></div>
+      <div class="head"><h4>Gate records</h4><span class="badge">LOCAL · ours</span></div>
       <ul>
-        <li>checkpoint writer <span class="role">per stage</span></li>
-        <li>artifact validation <span class="role">schemas/artifacts</span></li>
-        <li>delivery_promise <span class="role">bundle contract</span></li>
+        <li>record-approval.js <span class="role">verdict → approvals/*.json</span></li>
+        <li>board-sync.js pull <span class="role">board lock → hash-bound record</span></li>
+        <li>check-approval.js <span class="role">refuses a changed file</span></li>
       </ul>
-      <p class="note">OpenMontage's checkpoint lib powers Gate A and Gate B. Hash-bound records survive a resume.</p>
+      <p class="note">Hash-bound records survive a resume. OpenMontage's lib/checkpoint and delivery_promise are checked present but not called.</p>
     </div>
     <div class="rack">
       <div class="head"><h4>Delivery format</h4><span class="badge">LOCAL · python (ours)</span></div>
       <ul>
         <li>FCPXML 1.10 <span class="role">Premiere-importable</span></li>
-        <li>opentimelineio <span class="role">EDL / AAF fallback</span></li>
-        <li>rsync / rclone <span class="role">bundle push to Drive</span></li>
+        <li>build-fcpxml.py <span class="role">EDL + synced track → timeline</span></li>
+        <li>opentimelineio, rsync <span class="role">planned, not built</span></li>
       </ul>
       <p class="note">Written by us — OpenMontage's delivery outputs a rendered MP4; we need a Premiere project instead.</p>
     </div>
@@ -622,6 +624,7 @@ table.workflow tr:last-child td{border-bottom:0}
         <li>Storyboard-driven sequencing <span class="role">from pre-prod</span></li>
         <li>FCPXML packager <span class="role">editor handoff</span></li>
         <li>Post Control artifact board <span class="role">sibling to the Pre-production board</span></li>
+        <li>Runtime scripts (22) <span class="role">route, plan, state, records, bundle</span></li>
       </ul>
       <p class="note">The shape agency post actually has. Not autonomous — the editor keeps control.</p>
     </div>
@@ -630,10 +633,7 @@ table.workflow tr:last-child td{border-bottom:0}
       <ul>
         <li>lib/clip_embedder <span class="role">semantic retrieval</span></li>
         <li>remotion-composer <span class="role">5 mograph templates</span></li>
-        <li>lib/checkpoint <span class="role">gate persistence</span></li>
         <li>lib/media_profiles <span class="role">codec awareness</span></li>
-        <li>lib/delivery_promise <span class="role">bundle contract</span></li>
-        <li>schemas/artifacts <span class="role">validation harness</span></li>
       </ul>
       <p class="note">Proven, working code. Footage-repurpose plugin already runs on this pattern.</p>
     </div>
@@ -643,7 +643,8 @@ table.workflow tr:last-child td{border-bottom:0}
         <li>executive-producer autonomy <span class="role">too hands-off</span></li>
         <li>documentary-montage pipeline <span class="role">CLIP-thematic, not storyboard</span></li>
         <li>retrieval from Pexels / NASA <span class="role">we shoot our own</span></li>
-        <li>delivery_promise → MP4 render <span class="role">we need FCPXML</span></li>
+        <li>delivery renderer → MP4 <span class="role">we need FCPXML</span></li>
+        <li>lib/checkpoint, delivery_promise <span class="role">present, not called</span></li>
       </ul>
       <p class="note">OpenMontage's opinions fit its use case; they'd fight ours. Take the libs, leave the doctrine.</p>
     </div>
@@ -686,9 +687,8 @@ table.workflow tr:last-child td{border-bottom:0}
 │   │   └── <span class="n">A001_C003_sel.mov</span>
 │   └── <span class="d">day-02/</span>
 ├── <span class="d">audio/</span>
-│   ├── <span class="n">vo-final.wav</span>              <span class="c"># synced against picture</span>
-│   ├── <span class="n">bgm-choice.wav</span>            <span class="c"># the track the human picked at Gate B</span>
-│   └── <span class="n">sfx/</span>
+│   ├── <span class="n">synced-track.wav</span>          <span class="c"># VO, BGM and SFX mixed, music ducked under voice</span>
+│   └── <span class="n">waveform.png</span>
 ├── <span class="d">broll/</span>
 │   ├── <span class="n">shot-01_walking-road_v2.mp4</span> <span class="c"># slate frame embedded</span>
 │   └── <span class="n">shot-02_hands-typing_v1.mp4</span>
@@ -696,13 +696,40 @@ table.workflow tr:last-child td{border-bottom:0}
 │   ├── <span class="n">lower-third-01.mov</span>       <span class="c"># alpha channel — ProRes 4444</span>
 │   └── <span class="n">stat-reveal-2k-to-5k.mov</span>
 └── <span class="d">.pipeline/</span>
-    ├── <span class="n">manifest.json</span>
-    ├── <span class="n">rough-edl.json</span>
-    └── <span class="n">approvals/</span>            <span class="c"># hash-bound gate records A, B</span>
+    ├── <span class="n">manifest.json</span>         <span class="c"># sha256 of every file, the Gate A approval id</span>
+    └── <span class="n">fcpxml.sha256</span>
   </div>
 </section>
 
+<section>
+  <div class="sec-h">
+    <span class="n">07</span>
+    <h2>Audit · Built vs Proven</h2>
+    <p class="lede">What exists in the repo, what a test has proven, and what has never been run for real. "Proven" means a test file in scripts/test passes on a fixture; "live" means it ran against the real service or a real file. Nothing below has run on client footage yet.</p>
+  </div>
+  <div class="wrap-scroll">
+    <table class="workflow">
+      <thead><tr><th>Component</th><th>Built</th><th>Proven</th><th>Not yet</th></tr></thead>
+      <tbody>
+        <tr><td class="state">Post Control board</td><td class="produces">Page, published as a private artifact with database, comments and self-republish; two-mode board-sync</td><td class="produces">Real database writes and read-back (demo project on the slate); landing and hash-bound pull on a fixture</td><td class="hu">The bell (a board decision waking the run) not proven live</td></tr>
+        <tr><td class="state">Runtime scripts</td><td class="produces">root, scaffold, route, plan, state, versions, runs, approvals, collect, check, bundle</td><td class="produces">One end-to-end test drives all of them on a temp root, including a tamper after the lock</td><td class="hu">A live orchestrator walk of a real job</td></tr>
+        <tr><td class="state">Ingest</td><td class="produces">ffprobe manifest with size, hash, probe data</td><td class="produces">Live on three ffmpeg-generated clips (15 Sep); orphan and hash-drift refusals on a fixture</td><td class="hu">Real camera masters, proxies, audio trees</td></tr>
+        <tr><td class="state">Sequence (CLIP)</td><td class="produces">Skill and playbook; open_clip and PyTorch installed 21 Sep</td><td class="produces">Nothing beyond import</td><td class="hu">Storyboard-to-footage matching on real footage; falls back to a human EDL</td></tr>
+        <tr><td class="state">BGM</td><td class="produces">Three-candidate cards and the signed pick on the board; sync guard refuses without it</td><td class="produces">Choice landing and the signed file on a fixture</td><td class="hu">No music service wired; the client supplies the files</td></tr>
+        <tr><td class="state">VO drop + sync</td><td class="produces">Skills, playbook, synced-track contract bound to the EDL hash</td><td class="produces">Contract check (gate-a-check) on a fixture</td><td class="hu">A real VO track through ffmpeg</td></tr>
+        <tr class="review"><td class="state">Review pass</td><td class="produces">Rubric with critical / major / minor scoring</td><td class="produces">Rubric presence and depth</td><td class="hu">A reviewer run on a real cut</td></tr>
+        <tr><td class="state">B-roll (SeeDance)</td><td class="produces">Request → quote → approve on the board; spend guard; create_video_job on AgentC</td><td class="produces">Spend guard refusals on a fixture</td><td class="hu">No video job submitted yet (credits)</td></tr>
+        <tr><td class="state">Motion graphics</td><td class="produces">Sample-then-batch on the board; Remotion dependencies installed 21 Sep</td><td class="produces">One GPT image plate landed live (1 credit, 15 Sep)</td><td class="hu">A Remotion alpha render</td></tr>
+        <tr><td class="state">FCPXML bundle</td><td class="produces">build-fcpxml.py + build-bundle.js: lock check, FCPXML 1.10, README, hash manifest</td><td class="produces">Round-trip and bundle build on a fixture</td><td class="hu">Opened in Premiere Pro by an editor</td></tr>
+        <tr><td class="state">Function hooks</td><td class="produces">Five refusing guards</td><td class="produces">Unit-tested refusals</td><td class="hu">Off unless the folder arms them</td></tr>
+        <tr><td class="state">Source control</td><td class="produces">Local commits, org remote set</td><td class="produces">—</td><td class="hu">The org repo does not exist yet; push pending</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="mono" style="margin-top:12px;font-size:12px">Run the evidence yourself: <span style="color:var(--paper)">node scripts/test/run-all.js</span> in the repo. GATES.md lists each gate with its check command and the date it last passed; docs/AUDIT.md is the reading order.</p>
+</section>
+
 <div class="foot">
-  <span>creative-studio-post · v0.1.0 · blueprint</span>
-  <span>3echo · Sep 2026</span>
+  <span>creative-studio-post · v0.1.0 · blueprint v7 · audit copy</span>
+  <span>3echo · 21 Sep 2026</span>
 </div>

@@ -2,7 +2,7 @@
 
 Owned by `review-director`. One rubric per gate. Findings scored `critical`, `major`, `minor`. Verdict: `CLEAR`, `NEEDS REVISION`, `WARNINGS ONLY`.
 
-Gate B has no rubric — delivery is a mechanical check (`delivery_promise`) and the human approver's release call.
+Gate B has no rubric — delivery is a mechanical check (`build-bundle.js`) and the human approver's release call.
 
 ## Gate A: picture + audio lock
 

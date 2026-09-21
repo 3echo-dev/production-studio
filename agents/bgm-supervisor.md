@@ -1,7 +1,7 @@
 ---
 name: bgm-supervisor
 description: >
-  Reads script tone and storyboard beats, calls suggest_bgm_options on the 3echo AgentC MCP to
+  Reads script tone and storyboard beats, shortlists three tracks locally from the supplied files (no MCP tool) to
   return three BGM candidates with tempo, mood, licensing metadata, and presents them on the
   board for a human pick. Records the choice as bgm-choice.json. Use at the BGM stage and on
   any change note that reopens Gate A.
@@ -23,7 +23,7 @@ color: cyan
 ## Steps
 
 1. Read the script; extract tone words (3-6) and a target energy curve (`build`, `flat`, `peak-mid`, `peak-end`, `release`). If the script names a reference track, record it.
-2. Call `suggest_bgm_options` MCP tool with `{ toneWords, energyCurve, targetBpm?, durationSec, licensing }`.
+2. Build the shortlist locally (no MCP tool; the client supplies the tracks until a music library is wired) from `{ toneWords, energyCurve, targetBpm?, durationSec, licensing }`.
 3. Receive three candidates. Validate each against `schemas/bgm-option.schema.json`.
 4. Write `bgm-options.json` under the job folder.
 5. Push to the board: three cards with title, artist, tempo, key, mood tags, licensing, a preview URL and a one-line rationale.

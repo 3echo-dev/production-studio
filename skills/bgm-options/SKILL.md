@@ -1,7 +1,7 @@
 ---
 name: bgm-options
 description: >-
-  Reads script tone and storyboard beats, calls suggest_bgm_options on the 3echo AgentC MCP to return three BGM candidates with tempo, mood and licensing metadata, writes bgm-options.json, presents on the board for a human pick. Use at the BGM stage.
+  Reads script tone and storyboard beats, shortlists three BGM candidates locally from the supplied tracks (no MCP tool) with tempo, mood and licensing metadata, writes bgm-options.json, presents on the board for a human pick. Use at the BGM stage.
 metadata:
   version: 0.1.0
 user-invocable: false
@@ -19,7 +19,7 @@ user-invocable: false
 ## Steps
 
 1. Read the script; extract 3-6 tone words and an energy curve (`build`, `flat`, `peak-mid`, `peak-end`, `release`). Note any reference track the script names.
-2. Call `suggest_bgm_options` MCP with `{ toneWords, energyCurve, targetBpm?, durationSec, licensing: 'royalty-free' }` by default.
+2. Build the shortlist locally (no MCP tool) from `{ toneWords, energyCurve, targetBpm?, durationSec, licensing: 'royalty-free' }` by default.
 3. Receive three candidates. Validate against `schemas/bgm-option.schema.json`.
 4. Write `bgm-options.json`.
 5. Push to board: three cards (title, artist, tempo, key, mood tags, licensing, preview URL, one-line rationale).

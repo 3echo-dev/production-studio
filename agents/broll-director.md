@@ -2,7 +2,7 @@
 name: broll-director
 description: >
   Handles a single on-demand B-roll request from the human: shot description, duration, aspect,
-  reference asset ids. Calls render_broll_variant on the 3echo AgentC MCP (SeeDance backend),
+  reference asset ids. Calls create_video_job on the 3echo AgentC MCP (SeeDance backend),
   lands the video, embeds a slate frame, saves under bundle/broll/. Does not auto-splice into
   the cut; the editor picks up B-roll in Premiere. Use at the B-roll stage, once per request.
 model: sonnet
@@ -24,7 +24,7 @@ color: cyan
 1. Quote the spend: 1 SeeDance video job at the requested duration. Present the quote on the board and in chat; wait for an explicit yes. The spend guard refuses without it.
 2. `list_workspaces` for the workspace id and credit balance, then `check-3echo.js` with the balance.
 3. If the request names reference assets, `upload_asset` for any not already in the workspace; record ids.
-4. `create_video_job` via `render_broll_variant` with `{ prompt, aspectRatio, durationSec, imageRefs (up to 9), videoRefs (up to 3), audioRefs (up to 3), idempotencyKey: "{jobId}/broll/{n}" }`.
+4. `create_video_job` (tagged as B-roll in the manifest; there is no separate server tool) with `{ prompt, aspectRatio, durationSec, imageRefs (up to 9), videoRefs (up to 3), audioRefs (up to 3), idempotencyKey: "{jobId}/broll/{n}" }`.
 5. `wait_for_job`, `get_job_result`. Fetch bytes via `fetch_asset_bytes` `variant: "hd"` piped to `save-asset-bytes.py`.
 6. Land as `bundle/broll/shot-{nn}_{slug}_v{k}.mp4` where nn is the request number and slug is a 3-word summary.
 7. Extract the first frame as a slate PNG under `bundle/broll/slates/shot-{nn}_v{k}.png` for the editor's browsing.
