@@ -13,7 +13,7 @@ user-invocable: false
 
 - `--client {slug}`, `--title "..."`.
 - `--drive-folder {path}` — shoot output with `footage/` and optional `audio/` subtrees.
-- `--pre-release {path}` — pre-prod release package (script.md, storyboard.json, concept-breakdown.xlsx, call-sheet-day-*.pdf, storyboard/v{n}/P*.png).
+- `--pre-release {path}` — pre-prod release package (script.md, storyboard.json, concept-breakdown.xlsx, call-sheet-day-*.pdf or .xlsx, storyboard/v{n}/P*.png).
 - Human XX: `--aspect-ratio`, `--deliverable-duration-sec`, `--audio-led`, optional `--reference-cut-path`, optional `--colour-direction`.
 
 ## Steps

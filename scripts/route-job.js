@@ -105,7 +105,7 @@ if (rel) {
   else {
     const absent = REQUIRED_RELEASE.filter(f => !fs.existsSync(path.join(rel, f)));
     let names = []; try { names = fs.readdirSync(rel); } catch { names = []; }
-    if (!names.some(n => /^call-sheet-day-.*\.pdf$/i.test(n))) absent.push('call-sheet-day-*.pdf');
+    if (!names.some(n => /^call-sheet-day-.*\.(pdf|xlsx)$/i.test(n))) absent.push('call-sheet-day-*.pdf or .xlsx');
     let panels = 0;
     try { for (const v of fs.readdirSync(path.join(rel, 'storyboard')).filter(n => /^v\d+$/.test(n))) panels += fs.readdirSync(path.join(rel, 'storyboard', v)).filter(n => /^P\d+.*\.(png|jpe?g|webp)$/i.test(n)).length; } catch { panels = 0; }
     if (!panels) absent.push('storyboard/v{n}/P*.png');
@@ -116,7 +116,7 @@ if (rel) {
       const crypto = require('crypto');
       const lines = [];
       const walkPanels = d => { try { for (const e of fs.readdirSync(d, { withFileTypes: true })) { const f = path.join(d, e.name); if (e.isDirectory()) walkPanels(f); else if (/^P\d+.*\.(png|jpe?g|webp)$/i.test(e.name)) lines.push(path.relative(rel, f).split(path.sep).join('/') + ':' + crypto.createHash('sha256').update(fs.readFileSync(f)).digest('hex')); } } catch { /* none */ } };
-      for (const f of REQUIRED_RELEASE.concat(names.filter(n => /^call-sheet-day-.*\.pdf$/i.test(n)))) lines.push(f + ':' + crypto.createHash('sha256').update(fs.readFileSync(path.join(rel, f))).digest('hex'));
+      for (const f of REQUIRED_RELEASE.concat(names.filter(n => /^call-sheet-day-.*\.(pdf|xlsx)$/i.test(n)))) lines.push(f + ':' + crypto.createHash('sha256').update(fs.readFileSync(path.join(rel, f))).digest('hex'));
       walkPanels(path.join(rel, 'storyboard'));
       const releaseHash = crypto.createHash('sha256').update(lines.sort().join('\n')).digest('hex');
       if (job.prePipelineReleaseHash !== releaseHash) {

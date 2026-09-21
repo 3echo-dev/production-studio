@@ -11,7 +11,7 @@ The smallest useful real run of the post-production pipeline needs the three "Re
   - `script.md` — final approved script
   - `storyboard.json` — the panel table with frame references
   - `concept-breakdown.xlsx` — the line items (talent / prop / location)
-  - at least one `call-sheet-day-*.pdf` — one per shoot day
+  - at least one `call-sheet-day-*.pdf or .xlsx` — one per shoot day
   - `storyboard/v{n}/P*.png` — the visual panel images
 
 ### 2. Shot footage
