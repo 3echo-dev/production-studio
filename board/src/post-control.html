@@ -461,10 +461,13 @@ async function createProject(form){
   const title=form.querySelector('[name=title]').value.trim(); if(!title){ toast('Give the project a title'); form.querySelector('[name=title]').focus(); return; }
   const id=slug(title)+'-'+Date.now().toString(36).slice(-4); const base='projects/'+id;
   const doc={title, client:form.querySelector('[name=client]').value.trim(), driveFolder:form.querySelector('[name=drive]').value.trim(), preRelease:form.querySelector('[name=pre]').value.trim(), aspectRatio:form.querySelector('[name=aspect]').value, deliverableDurationSec:Number(form.querySelector('[name=duration]').value)||null, audioLed:form.querySelector('[name=led]').value==='audio', status:'intake', createdAt:now(), createdBy:me};
+  // The bell rings first, on the press itself: a send to Claude is allowed only from a recent
+  // viewer gesture, and the writes below take seconds. The order carries the seven answers, so
+  // the woken turn starts the job without asking them again; the card lands a moment later.
+  await signalPipeline('New post project opened: '+title+(doc.client?' for '+doc.client:'')+' ('+id+')', slateOrderFor(doc, id));
   if(!await write(base, doc)) return;
   for(const it of ITEMS) await write(base+'/items/'+it.id, {status:'pending', version:0, summary:'', updatedAt:now(), updatedBy:me});
-  await write(base+'/messages/'+Date.now().toString(36), {by:me, text:'Project opened. Waiting for the shoot folder and the pre-prod release to be read.', at:now()});
-  await signalPipeline('New post project opened: '+title+(doc.client?' for '+doc.client:'')+(doc.driveFolder?', footage '+doc.driveFolder:'')+(doc.preRelease?', release '+doc.preRelease:'')+', '+doc.aspectRatio+(doc.deliverableDurationSec?', '+doc.deliverableDurationSec+'s':'')+(doc.audioLed?', audio-led':', picture-led'));
+  await write(base+'/messages/'+Date.now().toString(36), {by:me, text:'Project opened from the slate. The run scaffolds the job from these answers and adopts this card.', at:now()});
   location.hash='#/p/'+encodeURIComponent(id);
 }
 
@@ -475,26 +478,37 @@ async function createProject(form){
 function pristineSource(){ const el=document.getElementById('__src'); if(!el) return null; try{ const bin=atob(el.textContent.trim()); const bytes=new Uint8Array(bin.length); for(let i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i); return new TextDecoder().decode(bytes); }catch(e){ return null; } }
 function embedSource(src){ const bytes=new TextEncoder().encode(src); let bin=''; for(let i=0;i<bytes.length;i++) bin+=String.fromCharCode(bytes[i]); return '<script type="text/plain" id="__src">'+btoa(bin)+'</scr'+'ipt>'; }
 function buildDocument(src){ const cut=src.indexOf('<svg width="0"'); const head=cut>0?src.slice(0,cut):''; const body=cut>0?src.slice(cut):src; return '<!doctype html>'+String.fromCharCode(10)+'<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">'+head+'</head><body>'+body+String.fromCharCode(10)+embedSource(src)+String.fromCharCode(10)+'</body></html>'; }
-async function signalPipeline(why){
+// Every bell outcome is written to the board database (bells/*, meta/bell), so a press that
+// seemed to do nothing can be read back with ArtifactData.
+async function bellLog(why, outcome, detail){ if(!db) return; const rec={at:now(), why, outcome, detail:detail==null?null:String(detail).slice(0,600), by:me, project:project&&project.id||null}; try{ await db.doc('bells/'+Date.now().toString(36)+Math.random().toString(36).slice(2,5)).set(rec); }catch(e){} try{ await db.doc('meta/bell').set(rec); }catch(e){} }
+// The slate form's project has a board id and no folder: the bell carries the order to start it,
+// so the woken turn runs new-post-project with the seven answers instead of asking them again.
+function slateOrderFor(d, id){ return 'This is a slate project with no job folder yet'+(id?', slate id '+id:'')+'. Run the new-post-project skill for it now, in this turn, with these answers already given: client '+(d.client||'not given, ask for it')+', title '+(d.title||'')+', footage folder '+(d.driveFolder||'not given, ask for it')+', pre-prod release folder '+(d.preRelease||'not given, ask for it')+', aspect ratio '+(d.aspectRatio||'not given')+', duration '+(d.deliverableDurationSec?d.deliverableDurationSec+' s':'not given, ask for it')+', '+(d.audioLed?'voice-over leads the cut (audioLed true)':'picture leads the cut (audioLed false)')+'. Ask nothing these answer. Scaffold the client if it does not exist, scaffold the job, write these into job.json, route, plan, board-sync.js open and push; when the job id exists run board-sync.js adopt with --from the slate id, push, and carry on to Gate A. Do not reply asking whether to start.'; }
+function slateOrder(){ return project&&project.createdBy&&project.createdBy!=='pipeline'&&project.status!=='moved'&&project.driveFolder!=null ? slateOrderFor(project, project.id) : null; }
+// Consent is per board and per viewer; asking for it here, on the person's own press, holds the
+// dialog open instead of letting the first send fail with consent_required and fall back.
+async function consentForComments(why){ let pm=null; try{ pm=await claude.use('permissions'); }catch(e){ pm=null; } if(!pm){ await bellLog(why,'permissions','no permissions capability'); return true; } let before='?'; try{ before=JSON.stringify(await pm.state()); }catch(e){ before='state failed: '+(e&&e.message||e); } let res=null, st='granted'; try{ res=await pm.request(['comments']); st=(res&&res.comments)||'granted'; }catch(e){ st='granted'; res='request failed: '+(e&&e.message||e); } await bellLog(why,'permissions', before+' -> '+(typeof res==='string'?res:JSON.stringify(res))); if(st==='denied'){ await bellLog(why,'consent_denied'); toast(why+'. Consent declined; say it in chat.'); return false; } return true; }
+async function signalPipeline(why, order){
   const what=why+(project&&project.title?' on '+project.title:'')+(project&&project.id?' ('+project.id+')':'');
   let cm=null; try{ cm=await claude.use('comments'); }catch(e){ cm=null; }
   if(cm){
     let can='off'; try{ can=await cm.canSendToClaude(); }catch(e){ can='off'; }
-    if(can==='available'){
+    if(can==='available' && await consentForComments(why)){
       try{
         const el=document.querySelector('[data-signal-anchor]')||document.body.firstElementChild||document.body;
         const anchor=await cm.anchorFor(el);
-        await cm.sendToClaude({anchor, text:'Post board: '+what+'. Land the board (board-sync.js land) and carry on; reply here in one line.'});
-        toast(why+'. The run has been told.', 'ok'); return true;
-      }catch(e){ if(e&&e.code==='consent_required') toast(why+'. Allow this page to send comments to Claude, or the run has to be told in chat.'); }
-    } else if(can==='no_session'){ toast(why+'. No run is watching the board right now; say it in chat when one is.'); }
-    else if(can==='writers_only'){ toast(why+'. Only an editor of the board can send it to the run; say it in chat.'); }
-  }
+        await cm.sendToClaude({anchor, text:'Post board: '+what+'. '+(order||slateOrder()||'Land the board (board-sync.js land) and carry on; reply here in one line.')});
+        await bellLog(why,'sent'); toast(why+'. The run has been told.', 'ok'); return true;
+      }catch(e){ await bellLog(why,'send_failed',(e&&(e.code+' '+e.message))||e); if(e&&e.code==='consent_required') toast(why+'. Allow this page to send comments to Claude, or the run has to be told in chat.'); }
+    } else if(can==='no_session'){ await bellLog(why,'no_session'); toast(why+'. No run is watching the board right now; say it in chat when one is.'); }
+    else if(can==='writers_only'){ await bellLog(why,'writers_only'); toast(why+'. Only an editor of the board can send it to the run; say it in chat.'); }
+    else if(can!=='available'){ await bellLog(why,'not_available',can); }
+  } else { await bellLog(why,'no_comments_capability'); }
   let art=null; try{ art=await claude.use('artifact'); }catch(e){ art=null; }
   const src=pristineSource();
   if(!art||!src){ toast(why+'. The pipeline will see it on its next check.'); return false; }
-  try{ await art.publish(buildDocument(src)); toast(why+'. The pipeline has been signalled.', 'ok'); return true; }
-  catch(e){ toast(why+'. Signal not sent ('+((e&&e.code)||'error')+'); the pipeline will see it on its next check.'); return false; }
+  try{ await art.publish(buildDocument(src)); await bellLog(why,'republished'); toast(why+'. The pipeline has been signalled.', 'ok'); return true; }
+  catch(e){ await bellLog(why,'republish_failed',(e&&e.code)||e); toast(why+'. Signal not sent ('+((e&&e.code)||'error')+'); the pipeline will see it on its next check.'); return false; }
 }
 function chatSummary(){
   const open=inbox.filter(r=>['open','waiting','requested','quoted'].includes(r.status));

@@ -12,7 +12,7 @@ user-invocable: true
 ## Steps
 
 1. Read the current workspace. If `workspaces/{client}/jobs/{job-id}/job.json` exists and `plan.md` shows any row not `verified`, route to `resume-post-project`.
-2. Otherwise, route to `new-post-project` and prompt for `--client`, `--title`, `--drive-folder`, `--pre-release`.
+2. Otherwise, route to `new-post-project`. Woken by the board's slate form (the bell names a slate id and the seven answers): pass them straight through and ask nothing they answer (`docs/SHARED-RULES.md`, "A project opened on the slate"). Otherwise ask, once, on the board and in chat, for client, title, footage folder, release folder, aspect ratio, duration and who leads.
 3. Run `check-om.js`. Exit 0 continues; any other exit stops with a plain sentence naming what is missing.
 4. Hand off to the orchestrator to walk the workflow table.
 

@@ -14,6 +14,7 @@ const { spawnSync } = require('child_process');
 
 const PLUGIN = path.resolve(__dirname, '..', '..');
 const S = f => path.join(PLUGIN, 'scripts', f);
+let ok;
 const run = (script, args, opts = {}) => spawnSync(process.execPath, [S(script), ...args], { encoding: 'utf8', ...opts });
 
 // 1. build check
@@ -26,7 +27,8 @@ assert.ok(src.startsWith('<title>Post Control</title>'), 'page title');
 for (const id of ['intake', 'ingest', 'sequence', 'bgm', 'vo_drop', 'sync', 'review', 'broll', 'mograph', 'package']) assert.ok(src.includes(`{id:'${id}'`), 'item ' + id);
 assert.ok(/const GATES = \{\s*A:/.test(src) && src.includes("B:{name:'Delivery released'"), 'two gates A and B');
 assert.ok(!/\n\s+C:\{name:/.test(src), 'no Gate C');
-for (const call of ["claude.use('db')", "claude.use('comments')", "claude.use('artifact')", 'sendToClaude', 'canSendToClaude', "getElementById('__src')"]) assert.ok(src.includes(call), 'runtime call ' + call);
+for (const call of ["claude.use('db')", "claude.use('comments')", "claude.use('artifact')", "claude.use('permissions')", 'sendToClaude', 'canSendToClaude', 'consentForComments', 'slateOrderFor', 'async function bellLog', "getElementById('__src')"]) assert.ok(src.includes(call), 'runtime call ' + call);
+assert.ok(src.indexOf('await signalPipeline(') < src.indexOf("if(!await write(base, doc)) return;"), 'the slate form rings the bell before its writes');
 for (const bad of ['call sheet', 'concept breakdown', 'shot list', 'creative-studio-pipeline']) assert.ok(!src.toLowerCase().includes(bad), 'no pre-prod skin: ' + bad);
 const built = fs.readFileSync(path.join(PLUGIN, 'board', 'post-control.html'), 'utf8');
 assert.ok(built.includes('<script type="text/plain" id="__src">'), 'built page embeds its source');
@@ -70,6 +72,9 @@ assert.strictEqual(seq.op, 'update'); assert.strictEqual(seq.if_version, 2);
 assert.ok(out.batches.flat().some(w => w.collection === 'projects' && w.doc_id === jobId), 'project doc at the root');
 assert.ok(out.pins.some(p => p.doc_id === 'sequence' && !p.mayExist), 'an update is a hard pin');
 assert.ok(fs.readFileSync(path.join(jobDir, '.board', 'outbox.jsonl'), 'utf8').length > 0, 'outbox kept until ack');
+r = run('board-sync.js', ['adopt', client, jobId, '--from', 'night-shift-ab12'], { cwd: tmp, env }); ok = r.status === 0; assert.ok(ok, 'adopt queues:' + r.stderr);
+assert.ok(fs.readFileSync(path.join(jobDir, '.board', 'outbox.jsonl'), 'utf8').includes('"docId":"night-shift-ab12","op":"update","data":{"status":"moved","movedTo":"' + jobId + '"'), 'adopt marks the slate card moved');
+r = run('board-sync.js', ['adopt', client, jobId], { cwd: tmp, env }); assert.strictEqual(r.status, 2, 'adopt needs --from');
 r = run('board-sync.js', ['push', client, jobId, '--ack'], { cwd: tmp, env });
 assert.strictEqual(r.status, 0); assert.strictEqual(fs.readFileSync(path.join(jobDir, '.board', 'outbox.jsonl'), 'utf8'), '', 'ack drains');
 

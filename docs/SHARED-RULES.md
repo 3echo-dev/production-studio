@@ -65,7 +65,19 @@ The bell reaches only a session that watches the board with comment replies arme
 3. If the row is missing or not armed, say so once in plain words: "The board cannot wake this run. Either run board-setup from this session, or paste the board link here and I will watch it." Then carry on; every decision must be said in chat until it is armed. Never claim to be watching unless that listing said so.
 4. When a decision does wake the run, land before acting: `board-sync.js land` first, then read what changed, then continue.
 
+4. The page needs a one-time consent per board and per viewer before it may message a session. The first send shows "Let this artifact send messages to your Claude session?" and, until it is approved, every decision falls back to a republish that starts no turn. The page asks for that consent on the press itself, before the send, and writes every bell outcome to `meta/bell` on the board database: read it with ArtifactData when a press seemed to do nothing. On a new board, a new viewer or a toast that says the run could not be told, ask the person to press **Signal pipeline** and approve. The turn it starts is the proof.
+
 A subagent never holds a watch; the orchestrator does, in the main session, and a director never asks the board for anything itself.
+
+### A project opened on the slate
+
+The slate's form opens a project on the board with the seven answers intake needs: title, client, footage folder, pre-prod release folder, aspect ratio, duration and which of picture or voice-over leads. That project has a board id and no folder. The bell from the form carries the order, the answers and the slate id, and rings before the card is written, so the card may land a few seconds after the turn starts: run from the answers in the bell and adopt the card once it exists. On that turn, or on any resume that finds such a card, run `new-post-project` at once with those answers as given: ask nothing they answer, never reply "say the word" or ask whether to start. Scaffold the client if it does not exist, scaffold the job, write the answers into `job.json`, route, plan, `board-sync.js open` and push, then:
+
+```
+node "${CLAUDE_PLUGIN_ROOT}/scripts/board-sync.js" adopt {client} {job-id} --from {slate id}
+```
+
+Push. The card the person opened points at the job and hides; the job's own page carries on. A folder the form left blank is asked for like any other question, on the board and in chat. Any project id the bell names that has no job folder on disk is a slate project.
 ## Delegation
 
 - `orchestrator` is the only agent that spawns subagents.

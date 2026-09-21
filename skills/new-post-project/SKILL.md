@@ -18,14 +18,16 @@ user-invocable: false
 
 ## Steps
 
-1. `job-id` = `job-{YYYYMMDD}-{slug of title}`.
+0. Opened on the slate: the bell carries client, title, footage folder, release folder, aspect ratio, duration and who leads. Take them as answers already given. Scaffold the client with `scaffold-client.js` if `workspaces/{client}/workspace.json` is missing.
+1. `scaffold-job.js {client} {slug} "{title}"` writes the folder, `status.md` and a `job.json` whose declarations are null; the id is `job-{YYYYMMDD}-{HHMM}-{slug}`.
 2. Validate `--pre-release` contains every required file. Missing = hard stop.
-3. Compute `prePipelineReleaseHash` = sha256 over sorted list of required file sha256s.
+3. The release hash is the router's: `route-job.js` computes it over the required files and writes it into `job.json`.
 4. Validate `--drive-folder` exists and has at least one clip in `footage/`.
 5. If any XX flag is unset, park at `needs_input` and ask on the board via `board-sync.js ask`.
 6. Fill `templates/job.json` with the values. Validate against `schemas/job.schema.json`.
 7. Write `workspaces/{client}/jobs/{job-id}/job.json`.
-8. Report the path, the release hash, and any open XX. Nothing else.
+8. `route-job.js {job.json}` (exit 3 names what is still missing; it computes and binds `prePipelineReleaseHash`), then `plan-job.js`, `board-sync.js open` and push. Opened on the slate: `board-sync.js adopt {client} {job-id} --from {slate id}`, push.
+9. Report the path, the release hash, and any open XX. Nothing else.
 
 ## Rules
 

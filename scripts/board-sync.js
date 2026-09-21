@@ -7,6 +7,7 @@
 //   ask   {client} {job-id} --item X --text "..." [--options "a|b|c"] [--blocks <request id>]
 //   land  {client} {job-id} [<landed.json>]          what the person decided, back on disk
 //   pull  {client} {job-id} --gate A|B               bind a locked gate to the file hashes
+//   adopt {client} {job-id} --from <slate id>        the card a person opened on the slate now points at this job
 //
 // Two modes, from lib-board.js: with a board address set (CREATIVE_STUDIO_POST_BOARD_URL or
 // .creative-studio-post/config.json) `push` PRINTS write batches for the Artifact tool's
@@ -27,7 +28,7 @@ const BATCH = 50;
 
 function usage(msg) {
   if (msg) console.error(msg);
-  console.error('usage: board-sync.js open|push|ask|land|pull <client> <job-id> [--json] [--ack] [--gate A|B] [--item X --text "..." --options "a|b" --blocks <id>]');
+  console.error('usage: board-sync.js open|push|ask|land|pull|adopt <client> <job-id> [--json] [--ack] [--gate A|B] [--from <slate id>] [--item X --text "..." --options "a|b" --blocks <id>]');
   process.exit(2);
 }
 
@@ -47,7 +48,7 @@ function parseFlags(list) {
 const flags = parseFlags(argv.slice(1));
 const client = flags.client || flags._[0];
 const jobId = flags.job || flags._[1];
-if (!['open', 'push', 'ask', 'land', 'pull'].includes(cmd)) usage('unknown command: ' + cmd);
+if (!['open', 'push', 'ask', 'land', 'pull', 'adopt'].includes(cmd)) usage('unknown command: ' + cmd);
 if (!client || !jobId) usage(cmd + ' needs {client} {job-id}');
 const jobDir = lib.jobRoot(CWD, client, jobId);
 const MODE = lib.mode();
@@ -138,6 +139,16 @@ if (cmd === 'push') {
     for (const w of all) console.log('  ' + w.op + ' ' + w.collection + '/' + w.doc_id);
     console.log('Hand each batch to the ArtifactData tool (action batch, writes) on the board, then run push --ack. Use --json to print them.');
   }
+  process.exit(0);
+}
+
+// The slate form opened a project on the board with a board id and no folder. Once the job
+// exists, its card points at the job and hides; the job's own page carries on.
+if (cmd === 'adopt') {
+  const from = flags.from;
+  if (!from || from === true || String(from) === jobId) usage('adopt needs --from <the slate project id the person opened>');
+  lib.appendOutbox(CWD, client, jobId, { collection: 'projects', docId: String(from), op: 'update', data: { status: 'moved', movedTo: jobId, movedAt: now() } });
+  console.log('Queued: slate project ' + from + ' now points at ' + jobId + '. Push next.');
   process.exit(0);
 }
 
