@@ -51,7 +51,7 @@
           "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
           "bytes": { "type": "integer" },
           "durationSec": { "type": "number", "minimum": 0 },
-          "kind": { "enum": ["lav", "boom", "ambient", "wild", "vo"] },
+          "kind": { "enum": ["lav", "boom", "ambient", "wild", "vo", "bgm", "sfx"] },
           "channels": { "type": "integer" },
           "sampleRateHz": { "type": "integer" },
           "day": { "type": ["integer", "null"] }

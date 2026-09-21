@@ -122,9 +122,13 @@ if (cmd === 'push') {
   for (const r of outbox) {
     const key = fullCollection(r.collection) + '/' + r.docId;
     const prev = byDoc.get(key);
-    const op = r.op || 'set';
-    const data = op === 'update' && prev && prev.op === 'update' ? Object.assign({}, prev.data, r.data) : r.data;
-    byDoc.set(key, { op, collection: fullCollection(r.collection), doc_id: r.docId, data, ...(r.ifVersion !== undefined ? { if_version: r.ifVersion } : {}) });
+    // One document, several records: a set replaces what came before; an update after a set
+    // folds into that set (so a status change queued after `open` does not drop the fields
+    // `open` wrote); an update after an update merges.
+    let op = r.op || 'set', data = r.data;
+    if (prev && op === 'update') { op = prev.op; data = Object.assign({}, prev.data, r.data); }
+    const ifVersion = r.ifVersion !== undefined ? r.ifVersion : (prev && prev.if_version);
+    byDoc.set(key, { op, collection: fullCollection(r.collection), doc_id: r.docId, data, ...(ifVersion !== undefined ? { if_version: ifVersion } : {}) });
   }
   const all = [...byDoc.values()];
   const batches = [];
