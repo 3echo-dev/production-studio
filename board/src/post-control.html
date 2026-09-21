@@ -337,7 +337,8 @@ function bindProject(){
   items={}; gates={}; inbox=[]; messages=[]; versions={}; runs={}; project=null; bgm=[]; mograph=[]; previews={};
   const r=route(); if(r.page!=='project'||!db) return;
   const base='projects/'+r.id;
-  unsubs.push(db.doc(base).onSnapshot(s=>{ project=s.exists?{id:s.id,...s.data()}:{id:r.id,missing:true}; render(); }));
+  // A slate card the run adopted points at the job; carry the person to the job's own page, where the questions are.
+  unsubs.push(db.doc(base).onSnapshot(s=>{ project=s.exists?{id:s.id,...s.data()}:{id:r.id,missing:true}; if(project.status==='moved'&&project.movedTo&&project.movedTo!==r.id){ toast('This card became '+project.movedTo+'; opening it', 'ok'); location.hash='#/p/'+encodeURIComponent(project.movedTo); return; } render(); }));
   unsubs.push(db.collection(base+'/items').onSnapshot(q=>{ items={}; q.docs.forEach(d=>items[d.id]=d.data()); render(); }));
   unsubs.push(db.collection(base+'/gates').onSnapshot(q=>{ gates={}; q.docs.forEach(d=>gates[d.id]=d.data()); render(); }));
   unsubs.push(db.collection(base+'/inbox').orderBy('createdAt','desc').limit(60).onSnapshot(q=>{ inbox=q.docs.map(d=>({id:d.id,...d.data()})); render(); }));
