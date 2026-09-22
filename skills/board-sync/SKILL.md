@@ -15,7 +15,9 @@ user-invocable: false
 
 Its address comes from `lib-board.js` (`CREATIVE_STUDIO_POST_BOARD_URL`, else `.creative-studio-post/config.json`); pass it to the tool as `url`, never print it in chat. With no address set the scripts use the file board at `.board/db/`.
 
-Collections under `projects/{job-id}`: `items`, `versions`, `runs`, `gates`, `inbox`, `messages`, `bgm`, `mograph`, `previews`. An item the pipeline delivers carries `file`, `sha256` and `bytes`; the page copies them into the gate record at lock time, which is what makes the approval hash-bound.
+Collections under `projects/{job-id}`: `items`, `versions`, `runs`, `gates`, `inbox`, `messages`, `bgm`, `mograph`, `previews`. An item the pipeline delivers carries `file`, `sha256` and `bytes`; the page copies them into the gate record at lock time, which is what makes the approval hash-bound. A `previews/{item}` document carries `thumb` (a PNG data URI under 200 KB, from `record-version.js --preview`) and, once `set-preview.js` has run, `video` (an asset url `/_blob/{id}` the card plays) and `assetId`. The MP4 itself goes into the board artifact's asset store with the Artifact tool (`asset: true`, one file per call); the board is published with the `assets` capability for that.
+
+`push --files` is the form to hand a batch to ArtifactData: every document body is written to `.board/push/{n}.json` and each entry names it as `file_path`, so a filmstrip or a run output never has to be retyped into the tool call.
 
 ## Open, once
 

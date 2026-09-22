@@ -29,6 +29,7 @@ user-invocable: false
 4. `ffmpeg -i vo.wav -i bgm.wav -i sfx.wav -filter_complex "sidechaincompress ..." -ac 2 -ar 48000 bundle/audio/synced-track.wav`.
 5. Render waveform: three-lane PNG showing VO, BGM, SFX levels over time (via ffmpeg `showwavespic` per input, composed).
 6. Write `synced-track.json` against `schemas/sync.schema.json` with sha256 of the WAV and of the referenced EDL.
+7. Render the audio preview: `render-preview.js {client} {job-id} --stage sync` muxes the mix onto the same picture as the silent cut preview, `previews/sync-v{n}.mp4` plus a filmstrip. Upload it to the board asset store and attach it with `set-preview.js --item sync`; Gate A is locked against this preview, not the waveform alone.
 
 ## Rules
 
@@ -39,7 +40,7 @@ user-invocable: false
 
 ## Output contract
 
-`bundle/audio/synced-track.wav`, `bundle/audio/waveform.png`, `synced-track.json` (sha256-bound to EDL).
+`bundle/audio/synced-track.wav`, `bundle/audio/waveform.png`, `synced-track.json` (sha256-bound to EDL), `previews/sync-v{n}.mp4` playing on the Audio sync card.
 
 ## Boundary
 

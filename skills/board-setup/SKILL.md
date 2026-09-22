@@ -22,7 +22,7 @@ user-invocable: true
 
    Exit 0 prints the board in use and where the setting came from: say so in one line and stop, unless the user asked for a new one (`--new`). Exit 3: continue.
 
-2. **Publish the page** with the Artifact tool: `file_path` `${CLAUDE_PLUGIN_ROOT}/board/post-control.html`, `title` "Post Control", `icon` "film", `capabilities` `{"db": {}, "artifact": {}, "comments": {}}`, `description` "Post-production board: two gates, BGM choice, B-roll quotes, alphas, inbox". Publish it as it is: never edit the page, never strip the base64 copy at its end, never pass `contract`. The artifact starts private; `comments` keeps it inside the organization. The publish result says whether this session now watches the board: note it for step 5.
+2. **Publish the page** with the Artifact tool: `file_path` `${CLAUDE_PLUGIN_ROOT}/board/post-control.html`, `title` "Post Control", `icon` "film", `capabilities` `{"db": {}, "artifact": {}, "comments": {}, "assets": {}}`, `description` "Post-production board: two gates, BGM choice, B-roll quotes, alphas, inbox". Publish it as it is: never edit the page, never strip the base64 copy at its end, never pass `contract`. The artifact starts private; `comments` keeps it inside the organization. The publish result says whether this session now watches the board: note it for step 5.
 
 3. **Record the address** the publish result returned, from the workspace root (the folder that holds `workspaces/`):
 
@@ -49,7 +49,7 @@ The shared rules in `${CLAUDE_PLUGIN_ROOT}/docs/SHARED-RULES.md` apply.
 
 ## Output contract
 
-A private artifact of the board page with capabilities db, artifact and comments; `boardUrl` and `boardSetAt` in `<root>/.creative-studio-post/config.json`; the `meta/board` document on the artifact's database.
+A private artifact of the board page with capabilities db, artifact, comments and assets; `boardUrl` and `boardSetAt` in `<root>/.creative-studio-post/config.json`; the `meta/board` document on the artifact's database.
 
 ## Boundary
 
@@ -59,7 +59,7 @@ Does not push projects (`board-sync`), share the artifact, or edit the page.
 
 | Failure | Fix |
 |---|---|
-| Publish refused for the capabilities | Say which; the page needs `db`, `artifact` and `comments` |
+| Publish refused for the capabilities | Say which; the page needs `db`, `artifact`, `comments` and `assets` |
 | A decision on the board wakes nobody | The job session is not watching the board: watch it with ArtifactComments, or land by hand |
 | The set-board.js address check fails | Use the artifact link exactly as the publish result printed it |
 | The consent for the first write is declined | Stop; the board stays published but unused until a session with consent writes it |

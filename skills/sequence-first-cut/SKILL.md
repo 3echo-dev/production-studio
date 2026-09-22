@@ -25,6 +25,7 @@ user-invocable: false
 5. Panels with best score below `0.28` → `unmatchedPanels[]`; no cut.
 6. Render `timeline.png`: horizontal strip, first frame of each cut labelled with panel id and score. Short-side ≥ 480px.
 7. Write `rough-edl.json` against `schemas/edl.schema.json`.
+8. Render the silent preview: `render-preview.js {client} {job-id} --stage cut` writes `previews/cut-v{n}.mp4` (the cuts in story order, panel id burned in, no audio: picture is judged before any audio touches it) and a filmstrip PNG under 200 KB. Upload the MP4 to the board artifact's asset store (Artifact tool, `asset: true`, one file per call) and attach it with `set-preview.js {client} {job-id} --item sequence --video-url /_blob/{id} --asset-id {id} --strip previews/cut-v{n}-strip.png`; the card then plays it.
 
 ## Rules
 
@@ -35,7 +36,7 @@ user-invocable: false
 
 ## Output contract
 
-`rough-edl.json` valid against schema. `timeline.png` created.
+`rough-edl.json` valid against schema. `timeline.png` created. `previews/cut-v{n}.mp4` rendered and playing on the First cut card.
 
 ## Boundary
 

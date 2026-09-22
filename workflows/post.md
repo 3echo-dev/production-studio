@@ -8,10 +8,10 @@ Read left to right. `State after` is the next state on a clean pass. `Rollback t
 |---|-------|----------------|---------------|----------|----------------|-----------------|-------------|-------------|
 | 1 | intake | post-intake-director | new-post-project | intake-rules | XX Drive folder, pre-prod release path, aspect ratio, duration, audio-led flag | project.json | 2 | 1 |
 | 2 | ingest | ingest-director | ingest-footage | ingest-rules | XX confirm footage + audio file counts | manifest.json (clips, audio, checksums) | 3 | 2 |
-| 3 | sequence | sequence-director | sequence-first-cut | cut-rules | - | rough-edl.json, timeline.png | 4 | 3 |
+| 3 | sequence | sequence-director | sequence-first-cut | cut-rules | - | rough-edl.json, timeline.png, previews/cut-v{n}.mp4 | 4 | 3 |
 | 4 | bgm | bgm-supervisor | bgm-options | bgm-rules | XX pick 1 of 3 | bgm-choice.json | 5 | 4 |
 | 5 | vo-drop | audio-engineer | vo-drop-in | sync-rules | XX confirm VO takes | vo-track.json | 6 | 5 |
-| 6 | sync | audio-engineer | audio-sync | sync-rules | - | synced-track.wav, synced-track.json, waveform.png | 7 | 6 |
+| 6 | sync | audio-engineer | audio-sync | sync-rules | - | synced-track.wav, synced-track.json, waveform.png, previews/sync-v{n}.mp4 | 7 | 6 |
 | 7 | cut-audio-review | review-director | review-pass | review-rubrics | XX approve/reject combined picture+audio | validation/review-a-{round}.md | 8 | 3 |
 | 8 | GATE A picture+audio lock | orchestrator | board-sync | - | XX board approval | approvals/gate-a.json (hash-bound) | 9 | 7 |
 | 9 | broll | broll-director | broll-generate | broll-rules | XX request shots (on-demand, one per request) | bundle/broll/*.mp4 | 10 | 9 |
