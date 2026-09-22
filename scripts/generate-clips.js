@@ -40,6 +40,10 @@ if (cmd === 'brief') {
   const script = fs.existsSync(path.join(rel, 'script.md')) ? fs.readFileSync(path.join(rel, 'script.md'), 'utf8') : '';
   const sceneLine = scene => { if (scene == null) return null; const re = new RegExp('^\\s*Scene\\s+' + String(scene).replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b[^\\n]*', 'im'); const m = script.match(re); return m ? m[0].trim() : null; };
   const clipSec = Number(gen.clipSec) || 6;
+  // Generate longer, use less: the model is asked for the used length plus headroom (capped at 15 s), and
+  // the cut takes its window from headSec in, so the weak first frames and the drifting tail are never on screen.
+  const headroomSec = gen.headroomSec == null ? 2 : Math.max(0, Number(gen.headroomSec) || 0);
+  const headSec = gen.headSec == null ? 0.5 : Math.max(0, Number(gen.headSec) || 0);
   const prev = fs.existsSync(briefPath) ? JSON.parse(fs.readFileSync(briefPath, 'utf8')) : null;
   const keep = new Map(((prev || {}).panels || []).map(p => [p.id, p]));
   const out = {
@@ -48,16 +52,18 @@ if (cmd === 'brief') {
     approvals: (prev || {}).approvals || {},
     panels: panels.map(p => {
       const old = keep.get(p.id) || {};
-      const durationSec = Math.min(15, Math.max(4, Math.round(Number(p.durationSec) || clipSec)));
+      const useSec = Math.min(15, Math.max(1, Math.round((Number(p.durationSec) || clipSec) * 10) / 10));
+      const durationSec = Math.min(15, Math.max(4, Math.ceil(useSec + headroomSec)));
+      const inSec = Math.max(0, Math.min(headSec, durationSec - useSec));
       const line = sceneLine(p.scene);
       const prompt = [p.caption || p.description || ('Storyboard panel ' + p.id), line ? 'Script: ' + line.replace(/^Scene\s+\S+:?\s*/i, '') : null, 'Match the framing and staging of the reference panel exactly; ' + (job.aspectRatio || '16:9') + ' frame; one continuous shot; no text, no captions, no logos.'].filter(Boolean).join(' ');
-      return { id: p.id, storyOrder: p.storyOrder || null, scene: p.scene == null ? null : String(p.scene), prompt: old.promptOverride || prompt, referencePanel: path.join(rel, p.file || ('storyboard/v1/' + p.id + '.png')).replace(/\\/g, '/'), durationSec, ratio: RATIO[job.aspectRatio] || '16:9', idempotencyKey: jobId + '/generate/' + p.id, status: old.status === 'delivered' ? 'delivered' : 'pending', quotedCredits: old.quotedCredits || null, jobRef: old.jobRef || null, file: old.file || null, sha256: old.sha256 || null, credits: old.credits || null };
+      return { id: p.id, storyOrder: p.storyOrder || null, scene: p.scene == null ? null : String(p.scene), prompt: old.promptOverride || prompt, referencePanel: path.join(rel, p.file || ('storyboard/v1/' + p.id + '.png')).replace(/\\/g, '/'), durationSec, useSec, inSec, ratio: RATIO[job.aspectRatio] || '16:9', idempotencyKey: jobId + '/generate/' + p.id, status: old.status === 'delivered' ? 'delivered' : 'pending', quotedCredits: old.quotedCredits || null, jobRef: old.jobRef || null, file: old.file || null, sha256: old.sha256 || null, credits: old.credits || null };
     }),
   };
   const missingRef = out.panels.filter(p => !fs.existsSync(p.referencePanel)).map(p => p.id);
   if (missingRef.length) { console.error('reference panel image missing for ' + missingRef.join(', ')); process.exit(1); }
   writeBrief(out);
-  console.log('generation-brief.json: ' + out.panels.length + ' panel(s), ' + out.panels.reduce((s, p) => s + p.durationSec, 0) + ' s of clips at ' + out.ratio + ' ' + out.resolution + (out.generateAudio ? ' with model audio' : ', silent') + '. Quote the sample (first panel) with estimate_video_job and ask on the board before anything is spent.');
+  console.log('generation-brief.json: ' + out.panels.length + ' panel(s); the cut uses ' + out.panels.reduce((s, p) => s + p.useSec, 0) + ' s, the model is asked for ' + out.panels.reduce((s, p) => s + p.durationSec, 0) + ' s (' + headroomSec + ' s headroom per clip, window from ' + headSec + ' s in) at ' + out.ratio + ' ' + out.resolution + (out.generateAudio ? ' with model audio' : ', silent') + '. Quote the sample (first panel) with estimate_video_job and ask on the board before anything is spent.');
   process.exit(0);
 }
 if (cmd === 'approve') {

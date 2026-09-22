@@ -11,7 +11,7 @@ user-invocable: false
 
 ## Inputs
 
-- `job.json` with `footageSource: "generated"`, `aspectRatio`, `deliverableDurationSec`, and `generation` (`clipSec`, `resolution`, `generateAudio`, `workspaceId`).
+- `job.json` with `footageSource: "generated"`, `aspectRatio`, `deliverableDurationSec`, and `generation` (`clipSec` used per panel, `headroomSec` asked beyond it (default 2), `headSec` where the window starts (default 0.5), `resolution`, `generateAudio`, `workspaceId`). The model is asked for `useSec + headroomSec` (cap 15 s); the cut uses `useSec` from `inSec`. Quotes are on the asked length.
 - The pre-prod release: `storyboard.json` (panel order, captions, per-panel `durationSec` when given), `storyboard/v{n}/P*.png` (the reference image per panel), `script.md`.
 - `scripts/generate-clips.js`, `scripts/preflight-generation.js --kind generate`.
 - The AgentC MCP tools: `list_workspaces`, `upload_asset`, `estimate_video_job`, `create_video_job`, `wait_for_job`, `get_job_result`.

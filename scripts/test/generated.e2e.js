@@ -55,7 +55,9 @@ r = run('generate-clips.js', ['acme', jobId, 'status']); assert.strictEqual(r.st
 ok(run('generate-clips.js', ['acme', jobId, 'brief']), 'brief');
 const brief = JSON.parse(fs.readFileSync(path.join(jobDir, 'generation-brief.json'), 'utf8'));
 assert.strictEqual(brief.panels.length, 3); assert.strictEqual(brief.ratio, '9:16');
-assert.deepStrictEqual(brief.panels.map(p => p.durationSec), [5, 6, 4], 'panel length, else clipSec');
+assert.deepStrictEqual(brief.panels.map(p => p.useSec), [5, 6, 4], 'used length: the panel length, else clipSec');
+assert.deepStrictEqual(brief.panels.map(p => p.durationSec), [7, 8, 6], 'asked of the model: used length plus 2 s headroom');
+assert.deepStrictEqual(brief.panels.map(p => p.inSec), [0.5, 0.5, 0.5], 'the window starts half a second in');
 assert.ok(/Late again/.test(brief.panels[0].prompt), 'the script line is in the prompt');
 assert.strictEqual(brief.panels[0].idempotencyKey, jobId + '/generate/P01');
 
@@ -84,7 +86,8 @@ assert.strictEqual(man.clips.length, 3);
 r = py('sequence-first-cut.py', ['acme', jobId, '--by-panel']); ok(r, 'sequence by panel');
 const edl = JSON.parse(fs.readFileSync(path.join(jobDir, 'rough-edl.json'), 'utf8'));
 assert.strictEqual(edl.generatedBy, 'panel-id'); assert.deepStrictEqual(edl.cuts.map(c => c.panelId), ['P01', 'P02', 'P03']);
-assert.deepStrictEqual(edl.cuts.map(c => c.outSec), [5, 6, 4], 'a panel length trims the clip; no length keeps it whole');
+assert.deepStrictEqual(edl.cuts.map(c => c.inSec), [0.5, 0, 0.5], 'window from headSec, clamped when the clip is exactly the used length');
+assert.deepStrictEqual(edl.cuts.map(c => c.outSec), [5.5, 6, 4.5], 'the cut uses useSec of each clip');
 ok(run('validate-schema.js', [path.join(PLUGIN, 'schemas', 'edl.schema.json'), path.join(jobDir, 'rough-edl.json')]), 'edl schema');
 assert.ok(fs.existsSync(path.join(jobDir, 'timeline.png')), 'timeline strip');
 ok(run('render-preview.js', ['acme', jobId, '--stage', 'cut', '--height', '360']), 'silent preview');

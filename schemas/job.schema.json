@@ -72,7 +72,9 @@
       "type": "object",
       "description": "Only with footageSource generated: how each panel clip is made.",
       "properties": {
-        "clipSec": { "type": "integer", "minimum": 4, "maximum": 15, "description": "Seconds per generated clip when the panel names no length. Default 6." },
+        "clipSec": { "type": "integer", "minimum": 4, "maximum": 15, "description": "Seconds of each panel USED in the cut when the panel names no length. Default 6." },
+        "headroomSec": { "type": "integer", "minimum": 0, "maximum": 9, "description": "Extra seconds asked of the model beyond what the cut uses, so the weak head and tail are trimmed and a line can breathe. Default 2; the request is capped at 15 s." },
+        "headSec": { "type": "number", "minimum": 0, "maximum": 3, "description": "Where the used window starts inside the generated clip. Default 0.5." },
         "resolution": { "enum": ["480p", "720p", "1080p"] },
         "generateAudio": { "type": "boolean", "description": "Let the model generate ambience with the clip. Default false: the pipeline adds VO and music itself." },
         "workspaceId": { "type": "string", "description": "The 3echo workspace that pays for the clips." }

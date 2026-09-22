@@ -27,6 +27,12 @@ def by_panel(job, job_id, job_dir, manifest, panels, clips):
     except Exception as e:
         die("Pillow is needed for timeline.png: %s" % e)
     by_stem = {Path(c["path"]).stem.upper(): c for c in clips}
+    # The brief says how much of each generated clip the cut uses and from where (generate longer, use less).
+    brief_p = job_dir / "generation-brief.json"
+    windows = {}
+    if brief_p.exists():
+        for bp in json.loads(brief_p.read_text(encoding="utf-8")).get("panels", []):
+            windows[str(bp.get("id")).upper()] = (float(bp.get("inSec") or 0), float(bp.get("useSec") or 0))
     total_budget = float(job.get("deliverableDurationSec") or 0) or None
     fps = float(clips[0].get("fps") or 25)
     cuts, unmatched, tiles = [], [], []
@@ -36,13 +42,15 @@ def by_panel(job, job_id, job_dir, manifest, panels, clips):
         if not clip:
             unmatched.append(p["id"]); continue
         dur = float(clip.get("durationSec") or 0)
-        want = float(p.get("durationSec") or 0) or dur
-        end = round(min(dur, want) if dur else want, 3)
-        cuts.append({"order": len(cuts) + 1, "panelId": p["id"], "clipSha256": clip["sha256"], "inSec": 0.0, "outSec": end,
+        head, use = windows.get(str(p["id"]).upper(), (0.0, 0.0))
+        want = use or float(p.get("durationSec") or 0) or dur
+        start = max(0.0, min(head, dur - want)) if dur else head
+        end = round(min(dur, start + want) if dur else start + want, 3)
+        cuts.append({"order": len(cuts) + 1, "panelId": p["id"], "clipSha256": clip["sha256"], "inSec": round(start, 3), "outSec": end,
                      "matchScore": 1.0, "matchReason": "generated for panel %s (%s)" % (p["id"], Path(clip["path"]).name), "note": None})
         fpath = tmp / ("%s.png" % p["id"])
-        subprocess.run(["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-ss", "%.3f" % (end / 2), "-i", clip["path"], "-frames:v", "1", "-vf", "scale=320:-2", str(fpath)], check=False)
-        tiles.append((p["id"], 1.0, str(fpath), Path(clip["path"]).name, end / 2))
+        subprocess.run(["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-ss", "%.3f" % ((start + end) / 2), "-i", clip["path"], "-frames:v", "1", "-vf", "scale=320:-2", str(fpath)], check=False)
+        tiles.append((p["id"], 1.0, str(fpath), Path(clip["path"]).name, (start + end) / 2))
     if not cuts: die("no panel has a generated clip yet; land them with generate-clips.js first", 3)
     total = sum(c["outSec"] - c["inSec"] for c in cuts)
     note = None
@@ -66,7 +74,7 @@ def by_panel(job, job_id, job_dir, manifest, panels, clips):
     strip.save(job_dir / "timeline.png")
     small = strip.copy(); small.thumbnail((1600, 400)); small.save(job_dir / "timeline-preview.png", optimize=True)
     print("rough-edl.json: %d cut(s) from %d panel(s) by panel id, %d unmatched, %.1fs total%s" % (len(cuts), len(panels), len(unmatched), total, ("; " + note) if note else ""))
-    for c in cuts: print("  %s -> %s 0.0-%.1fs" % (c["panelId"], c["matchReason"], c["outSec"]))
+    for c in cuts: print("  %s -> %s %.1f-%.1fs" % (c["panelId"], c["matchReason"], c["inSec"], c["outSec"]))
     if unmatched: print("  unmatched (no clip yet): " + ", ".join(unmatched))
     return 0
 
