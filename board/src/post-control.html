@@ -4,7 +4,7 @@
 :root{
   --ink:#f3f5f7;--panel:#ffffff;--panel2:#f6f8fa;--panel3:#eceff3;--line:#d9dfe6;--line2:#c3ccd6;
   --paper:#101418;--dim:#4d5966;--faint:#7d8896;
-  --scrub:#0f9c92;--scrub-ink:#ffffff;--go:#1f9e6e;--go-dim:#bfe8d6;--hold:#c8432c;--hold-dim:#f3cfc7;--wait:#2f6fd6;--wait-dim:#cfdcf5;
+  --scrub:#0f9c92;--scrub-ink:#ffffff;--go:#1f9e6e;--go-dim:#bfe8d6;--hold:#c8432c;--hold-dim:#f3cfc7;--wait:#2f6fd6;--wait-dim:#cfdcf5;--gate-a:#0f9c92;--gate-a-dim:#bfe6e2;--gate-b:#c98a1a;--gate-b-dim:#f1dfb5;
   --mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
   --sans:'IBM Plex Sans',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
   --cond:'Barlow Condensed','Arial Narrow',sans-serif;
@@ -18,7 +18,7 @@
   :root:not([data-theme="light"]){
     --ink:#0a0c0f;--panel:#12161b;--panel2:#181d24;--panel3:#1f252d;--line:#262d36;--line2:#333c47;
     --paper:#e4e8ed;--dim:#9da7b4;--faint:#66707d;
-    --scrub:#45d0c4;--scrub-ink:#03201d;--go:#3fd39b;--go-dim:#1f7d5c;--hold:#e4573f;--hold-dim:#7d2d21;--wait:#6aa9ff;--wait-dim:#2b4a75;
+    --scrub:#45d0c4;--scrub-ink:#03201d;--go:#3fd39b;--go-dim:#1f7d5c;--hold:#e4573f;--hold-dim:#7d2d21;--wait:#6aa9ff;--wait-dim:#2b4a75;--gate-a:#45d0c4;--gate-a-dim:#1d5b56;--gate-b:#e6b04a;--gate-b-dim:#6b4f14;
     --shadow:0 12px 32px -8px rgba(0,0,0,.55),0 2px 6px rgba(0,0,0,.35);
     color-scheme:dark;
   }
@@ -26,7 +26,7 @@
 :root[data-theme="dark"]{
   --ink:#0a0c0f;--panel:#12161b;--panel2:#181d24;--panel3:#1f252d;--line:#262d36;--line2:#333c47;
   --paper:#e4e8ed;--dim:#9da7b4;--faint:#66707d;
-  --scrub:#45d0c4;--scrub-ink:#03201d;--go:#3fd39b;--go-dim:#1f7d5c;--hold:#e4573f;--hold-dim:#7d2d21;--wait:#6aa9ff;--wait-dim:#2b4a75;
+  --scrub:#45d0c4;--scrub-ink:#03201d;--go:#3fd39b;--go-dim:#1f7d5c;--hold:#e4573f;--hold-dim:#7d2d21;--wait:#6aa9ff;--wait-dim:#2b4a75;--gate-a:#45d0c4;--gate-a-dim:#1d5b56;--gate-b:#e6b04a;--gate-b-dim:#6b4f14;
   --shadow:0 12px 32px -8px rgba(0,0,0,.55),0 2px 6px rgba(0,0,0,.35);
   color-scheme:dark;
 }
@@ -97,7 +97,8 @@ svg.i{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8;stro
 .gates{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:18px 0 12px}
 .gate{background:var(--panel);border:1px solid var(--line);border-radius:var(--r3);padding:12px 14px;display:grid;grid-template-columns:auto 1fr;gap:4px 14px;align-items:start;position:relative;text-align:left;cursor:pointer;transition:border-color 150ms ease,background-color 150ms ease,transform 160ms var(--ease-out)}
 .gate:hover{border-color:var(--dim)}
-.gate .letter{font-family:var(--cond);font-size:44px;font-weight:700;line-height:.85;grid-row:1/4;color:var(--dim);letter-spacing:-.02em;transition:color 200ms ease}
+.gate .letter{font-family:var(--cond);font-size:44px;font-weight:700;line-height:.85;grid-row:1/6;grid-column:1;color:var(--g);opacity:.45;letter-spacing:-.02em;transition:color 200ms ease,opacity 200ms ease}
+.gate .name,.gate .bar,.gate .live,.gate .cond,.gate .approver{grid-column:2}
 .gate .name{font-family:var(--cond);text-transform:uppercase;letter-spacing:.06em;font-size:15px;font-weight:600;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
 .gate .cond{font-size:12px;color:var(--dim);line-height:1.4}
 .gate .approver{font-size:11px;color:var(--faint);display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap}
@@ -110,6 +111,22 @@ svg.i{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8;stro
 .gate.reopened{border-color:var(--hold-dim)}
 .gate.reopened .letter{color:var(--hold)}
 .gate.sel{background:var(--panel2);border-color:var(--paper)}
+.gate[data-gate=A]{--g:var(--gate-a);--g-dim:var(--gate-a-dim)}
+.gate[data-gate=B]{--g:var(--gate-b);--g-dim:var(--gate-b-dim)}
+.gate{border-left:4px solid var(--g-dim)}
+.gate.ready,.gate.passed,.gate.working{border-left-color:var(--g)}
+.gate.ready .letter,.gate.passed .letter,.gate.working .letter{opacity:1}
+.gate.ready{border-color:var(--g)}
+.gate.passed .letter{color:var(--go)}
+.gate .bar{height:4px;border-radius:2px;background:var(--panel3);overflow:hidden;margin-top:2px}
+.gate .bar i{display:block;height:100%;background:var(--g);transition:width 300ms var(--ease-out)}
+.gate.passed .bar i{background:var(--go)}
+.gate .live{display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--dim)}
+.gate .live i{width:7px;height:7px;border-radius:50%;background:var(--faint);display:inline-block;flex:none}
+.gate.working .live i{background:var(--wait);box-shadow:0 0 0 3px rgba(47,111,214,.18);animation:pulse 1.4s ease-in-out infinite}
+.gate.ready .live i{background:var(--g)}
+.gate.passed .live i{background:var(--go)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
 .gatedetail{background:var(--panel2);border:1px solid var(--paper);border-radius:var(--r3);padding:14px 18px 16px;margin:-4px 0 16px;display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:8px 24px}
 .gatedetail h3{font-size:22px;grid-column:1/-1;display:flex;justify-content:space-between;align-items:baseline;gap:10px}
 .gatedetail h3 span{font-family:var(--sans);text-transform:none;letter-spacing:0;font-weight:400;font-size:12px;color:var(--dim)}
@@ -609,8 +626,7 @@ function projectPage(id){
     <div class="rail">
       <div class="box"><h2>Inbox <span>${openReqs.length} waiting on you</span></h2>
         ${inbox.length?inbox.slice(0,14).map(reqHtml).join(''):'<p class="empty">Questions from the pipeline, quotes and your change notes land here.</p>'}
-      </div>
-      <div class="box"><h2>Tell the council <span>read at every session start</span></h2>
+        <h2 style="margin-top:14px;padding-top:12px;border-top:1px solid var(--line)">Council <span>read at every session start</span></h2>
         <form id="msgf"><textarea name="text" id="msg-text" aria-label="Message to the council" placeholder="A ruling, a note, a heads-up for the next session"></textarea><div style="display:flex;justify-content:space-between;gap:6px;margin-top:6px;flex-wrap:wrap"><button type="button" class="ghost" data-copy title="Copy a plain-text summary of this board to paste into a Claude chat">${ic('copy')} Copy board for chat</button><button type="button" class="ghost" data-signal title="Wake the pipeline now, for example after answering questions">${ic('send')} Signal pipeline</button><button class="primary" type="submit">${ic('send')} Post</button></div></form>
         ${messages.slice(0,15).map(m=>`<div class="msg"><div class="by"><span>${esc(humanName(m.by))}${m.item?` · ${esc(itemOf(m.item).name)}`:''}</span><span>${fmt(m.at)}</span></div>${esc(m.text)}</div>`).join('')}
       </div>
@@ -629,6 +645,11 @@ function projectPage(id){
 function gateCard(g){
   const v=gateView(g); const G=GATES[g];
   const done=G.items.filter(id=>['approved','na'].includes(itemOf(id).status)).length;
+  const working=G.items.map(id=>itemOf(id)).filter(it=>it.status==='running');
+  const waiting=G.items.map(id=>itemOf(id)).filter(it=>['needs_input','needs_review'].includes(shownStatus(it)));
+  const next=G.items.map(id=>itemOf(id)).find(it=>!['approved','na'].includes(it.status));
+  const live = v.st==='passed' ? `Locked ${fmt(v.decidedAt)}` : v.st==='ready' ? 'Every item in; the lock is yours' : v.st==='reopened' ? 'Reopened; items back in review' : working.length ? `Run working on ${esc(working.map(w=>w.name).join(', '))}` : waiting.length ? `Waiting on you: ${esc(waiting.map(w=>w.name).join(', '))}` : next ? `Idle; next up ${esc(next.name)}` : 'Not started';
+  const isWorking = v.st!=='passed' && working.length>0;
   const right = v.st==='passed' ? `<span class="pill approved">Locked · ${esc(humanName(v.decidedBy))}</span>`
               : v.st==='ready' ? `<span class="pill needs_input">Ready to lock</span>`
               : v.st==='reopened' ? `<span class="pill needs_review">Reopened</span>`
@@ -637,7 +658,7 @@ function gateCard(g){
              : v.st==='ready' ? (isArmed('lock'+g) ? `<button class="primary" data-lock="${g}" ${busy.has('lock'+g)?'disabled':''}>${ic('check')} Confirm: lock Gate ${g}</button>` : `<button class="scrub" data-lock="${g}" ${busy.has('lock'+g)?'disabled':''}>${ic('gate')} Lock Gate ${g}</button>`)
              : v.st==='reopened' ? `<span>${esc(v.reason||'')}</span>`
              : `<span>${esc(G.approver)}</span>`;
-  return `<div class="gate ${v.st} ${gateOpen===g?'sel':''}" data-gate="${g}" role="button" tabindex="0" aria-expanded="${gateOpen===g}"><span class="letter">${g}</span><span class="name">${G.name}<span style="display:inline-flex;gap:6px;align-items:center">${right}<span class="chev">${ic('chev')}</span></span></span><span class="cond">${esc(G.cond)}</span><span class="approver">${foot}</span></div>`;
+  return `<div class="gate ${v.st} ${isWorking?'working':''} ${gateOpen===g?'sel':''}" data-gate="${g}" role="button" tabindex="0" aria-expanded="${gateOpen===g}"><span class="letter">${g}</span><span class="name">${G.name}<span style="display:inline-flex;gap:6px;align-items:center">${right}<span class="chev">${ic('chev')}</span></span></span><span class="bar"><i style="width:${Math.round(100*done/G.items.length)}%"></i></span><span class="live"><i></i>${live} · ${done}/${G.items.length} items</span><span class="cond">${esc(G.cond)}</span><span class="approver">${foot}</span></div>`;
 }
 function itemCard(it){
   const st=it.status;
