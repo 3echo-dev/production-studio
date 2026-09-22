@@ -47,7 +47,7 @@ Read the board with `ArtifactData`, every call with the same `out_dir` `.board/l
 2. `action: list`, collection `projects/{job-id}/inbox` (open, quoted, waiting and answered rows together).
 3. `action: list` on `/items`, `/bgm` and, past Gate A, `/mograph`.
 
-Then hand the folder over (a JSON file of `{"collection", "documents": [...]}` groups is accepted too):
+Then hand the folder over:
 
 ```bash
 node "${CLAUDE_PLUGIN_ROOT}/scripts/board-sync.js" land {client} {job-id} ".board/landed/{stamp}"
@@ -71,7 +71,7 @@ A question only a person can answer goes to the board and the chat:
 node "${CLAUDE_PLUGIN_ROOT}/scripts/board-sync.js" ask {client} {job-id} --item vo_drop --text "Which takes are final for scenes 1, 4 and 9?" --options "Take 2 everywhere|Mixed, see notes|Send me the scratch first"
 ```
 
-Say the printed text in chat, push; the answer arrives with the next `land`. `--blocks {request id}` on a question that blocks a B-roll or mograph request marks the request waiting; `land` says when it can proceed.
+Push; the answer arrives with the next `land`. `--blocks {request id}` on a question that blocks a B-roll or mograph request marks the request waiting; `land` says when it can proceed.
 
 ## B-roll quotes
 
@@ -81,8 +81,8 @@ A `generate` record for `broll` arrives `requested`. Quote it (AgentC estimate),
 
 The shared rules in `${CLAUDE_PLUGIN_ROOT}/docs/SHARED-RULES.md` apply.
 
-1. Push before ending any turn; an unpushed version is a person waiting for nothing.
-2. Land before deciding anything on a resume; the decision is usually already there.
+1. Push before ending any turn.
+2. Land before deciding anything on a resume.
 3. Silence is not approval. `pull --gate` waits, it does not assume.
 
 ## Output contract
