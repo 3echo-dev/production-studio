@@ -44,10 +44,11 @@ if (check.status !== 0) {
   for (const cut of stageEdl.cuts || []) {
     const clip = bySha.get(cut.clipSha256);
     if (!clip) { console.error('cut ' + cut.panelId + ' references a clip not in manifest.json (' + String(cut.clipSha256).slice(0, 12) + ').'); process.exit(1); }
-    if (!fs.existsSync(clip.path)) { console.error('take not on disk: ' + clip.path); process.exit(1); }
-    const dest = path.join(footageDir, path.basename(clip.path));
-    if (!fs.existsSync(dest) || fs.statSync(dest).size !== fs.statSync(clip.path).size) fs.copyFileSync(clip.path, dest);
-    staged.add(path.basename(clip.path));
+    const src = path.isAbsolute(clip.path) ? clip.path : path.join(dir, clip.path);
+    if (!fs.existsSync(src)) { console.error('take not on disk: ' + clip.path); process.exit(1); }
+    const dest = path.join(footageDir, path.basename(src));
+    if (path.resolve(src) !== path.resolve(dest) && (!fs.existsSync(dest) || fs.statSync(dest).size !== fs.statSync(src).size)) fs.copyFileSync(src, dest);
+    staged.add(path.basename(src));
   }
   if (staged.size) console.log('Staged ' + staged.size + ' take(s) under bundle/footage/: ' + [...staged].join(', '));
 }

@@ -1,7 +1,7 @@
 ---
 name: board-sync
 description: >-
-  How the orchestrator keeps the Post Control board and the job folder agreeing: push the outbox as write batches after every row, land what the person decided before every gate and on every resume, and bind a locked gate to the file hashes. Use after any row that recorded a version or a run, at every gate, and first thing on every resume. Only the orchestrator invokes.
+  How the orchestrator keeps the Post Control board and the job folder agreeing: push the outbox after every row, land what the person decided at every gate and on every resume, bind a locked gate to the file hashes. Orchestrator only.
 metadata:
   version: 0.2.0
 user-invocable: false
@@ -15,9 +15,7 @@ user-invocable: false
 
 Its address comes from `lib-board.js` (`CREATIVE_STUDIO_POST_BOARD_URL`, else `.creative-studio-post/config.json`); pass it to the tool as `url`, never print it in chat. With no address set the scripts use the file board at `.board/db/`.
 
-Collections under `projects/{job-id}`: `items`, `versions`, `runs`, `gates`, `inbox`, `messages`, `bgm`, `mograph`, `previews`. An item the pipeline delivers carries `file`, `sha256` and `bytes`; the page copies them into the gate record at lock time, which is what makes the approval hash-bound. A `previews/{item}` document carries `thumb` (a PNG data URI under 200 KB, from `record-version.js --preview`) and, once `set-preview.js` has run, `video` (an asset url `/_blob/{id}` the card plays) and `assetId`. The MP4 itself goes into the board artifact's asset store with the Artifact tool (`asset: true`, one file per call); the board is published with the `assets` capability for that.
-
-`push --files` is the form to hand a batch to ArtifactData: every document body is written to `.board/push/{n}.json` and each entry names it as `file_path`, so a filmstrip or a run output never has to be retyped into the tool call.
+Collections under `projects/{job-id}`: `items`, `versions`, `runs`, `gates`, `inbox`, `messages`, `bgm`, `mograph`, `previews`. An item the pipeline delivers carries `file`, `sha256` and `bytes`; the page copies them into the gate record at lock time, which is what makes the approval hash-bound. A `previews/{item}` document carries `thumb` (PNG data URI under 200 KB) and, after `set-preview.js`, `video` (an asset url the card plays; the MP4 is uploaded with the Artifact tool, `asset: true`). `push --files` writes each body to `.board/push/{n}.json` and names it as `file_path`, so nothing large is retyped.
 
 ## Open, once
 
@@ -33,7 +31,7 @@ Queues the project and its ten items from `job.json`. Push next.
 node "${CLAUDE_PLUGIN_ROOT}/scripts/board-sync.js" push {client} {job-id} --json
 ```
 
-It prints the outbox as batches of at most fifty, with a `pins` list. The database refuses an unpinned write to an existing document: `ArtifactData get` each pinned document and put its `version` as `if_version` on that write (`mayExist` pins: skip when the read finds nothing). Hand each batch to `ArtifactData` `action: batch`, `writes` the array. On success:
+It prints batches of at most fifty with a `pins` list: `ArtifactData get` each pinned document and put its `version` as `if_version` on that write (`mayExist` pins: skip when nothing is found). Hand each batch to `ArtifactData` `action: batch`. On success:
 
 ```bash
 node "${CLAUDE_PLUGIN_ROOT}/scripts/board-sync.js" push {client} {job-id} --ack
@@ -77,7 +75,7 @@ Say the printed text in chat, push; the answer arrives with the next `land`. `--
 
 ## B-roll quotes
 
-A `generate` record for `broll` arrives `requested`. Quote it with the AgentC estimate, then queue an `update` on that inbox record with `status: quoted`, `credits`, `quoteText`; push. The person approves on the board (`status: open`, `approvedBy`); `land` prints it; only then does the guard let the generation fire. After the shot lands, update the record to `delivered` with `path` and a small `thumb`.
+A `generate` record for `broll` arrives `requested`. Quote it (AgentC estimate), queue an `update` with `status: quoted`, `credits`, `quoteText`; push. The person approves on the board; `land` prints it; only then may the generation fire. After the shot lands, update the record to `delivered` with `path` and a small `thumb`.
 
 ## Rules
 
