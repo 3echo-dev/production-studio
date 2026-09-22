@@ -56,7 +56,13 @@ if (cmd === 'brief') {
       const durationSec = Math.min(15, Math.max(4, Math.ceil(useSec + headroomSec)));
       const inSec = Math.max(0, Math.min(headSec, durationSec - useSec));
       const line = sceneLine(p.scene);
-      const prompt = [p.caption || p.description || ('Storyboard panel ' + p.id), line ? 'Script: ' + line.replace(/^Scene\s+\S+:?\s*/i, '') : null, 'Match the framing and staging of the reference panel exactly; ' + (job.aspectRatio || '16:9') + ' frame; one continuous shot; no text, no captions, no logos.'].filter(Boolean).join(' ');
+      // The prompt: the panel caption, the line spoken over it (mood only, the VO is added in the audio
+      // stages), and the frame. The reference-panel sentence is added by the orchestrator only when a
+      // panel image is actually attached as a reference asset.
+      const voLine = line ? (line.match(/VO:\s*"([^"]+)"/i) || [])[1] || null : null;
+      const action = line ? line.replace(/^Scene\s+\S+:?\s*/i, '').replace(/,?\s*VO:\s*"[^"]*"/i, '').trim() : '';
+      const capText = p.caption || p.description || ('Storyboard panel ' + p.id);
+      const prompt = [capText + '.', action && action.toLowerCase() !== capText.toLowerCase() ? action + '.' : null, voLine ? 'The moment carries the line "' + voLine + '" (unspoken; no dialogue, no lip movement).' : null, 'Live-action, cinematic, natural light, ' + (job.aspectRatio || '16:9') + ' frame, one continuous shot, subtle camera move; no text, no captions, no logos, no watermarks.'].filter(Boolean).join(' ');
       return { id: p.id, storyOrder: p.storyOrder || null, scene: p.scene == null ? null : String(p.scene), prompt: old.promptOverride || prompt, referencePanel: path.join(rel, p.file || ('storyboard/v1/' + p.id + '.png')).replace(/\\/g, '/'), durationSec, useSec, inSec, ratio: RATIO[job.aspectRatio] || '16:9', idempotencyKey: jobId + '/generate/' + p.id, status: old.status === 'delivered' ? 'delivered' : 'pending', quotedCredits: old.quotedCredits || null, jobRef: old.jobRef || null, file: old.file || null, sha256: old.sha256 || null, credits: old.credits || null };
     }),
   };
