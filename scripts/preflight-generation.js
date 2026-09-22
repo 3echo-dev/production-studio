@@ -3,6 +3,7 @@
 //
 // Usage:
 //   preflight-generation.js {client} {job-id} {n} --kind broll|mograph
+//   preflight-generation.js {client} {job-id} sample|batch --kind generate     (generation-brief.json)
 //
 // Checks:
 //   1. Job dir exists.
@@ -29,11 +30,30 @@ for (let i = 3; i < args.length; i++) {
 }
 if (!client || !jobId || !n) { console.error('usage: preflight-generation.js {client} {job-id} {n} --kind broll|mograph'); process.exit(2); }
 const kind = flags.kind;
-if (!['broll', 'mograph'].includes(kind)) { console.error('--kind must be broll or mograph'); process.exit(2); }
+if (!['broll', 'mograph', 'generate'].includes(kind)) { console.error('--kind must be broll, mograph or generate'); process.exit(2); }
 
 const jobDir = lib.jobRoot(process.cwd(), client, jobId);
 if (!fs.existsSync(jobDir)) { console.error('job dir missing: ' + jobDir); process.exit(1); }
 
+// generate: the brief carries one approval per scope (sample, then batch) landed from the board.
+if (kind === 'generate') {
+  const briefPath = path.join(jobDir, 'generation-brief.json');
+  if (!fs.existsSync(briefPath)) { console.error('no generation-brief.json yet; run generate-clips.js brief first'); process.exit(3); }
+  let brief; try { brief = JSON.parse(fs.readFileSync(briefPath, 'utf8')); } catch (e) { console.error('generation-brief.json: invalid JSON (' + e.message + ')'); process.exit(1); }
+  const scope = ['sample', 'batch'].includes(n) ? n : null; if (!scope) { console.error('generate takes sample or batch as its third argument'); process.exit(2); }
+  const ap = (brief.approvals || {})[scope];
+  if (!ap || !ap.by || !ap.at) { console.error('no ' + scope + ' approval on record in generation-brief.json; the yes comes from the board'); process.exit(3); }
+  const pending = (brief.panels || []).filter(p => p.status !== 'delivered');
+  const todo = scope === 'sample' ? pending.slice(0, 1) : pending;
+  if (!todo.length) { console.error('nothing left to generate for ' + scope); process.exit(3); }
+  let ceilingG = 120; try { const m = fs.readFileSync(path.resolve(__dirname, '..', 'CONFIG.md'), 'utf8').match(/credit_ceiling_per_job:\s*(\d+)/); if (m) ceilingG = parseInt(m[1], 10); } catch {}
+  let spentG = 0; try { const m = fs.readFileSync(path.join(jobDir, 'status.md'), 'utf8').match(/credits_spent:\s*(\d+)/); if (m) spentG = parseInt(m[1], 10); } catch {}
+  const est = todo.reduce((s, p) => s + (Number(p.quotedCredits) || (p.durationSec >= 10 ? 8 : 4)), 0);
+  if (Number(ap.credits) && est > Number(ap.credits)) { console.error('the ' + scope + ' estimate (' + est + ') is above the ' + ap.credits + ' credits approved on the board; ask again'); process.exit(1); }
+  if (spentG + est > ceilingG) { console.error('ceiling ' + ceilingG + ' would be exceeded (spent=' + spentG + ', est=' + est + ')'); process.exit(1); }
+  console.log('preflight ok: generate ' + scope + ' of ' + todo.length + ' clip(s) approved by ' + ap.by + ' for ' + (ap.credits || 'unstated') + ' credits; est ' + est + ', spent ' + spentG + '/' + ceilingG);
+  process.exit(0);
+}
 const reqPath = path.join(jobDir, `${kind}-requests`, `${n}.json`);
 if (!fs.existsSync(reqPath)) { console.error(`no ${kind} request at ${reqPath}`); process.exit(3); }
 

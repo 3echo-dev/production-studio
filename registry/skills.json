@@ -13,6 +13,7 @@
     { "id": "export-premiere-bundle", "file": "skills/export-premiere-bundle/SKILL.md", "role": "Runs scripts/build-bundle.js (local; no MCP tool). Emits project.fcpxml + bundle/ tree." },
     { "id": "board-setup", "file": "skills/board-setup/SKILL.md", "role": "Publishes this account's own Post Control board artifact (db, artifact, comments) and records its address." },
     { "id": "board-sync", "file": "skills/board-sync/SKILL.md", "role": "Keeps the Post Control board and the job folder agreeing: push batches, land decisions, hash-bound gate pull." },
-    { "id": "review-pass", "file": "skills/review-pass/SKILL.md", "role": "Runs a rubric against a gate. Emits review.md verdict." }
+    { "id": "review-pass", "file": "skills/review-pass/SKILL.md", "role": "Runs a rubric against a gate. Emits review.md verdict." },
+    { "id": "generate-clips", "file": "skills/generate-clips/SKILL.md", "role": "Generated jobs only: one AI clip per storyboard panel via AgentC create_video_job, sample then batch, every credit approved on the board; lands under footage/generated." }
   ]
 }

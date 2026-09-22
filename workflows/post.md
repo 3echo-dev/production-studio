@@ -19,6 +19,10 @@ Read left to right. `State after` is the next state on a clean pass. `Rollback t
 | 11 | package | premiere-packager | export-premiere-bundle | delivery-rules | - | bundle/project.fcpxml, bundle/README.md | 12 | 11 |
 | 12 | GATE B delivery released | orchestrator | board-sync | - | XX editor handoff acknowledged | approvals/gate-b.json (hash-bound) | done | 11 |
 
+## Generated footage
+
+A job with `footageSource: generated` (a microdrama, one AI clip per storyboard panel) runs the same table. Row 2 is the generate stage (`generate-clips` skill: brief, sample quoted and approved on the board, batch, then ingest of `footage/generated/`), row 3 cuts by panel id (`sequence-first-cut.py --by-panel`), and row 11 adds `bundle/master.mp4` (`render-preview.js --stage master`) since there is no editor to hand to. The release needs no call sheets. Credits are the only spend and every scope has its yes on the board first.
+
 ## State machine invariants
 
 - Every `State after` and `Rollback to` value points at a real state in this table.

@@ -10,7 +10,7 @@
       "displayName": "Creative Studio Post",
       "source": "./",
       "description": "Footage in, Premiere bundle out. The studio's post-production pipeline: ten director agents, eight XX items a person declares, two gates decided on the Post Control board.",
-      "version": "0.1.2",
+      "version": "0.2.0",
       "author": {
         "name": "3echo"
       }

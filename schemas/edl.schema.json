@@ -9,7 +9,7 @@
     "version": { "type": "integer", "minimum": 1 },
     "aspectRatio": { "type": "string" },
     "fps": { "type": "number" },
-    "generatedBy": { "enum": ["clip-embedder", "human", "reference-cut"] },
+    "generatedBy": { "enum": ["clip-embedder", "human", "reference-cut", "panel-id"] },
     "cuts": {
       "type": "array",
       "minItems": 1,

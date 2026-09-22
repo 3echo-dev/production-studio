@@ -71,7 +71,8 @@ for (const f of clipFiles) {
   if (!v) { warnings.push(fwd(path.relative(drive, f)) + ': no video stream; skipped'); continue; }
   const h = hashFile(f);
   const day = dayOf(f, footageDir);
-  if (day === null) warnings.push(fwd(path.relative(drive, f)) + ': not under a day-NN folder; day parked as null');
+  const generated = /[\\/]generated[\\/]/.test(path.relative(footageDir, f).split(path.sep).join('/') + '/') || /^generated$/i.test(path.basename(path.dirname(f)));
+  if (day === null && !generated) warnings.push(fwd(path.relative(drive, f)) + ': not under a day-NN folder; day parked as null');
   const name = path.parse(f).name;
   const scene = (name.match(/scene[-_ ]?([A-Za-z0-9]+)/i) || [])[1] || null;
   const take = (name.match(/(?:^|[_-])t(?:ake)?[-_ ]?(\d+)(?:$|[_-])/i) || [])[1] || null;
@@ -83,7 +84,7 @@ for (const f of clipFiles) {
     path: fwd(f), sha256: h.sha256, bytes: fs.statSync(f).size,
     durationSec: Math.round(Number((p.format && p.format.duration) || v.duration || 0) * 1000) / 1000,
     codec: v.codec_name || 'unknown', width: Number(v.width) || 0, height: Number(v.height) || 0, fps: fps || 25,
-    ...(tc ? { timecodeStart: tc } : {}), day, ...(scene ? { scene } : {}), ...(take ? { take: Number(take) } : {}), ...(slate ? { slate } : {}),
+    ...(tc ? { timecodeStart: tc } : {}), day, ...(generated ? { generated: true } : {}), ...(scene ? { scene } : {}), ...(take ? { take: Number(take) } : {}), ...(slate ? { slate } : {}),
     ...(proxyFor(f, footageDir) ? { proxyPath: proxyFor(f, footageDir) } : {}),
   });
 }

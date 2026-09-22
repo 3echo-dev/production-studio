@@ -26,6 +26,20 @@ export function readCeiling(pluginRoot) {
 export function refuseBrollWithoutRequest({ command, cwd }) {
   if (!/render_broll_variant|create_video_job/.test(command)) return null;
   const jobDir = cwd;
+  // A generated job (footageSource "generated") carries its yes in generation-brief.json:
+  // sample first, then batch, each approved on the board and recorded by generate-clips.js.
+  const briefPath = path.join(jobDir, 'generation-brief.json');
+  if (fs.existsSync(briefPath)) {
+    try {
+      const b = JSON.parse(fs.readFileSync(briefPath, 'utf8'));
+      const pending = (b.panels || []).filter(p => p.status !== 'delivered');
+      const scope = (b.panels || []).some(p => p.status === 'delivered') ? 'batch' : 'sample';
+      const ap = (b.approvals || {})[scope];
+      if (!pending.length) return 'Generation refused: every panel already has a clip.';
+      if (!ap || !ap.by || !ap.at) return 'Generation refused: no ' + scope + ' approval on record from the board.';
+      return null;
+    } catch { return 'Generation refused: generation-brief.json is unreadable.'; }
+  }
   const requestsDir = path.join(jobDir, 'broll-requests');
   if (!fs.existsSync(requestsDir)) return 'B-roll generation refused: no broll-requests folder on disk.';
   const requests = fs.readdirSync(requestsDir).filter(f => f.endsWith('.json'));

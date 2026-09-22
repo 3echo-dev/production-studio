@@ -98,6 +98,9 @@ else { R.workflowId = wf.workflowId || wf.id; R.workflowVersion = wf.version || 
 // cut would spend the whole intake finding that out.
 const jobDir = path.dirname(path.resolve(jobPath));
 const resolveDir = p => (p ? (path.isAbsolute(p) ? p : path.resolve(jobDir, p)) : null);
+const generated = job.footageSource === 'generated';
+if (job.footageSource && !['shoot', 'generated'].includes(job.footageSource)) missing('footageSource (shoot or generated)');
+// A generated job (one AI clip per panel) hands over no call sheets: there was no shoot day.
 const REQUIRED_RELEASE = ['script.md', 'storyboard.json', 'concept-breakdown.xlsx'];
 const rel = resolveDir(job.prePipelineReleaseFolder);
 if (rel) {
@@ -105,7 +108,7 @@ if (rel) {
   else {
     const absent = REQUIRED_RELEASE.filter(f => !fs.existsSync(path.join(rel, f)));
     let names = []; try { names = fs.readdirSync(rel); } catch { names = []; }
-    if (!names.some(n => /^call-sheet-day-.*\.(pdf|xlsx)$/i.test(n))) absent.push('call-sheet-day-*.pdf or .xlsx');
+    if (!generated && !names.some(n => /^call-sheet-day-.*\.(pdf|xlsx)$/i.test(n))) absent.push('call-sheet-day-*.pdf or .xlsx');
     let panels = 0;
     try { for (const v of fs.readdirSync(path.join(rel, 'storyboard')).filter(n => /^v\d+$/.test(n))) panels += fs.readdirSync(path.join(rel, 'storyboard', v)).filter(n => /^P\d+.*\.(png|jpe?g|webp)$/i.test(n)).length; } catch { panels = 0; }
     if (!panels) absent.push('storyboard/v{n}/P*.png');
@@ -137,9 +140,10 @@ function count(dir, re, depth = 0) {
 const drive = resolveDir(job.driveFolder);
 if (drive) {
   const clips = count(path.join(drive, 'footage'), MEDIA);
-  if (!clips) { R.blockers.push('the shoot footage (no clips under ' + ws.fwd(path.join(drive, 'footage')) + ')'); say('Rule 3: no footage'); }
+  if (!clips && generated) say('Rule 3: no clips yet; the generate stage makes one per panel under footage/generated');
+  else if (!clips) { R.blockers.push('the shoot footage (no clips under ' + ws.fwd(path.join(drive, 'footage')) + ')'); say('Rule 3: no footage'); }
   else say('Rule 3: ' + clips + ' clip' + (clips === 1 ? '' : 's') + ' under footage/');
-  if (clips && !count(path.join(drive, 'proxies'), MEDIA)) risk('no_proxies');
+  if (clips && !generated && !count(path.join(drive, 'proxies'), MEDIA)) risk('no_proxies');
   const vo = count(path.join(drive, 'audio', 'vo'), AUDIO);
   const anyAudio = count(path.join(drive, 'audio'), AUDIO);
   if (!vo) { tag('no_vo'); risk('no_vo'); say('Rule 3: no VO takes under audio/vo; the cut is picture-only unless VO arrives'); }
@@ -151,6 +155,7 @@ if (job.audioLed === true) tag('audio_led'); else if (job.audioLed === false) ta
 if (job.referenceCutPath) tag('has_reference_cut');
 if (job.colourDirection) tag('has_colour_direction');
 if (['9:16', '4:5'].includes(job.aspectRatio)) tag('vertical');
+if (generated) { tag('generated_footage'); risk('credit_spend'); }
 if (Number.isInteger(job.deliverableDurationSec) && job.deliverableDurationSec > 180) risk('long_deliverable');
 say('Rule 4: tags ' + (R.tags.join(', ') || 'none'));
 

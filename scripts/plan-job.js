@@ -54,7 +54,12 @@ for (const r of kept) {
   const agent = cell(r['director-agent']) || 'orchestrator';
   const ownership = agent === owner ? 'owner' : (support.has(agent) ? 'support' : cell(agent));
   const gate = states.ROW_GATE[n] || '';
-  out += '| ' + [n, cell(r.state), cell(r['output-artefact']), agent, gate ? 'orchestrator' : agent, ownership, cell(r['skill-invoked']), cell(r['output-artefact']), states.ROW_STATE[n] || '', gate, 'pending', ''].join(' | ') + ' |\n';
+  // A generated job makes its clips in the ingest row and cuts them by panel id in the sequence row.
+  const gen = (route.tags || []).includes('generated_footage');
+  const skill = gen && n === 2 ? 'generate-clips' : gen && n === 3 ? 'sequence-first-cut --by-panel' : cell(r['skill-invoked']);
+  const output = gen && n === 2 ? 'generation-brief.json, footage/generated/P*.mp4, manifest.json' : gen && n === 11 ? cell(r['output-artefact']) + ', bundle/master.mp4' : cell(r['output-artefact']);
+  const agentName = gen && n === 2 ? 'orchestrator' : agent;
+  out += '| ' + [n, gen && n === 2 ? 'generate + ingest' : cell(r.state), output, agentName, gate ? 'orchestrator' : agentName, agentName === owner ? 'owner' : ownership, skill, output, states.ROW_STATE[n] || '', gate, 'pending', ''].join(' | ') + ' |\n';
 }
 fs.writeFileSync(outPath, out);
 if (args.includes('--human')) console.log('Planned: ' + kept.length + ' steps, ' + gates.length + ' of them waiting on you.');

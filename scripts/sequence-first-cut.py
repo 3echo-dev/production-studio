@@ -20,8 +20,59 @@ from pathlib import Path
 def die(msg, code=1):
     print(msg, file=sys.stderr); sys.exit(code)
 
+def by_panel(job, job_id, job_dir, manifest, panels, clips):
+    """One cut per panel from the clip that carries the panel id in its name (footage/generated/P01.mp4)."""
+    try:
+        from PIL import Image, ImageDraw
+    except Exception as e:
+        die("Pillow is needed for timeline.png: %s" % e)
+    by_stem = {Path(c["path"]).stem.upper(): c for c in clips}
+    total_budget = float(job.get("deliverableDurationSec") or 0) or None
+    fps = float(clips[0].get("fps") or 25)
+    cuts, unmatched, tiles = [], [], []
+    tmp = Path(tempfile.mkdtemp(prefix="seq-"))
+    for p in panels:
+        clip = by_stem.get(str(p["id"]).upper())
+        if not clip:
+            unmatched.append(p["id"]); continue
+        dur = float(clip.get("durationSec") or 0)
+        want = float(p.get("durationSec") or 0) or dur
+        end = round(min(dur, want) if dur else want, 3)
+        cuts.append({"order": len(cuts) + 1, "panelId": p["id"], "clipSha256": clip["sha256"], "inSec": 0.0, "outSec": end,
+                     "matchScore": 1.0, "matchReason": "generated for panel %s (%s)" % (p["id"], Path(clip["path"]).name), "note": None})
+        fpath = tmp / ("%s.png" % p["id"])
+        subprocess.run(["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-ss", "%.3f" % (end / 2), "-i", clip["path"], "-frames:v", "1", "-vf", "scale=320:-2", str(fpath)], check=False)
+        tiles.append((p["id"], 1.0, str(fpath), Path(clip["path"]).name, end / 2))
+    if not cuts: die("no panel has a generated clip yet; land them with generate-clips.js first", 3)
+    total = sum(c["outSec"] - c["inSec"] for c in cuts)
+    note = None
+    if total_budget and total > total_budget + 0.5:
+        note = "cuts total %.1fs against a %.0fs deliverable; ask which panels to shorten" % (total, total_budget)
+    edl = {"schemaVersion": "1.0", "jobId": job_id, "version": 1, "aspectRatio": job.get("aspectRatio") or "16:9",
+           "fps": fps, "generatedBy": "panel-id", "cuts": cuts, "unmatchedPanels": unmatched}
+    if note: edl["cuts"][0]["note"] = note
+    out = job_dir / "rough-edl.json"; tmpf = out.with_suffix(".json.tmp")
+    tmpf.write_text(json.dumps(edl, indent=2) + "\n", encoding="utf-8"); tmpf.replace(out)
+    th = 480; tw = int(th * 16 / 9); pad = 8; label_h = 44
+    strip = Image.new("RGB", (len(tiles) * (tw + pad) + pad, th + label_h + pad * 2), (14, 16, 20))
+    d = ImageDraw.Draw(strip)
+    for i, (pid, score, fpath, name, t) in enumerate(tiles):
+        x = pad + i * (tw + pad)
+        if Path(fpath).exists():
+            im = Image.open(fpath).convert("RGB"); im.thumbnail((tw, th))
+            strip.paste(im, (x + (tw - im.width) // 2, pad + (th - im.height) // 2))
+        d.text((x + 6, th + pad + 6), "%s  generated" % pid, fill=(228, 232, 237))
+        d.text((x + 6, th + pad + 24), name[:28], fill=(157, 167, 180))
+    strip.save(job_dir / "timeline.png")
+    small = strip.copy(); small.thumbnail((1600, 400)); small.save(job_dir / "timeline-preview.png", optimize=True)
+    print("rough-edl.json: %d cut(s) from %d panel(s) by panel id, %d unmatched, %.1fs total%s" % (len(cuts), len(panels), len(unmatched), total, ("; " + note) if note else ""))
+    for c in cuts: print("  %s -> %s 0.0-%.1fs" % (c["panelId"], c["matchReason"], c["outSec"]))
+    if unmatched: print("  unmatched (no clip yet): " + ", ".join(unmatched))
+    return 0
+
+
 def main(argv):
-    if len(argv) < 3: die("usage: sequence-first-cut.py <client> <job-id> [--stride 1.0] [--threshold 0.28] [--om-root <dir>]", 2)
+    if len(argv) < 3: die("usage: sequence-first-cut.py <client> <job-id> [--stride 1.0] [--threshold 0.28] [--om-root <dir>] [--by-panel]", 2)
     client, job_id = argv[1], argv[2]
     opt = lambda k, d: argv[argv.index(k) + 1] if k in argv and argv.index(k) + 1 < len(argv) else d
     stride = float(opt("--stride", "1.0")); threshold = float(opt("--threshold", "0.28"))
@@ -35,8 +86,13 @@ def main(argv):
     sb = json.loads((release / "storyboard.json").read_text(encoding="utf-8"))
     panels = sorted(sb.get("panels", []), key=lambda p: (p.get("storyOrder") or 0, p.get("id")))
     if not panels: die("storyboard.json has no panels")
+
+
     clips = [c for c in manifest.get("clips", []) if Path(c["path"]).exists()]
     if not clips: die("no clips from the manifest exist on disk")
+    # --by-panel: a generated job has one clip per panel, named after it; no frame matching, the whole clip is the cut.
+    if "--by-panel" in argv or job.get("footageSource") == "generated":
+        return by_panel(job, job_id, job_dir, manifest, panels, clips)
 
     sys.path.insert(0, str(om_root))
     try:
