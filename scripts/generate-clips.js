@@ -60,7 +60,7 @@ if (cmd === 'brief') {
       // stages), and the frame. The reference-panel sentence is added by the orchestrator only when a
       // panel image is actually attached as a reference asset.
       const voLine = line ? (line.match(/VO:\s*"([^"]+)"/i) || [])[1] || null : null;
-      const action = line ? line.replace(/^Scene\s+\S+:?\s*/i, '').replace(/,?\s*VO:\s*"[^"]*"/i, '').trim() : '';
+      const action = line ? line.replace(/^Scene\s+\S+:?\s*/i, '').replace(/,?\s*VO:\s*"[^"]*"/i, '').trim().replace(/[.\s]+$/, '') : '';
       const capText = p.caption || p.description || ('Storyboard panel ' + p.id);
       const prompt = [capText + '.', action && action.toLowerCase() !== capText.toLowerCase() ? action + '.' : null, voLine ? 'The moment carries the line "' + voLine + '" (unspoken; no dialogue, no lip movement).' : null, 'Live-action, cinematic, natural light, ' + (job.aspectRatio || '16:9') + ' frame, one continuous shot, subtle camera move; no text, no captions, no logos, no watermarks.'].filter(Boolean).join(' ');
       return { id: p.id, storyOrder: p.storyOrder || null, scene: p.scene == null ? null : String(p.scene), prompt: old.promptOverride || prompt, referencePanel: path.join(rel, p.file || ('storyboard/v1/' + p.id + '.png')).replace(/\\/g, '/'), durationSec, useSec, inSec, ratio: RATIO[job.aspectRatio] || '16:9', idempotencyKey: jobId + '/generate/' + p.id, status: old.status === 'delivered' ? 'delivered' : 'pending', quotedCredits: old.quotedCredits || null, jobRef: old.jobRef || null, file: old.file || null, sha256: old.sha256 || null, credits: old.credits || null };
