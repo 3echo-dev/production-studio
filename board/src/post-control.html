@@ -68,10 +68,12 @@ svg.i{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8;stro
 .sect{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-top:26px;margin-bottom:10px}
 .sect h2{font-size:20px}
 .slate{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:12px}
-.pcard{background:var(--panel);border:1px solid var(--line);border-radius:var(--r3);padding:14px 16px;display:flex;flex-direction:column;gap:10px;cursor:pointer;text-align:left;transition:border-color 150ms ease,transform 160ms var(--ease-out),background-color 150ms ease}
+.pcard{background:var(--panel);border:1px solid var(--line);border-radius:var(--r3);padding:14px 16px;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:10px;cursor:pointer;text-align:left;transition:border-color 150ms ease,transform 160ms var(--ease-out),background-color 150ms ease}
 .pcard:hover{border-color:var(--line2);background:var(--panel2)}
 .pcard:active{transform:scale(.99)}
-.pcard h3{font-size:22px;line-height:1.05}
+.pcard h3{font-size:20px;line-height:1.15;text-align:left}
+.pcard .meta{text-align:left}
+.pcard > *{width:100%}
 .pcard .row{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
 .gchips{display:inline-flex;gap:4px}
 .gchip{font-family:var(--cond);font-weight:700;font-size:12px;width:20px;height:20px;border-radius:var(--r1);border:1px solid var(--line2);display:inline-flex;align-items:center;justify-content:center;color:var(--faint)}
@@ -215,13 +217,16 @@ svg.i{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8;stro
 .preview{border:1px solid var(--line);border-radius:var(--r2);background:var(--ink);padding:6px;margin-bottom:12px}
 .preview img,.preview video{display:block;max-width:100%;width:100%;border-radius:var(--r1);background:#000}
 .preview .cap{font-size:11px;color:var(--faint);margin-top:6px;display:flex;justify-content:space-between;gap:8px}
-.cands{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px}
-.cand{background:var(--panel2);border:1px solid var(--line);border-radius:var(--r3);padding:12px;display:flex;flex-direction:column;gap:6px}
-.cand.chosen{border-color:var(--go)}
-.cand h4{font-family:var(--cond);text-transform:uppercase;letter-spacing:.03em;font-size:17px;margin:0;line-height:1.1}
+.cands{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;align-items:stretch}
+.cand{background:var(--panel2);border:1px solid var(--line);border-radius:var(--r3);padding:12px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.cand.chosen{border-color:var(--go);box-shadow:0 0 0 1px var(--go)}
+.cand h4{font-family:var(--sans);font-weight:800;font-size:16px;margin:0;line-height:1.2;min-height:2.4em;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .cand .tc{font-family:var(--mono);font-size:11px;color:var(--faint)}
-.cand p{margin:0;font-size:12px;color:var(--dim);line-height:1.4}
-.cand .tag{align-self:flex-start;font-size:10px;letter-spacing:.06em;text-transform:uppercase;padding:1px 6px;border-radius:var(--r1);background:var(--go);color:var(--ink);font-weight:600}
+.cand audio{width:100%;height:32px;display:block}
+.cand p{margin:0;font-size:12px;color:var(--dim);line-height:1.45}
+.cand .path{font-size:10px;color:var(--faint);word-break:break-all;opacity:.8}
+.cand .foot{margin-top:auto;display:flex;flex-direction:column;gap:6px}
+.cand .tag{align-self:flex-start;font-size:10px;letter-spacing:.02em;font-weight:700;padding:1px 6px;border-radius:var(--r1);background:var(--go);color:var(--ink)}
 .reqform{display:grid;grid-template-columns:1fr;gap:8px;margin-bottom:14px;padding:12px;border:1px dashed var(--line2);border-radius:var(--r3)}
 .reqform .two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .reqform label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--dim)}
@@ -563,7 +568,7 @@ function slatePage(){
       <div class="row"><h3>${esc(p.title)}</h3><span class="pill ${p.status==='released'?'approved':'plain'}">${esc(statusWord(p.status))}</span></div>
       <div class="row meta"><span>${esc(p.client||'')}${p.client?' · ':''}${esc(p.aspectRatio||'')}${p.deliverableDurationSec?' · '+esc(p.deliverableDurationSec)+'s':''}${p.audioLed?' · audio-led':''}</span><span class="gchips" aria-label="Gates">${['A','B'].map(x=>`<span class="gchip ${gateChipState(p,x)}">${x}</span>`).join('')}</span></div>
       <div class="meta">Opened ${fmt(p.createdAt)} by ${esc(humanName(p.createdBy))}</div>
-      ${p.activity&&!['released','killed'].includes(p.status)?`<div class="meta"><span class="pill running">Working</span> ${esc(p.activity)}${p.heartbeatAt?' · '+fmt(p.heartbeatAt):''}</div>`:''}
+      ${p.activity&&!['released','killed'].includes(p.status)?(()=>{ const live=p.heartbeatAt&&!String(p.status).startsWith('gate')&&(Date.now()-new Date(p.heartbeatAt).getTime())<15*60*1000; return `<div class="meta"><span class="pill ${live?'running':'plain'}">${live?'Working':'Last update'}</span> ${esc(p.activity)}${p.heartbeatAt?' · '+fmt(p.heartbeatAt):''}</div>`; })():''}
     </button>`).join('')
     : `<p class="empty">${dbState==='on'?'No projects on the board yet. Open one below, or let the pipeline open it from job.json.':dbState==='connecting'?'Connecting to the board…':'This is the pipeline model. Open the page in claude.ai to connect the board.'}</p>`;
   return `<div class="sect"><h2>Slate</h2><span class="meta">${live.length} project${live.length===1?'':'s'}</span></div>
@@ -692,7 +697,7 @@ function candidatesHtml(it){
   if(!bgm.length) return `<p class="empty">The BGM supervisor pushes three candidates here once the first cut exists. Pick one; the sync stage will not start without a choice signed here.</p>`;
   const chosen=bgm.find(c=>c.chosen);
   return `<div class="runmeta"><span>${bgm.length} candidate${bgm.length===1?'':'s'}${chosen?' · chosen: '+esc(chosen.title||chosen.id)+' by '+esc(humanName(chosen.chosenBy)):' · none chosen yet'}</span><span>${it.status==='approved'?'BGM approved':''}</span></div>
-  <div class="cands">${bgm.map(c=>`<div class="cand ${c.chosen?'chosen':''}"><h4>${esc(c.title||c.id)}</h4><span class="tc">${tc(c.durationSec)}${c.bpm?' · '+esc(c.bpm)+' bpm':''}${c.source?' · '+esc(c.source):''}</span>${c.audio?`<audio controls preload="none" src="${esc(c.audio)}" style="width:100%;height:32px"></audio>`:''}${c.mood?`<p>${esc(c.mood)}</p>`:''}${c.note?`<p>${esc(c.note)}</p>`:''}${c.file?`<span class="mono" style="color:var(--faint);font-size:11px;word-break:break-all">${esc(c.file)}</span>`:''}${c.chosen?`<span class="tag">Chosen</span>`:(isArmed('bgm'+c.id)?`<button class="primary" data-choose-bgm="${esc(c.id)}">${ic('check')} Confirm ${esc(c.title||c.id)}</button>`:`<button data-choose-bgm="${esc(c.id)}">${ic('music')} Choose</button>`)}</div>`).join('')}</div>`;
+  <div class="cands">${bgm.map(c=>`<div class="cand ${c.chosen?'chosen':''}"><h4>${esc(c.title||c.id)}</h4><span class="tc">${tc(c.durationSec)}${c.bpm?' · '+esc(c.bpm)+' bpm':''}${c.source?' · '+esc(c.source):''}</span>${c.audio?`<audio controls preload="none" src="${esc(c.audio)}"></audio>`:''}${c.mood?`<p>${esc(c.mood)}</p>`:''}${c.note?`<p>${esc(c.note)}</p>`:''}<div class="foot">${c.file?`<span class="mono path" title="${esc(c.file)}">${esc(String(c.file).split(/[\\/]/).pop())}</span>`:''}${c.chosen?`<span class="tag">Chosen</span>`:(isArmed('bgm'+c.id)?`<button class="primary" data-choose-bgm="${esc(c.id)}">${ic('check')} Confirm ${esc(c.title||c.id)}</button>`:`<button data-choose-bgm="${esc(c.id)}">${ic('music')} Choose</button>`)}</div></div>`).join('')}</div>`;
 }
 function requestsHtml(it){
   const rs=brollReqs(); const gateA=gateView('A').st==='passed';
