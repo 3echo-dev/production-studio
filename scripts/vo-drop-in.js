@@ -30,6 +30,13 @@ if (!takes.length) { console.error('No VO take under audio/vo in the manifest; n
 let t = 0; const cutStarts = edl.cuts.map(c => { const s = t; t += c.outSec - c.inSec; return { panelId: c.panelId, startSec: s, endSec: t, scene: (c.panelId.match(/\d+/) || [])[0] }; });
 const pictureSec = Math.round(t * 1000) / 1000;
 const warnings = []; const lines = []; const unmatched = [];
+// A marker whose scene has no cut yet (a partial generated batch, an unmatched panel) waits for picture:
+// it is listed, not placed and not an error. The takes still map to markers by order.
+const cutScenes = new Set(cutStarts.map(c => String(Number(c.scene))));
+const noPicture = (edl.unmatchedPanels || []).length || cutStarts.length < markers.length
+  ? markers.filter(m => m.scene != null && !cutScenes.has(String(Number(m.scene)))) : [];
+const waitingForPicture = noPicture.map(m => ({ scriptMarker: m.id, text: m.text, reason: 'no picture for scene ' + m.scene + ' yet' }));
+const cutIndexOfScene = scene => cutStarts.findIndex(c => String(Number(c.scene)) === String(Number(scene)));
 const startFor = idx => { const cut = cutStarts[Math.min(idx, cutStarts.length - 1)] || { startSec: 0 }; return cut.startSec; };
 if (takes.length === 1 && markers.length > 1) {
   const take = takes[0];
@@ -37,14 +44,17 @@ if (takes.length === 1 && markers.length > 1) {
   warnings.push('One take (' + path.basename(take.path) + ') against ' + markers.length + ' script markers: placed as one continuous read from the first cut. Split takes or confirm the read on the board.');
 } else {
   markers.forEach((m, i) => {
+    if (noPicture.includes(m)) return;
     const take = takes[i];
     if (!take) { unmatched.push({ scriptMarker: m.id, text: m.text, reason: 'no take for this marker' }); return; }
-    lines.push({ scriptMarker: m.id, markerText: m.text, clipSha256: take.sha256, path: take.path, startSec: startFor(i), endSec: Math.round((startFor(i) + take.durationSec) * 1000) / 1000, matchedBy: 'ordered-index', confidence: null });
+    const ci = m.scene != null && cutIndexOfScene(m.scene) >= 0 ? cutIndexOfScene(m.scene) : i;
+    const st = startFor(ci) + (lines.length ? 0.3 : 0.5);
+    lines.push({ scriptMarker: m.id, markerText: m.text, clipSha256: take.sha256, path: take.path, startSec: Math.round(st * 1000) / 1000, endSec: Math.round((st + take.durationSec) * 1000) / 1000, matchedBy: 'ordered-index', confidence: null });
   });
   if (takes.length > markers.length) warnings.push((takes.length - markers.length) + ' take(s) beyond the script markers were not placed.');
 }
 for (const l of lines) if (l.endSec > pictureSec + 1 / (edl.fps || 25)) warnings.push(l.scriptMarker + ' ends at ' + l.endSec + ' s, past the picture (' + pictureSec + ' s); the sync trims the mix to picture and the review flags it.');
-const out = { schemaVersion: '1.0', jobId, version: 1, generatedAt: new Date().toISOString(), scriptPath: scriptPath.replace(/\\/g, '/'), transcriber: 'none', pictureDurationSec: pictureSec, markers, lines, unmatched, warnings };
+const out = { schemaVersion: '1.0', jobId, version: 1, generatedAt: new Date().toISOString(), scriptPath: scriptPath.replace(/\\/g, '/'), transcriber: 'none', pictureDurationSec: pictureSec, markers, lines, unmatched, waitingForPicture, warnings };
 const p = path.join(dir, 'vo-track.json'); fs.writeFileSync(p + '.tmp', JSON.stringify(out, null, 2) + '\n'); fs.renameSync(p + '.tmp', p);
-console.log('vo-track.json: ' + lines.length + ' line(s) placed, ' + unmatched.length + ' unmatched, ' + markers.length + ' marker(s) in script.md.' + (warnings.length ? '\n  warning: ' + warnings.join('\n  warning: ') : ''));
+console.log('vo-track.json: ' + lines.length + ' line(s) placed, ' + unmatched.length + ' unmatched, ' + waitingForPicture.length + ' waiting for picture, ' + markers.length + ' marker(s) in script.md.' + (warnings.length ? '\n  warning: ' + warnings.join('\n  warning: ') : ''));
 if (unmatched.length) { console.error('Unmatched markers wait on the person: ' + unmatched.map(u => u.scriptMarker).join(', ')); process.exit(3); }

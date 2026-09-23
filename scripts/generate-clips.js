@@ -3,7 +3,7 @@
 // panel, made through the 3echo AgentC video model by the orchestrator, landed here.
 //
 //   node generate-clips.js <client> <job-id> brief                 write generation-brief.json from the storyboard and script
-//   node generate-clips.js <client> <job-id> approve sample|batch --by <who> --at <iso> [--credits N]
+//   node generate-clips.js <client> <job-id> approve sample|batch --by <who> --at <iso> [--credits N] [--panels P02,P03]
 //   node generate-clips.js <client> <job-id> quote <panelId> --credits N [--job-ref <agentc job id>]
 //   node generate-clips.js <client> <job-id> land <panelId> --file <mp4> | --url <https media url> [--job-ref <id>] [--credits N]
 //   node generate-clips.js <client> <job-id> status
@@ -74,7 +74,7 @@ if (cmd === 'brief') {
 }
 if (cmd === 'approve') {
   const scope = rest[1]; if (!['sample', 'batch'].includes(scope) || !opt('--by') || !opt('--at')) { console.error('usage: approve sample|batch --by <who> --at <iso> [--credits N]'); process.exit(2); }
-  const b = readBrief(); b.approvals = b.approvals || {}; b.approvals[scope] = { by: opt('--by'), at: opt('--at'), credits: opt('--credits') ? Number(opt('--credits')) : null, channel: 'board' };
+  const b = readBrief(); b.approvals = b.approvals || {}; b.approvals[scope] = { by: opt('--by'), at: opt('--at'), credits: opt('--credits') ? Number(opt('--credits')) : null, channel: 'board', panels: opt('--panels') ? opt('--panels').split(',').map(s => s.trim().toUpperCase()).filter(Boolean) : null };
   writeBrief(b); console.log(scope + ' approved by ' + opt('--by') + (opt('--credits') ? ' for ' + opt('--credits') + ' credits' : '') + '; recorded in generation-brief.json.'); process.exit(0);
 }
 if (cmd === 'quote') {
@@ -85,6 +85,8 @@ if (cmd === 'land') {
   const b = readBrief(); const p = b.panels.find(x => x.id === rest[1]); if (!p) { console.error('no panel ' + rest[1] + ' in the brief'); process.exit(2); }
   const scope = b.panels.filter(x => x.status === 'delivered').length === 0 ? 'sample' : 'batch';
   if (!(b.approvals || {})[scope]) { console.error('no ' + scope + ' approval on record; nothing lands without a yes from the board'); process.exit(3); }
+  const only = scope === 'batch' && b.approvals.batch.panels;
+  if (only && !only.includes(p.id.toUpperCase())) { console.error(p.id + ' is outside the approved batch (' + only.join(', ') + '); ask on the board for it first'); process.exit(3); }
   board.ensureDir(outDir);
   const dest = path.join(outDir, p.id + '.mp4');
   if (opt('--file')) { if (!fs.existsSync(opt('--file'))) { console.error('file not there: ' + opt('--file')); process.exit(1); } fs.copyFileSync(opt('--file'), dest); }
