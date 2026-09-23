@@ -31,11 +31,13 @@ const scored = tracks.map(t => ({ t, cover: t.durationSec >= target ? 1 : 0 })).
 const candidates = scored.map(({ t }, i) => {
   const name = path.parse(t.path).name;
   const bpm = Number((name.match(/(\d{2,3})\s*bpm/i) || [])[1]) || 0;
+  // A generated track carries a sidecar <name>.json {source, prompt, moodTags, licensing} written when it landed.
+  let side = {}; try { side = JSON.parse(fs.readFileSync(t.path.replace(/\.[^.]+$/, '.json'), 'utf8')); } catch { side = {}; }
   return {
-    id: 'c' + (i + 1), source: 'library-local', title: name.replace(/[_-]+/g, ' ').replace(/\s*\d{2,3}\s*bpm/i, '').trim() || name, artist: null,
+    id: 'c' + (i + 1), source: side.source || 'library-local', title: name.replace(/[_-]+/g, ' ').replace(/\s*\d{2,3}\s*bpm/i, '').trim() || name, artist: null,
     durationSec: t.durationSec, bpm, keyRoot: 'not analysed', keyMode: 'minor',
-    moodTags: [], licensing: 'custom', previewUrl: null, localPath: t.path,
-    rationale: (bpm ? bpm + ' bpm; ' : '') + (t.durationSec >= target ? 'covers the ' + target + ' s deliverable' : 'shorter than the deliverable (' + t.durationSec + ' s); would loop or fade') + '. Supplied with the shoot; licensing as the client declares.',
+    moodTags: side.moodTags || [], licensing: side.licensing || 'custom', previewUrl: null, localPath: t.path,
+    rationale: (bpm ? bpm + ' bpm; ' : '') + (t.durationSec >= target ? 'covers the ' + target + ' s deliverable' : 'shorter than the deliverable (' + t.durationSec + ' s); would loop or fade') + '. ' + (side.prompt ? 'Generated: ' + side.prompt : 'Supplied with the shoot; licensing as the client declares.'),
   };
 });
 const options = { schemaVersion: '1.0', jobId, generatedAt: new Date().toISOString(), brief: { toneWords: tone, referenceTracks: [], targetBpm: null, energyCurve: curve }, candidates };
@@ -44,5 +46,5 @@ const errs = validate(schema, options);
 if (errs.length) { console.error('bgm-options fails schema: ' + errs.map(e => e.path + ' ' + e.message).join('; ')); process.exit(1); }
 const out = path.join(dir, 'bgm-options.json'); fs.writeFileSync(out + '.tmp', JSON.stringify(options, null, 2) + '\n'); fs.renameSync(out + '.tmp', out);
 const cwd = process.cwd();
-for (const c of candidates) board.appendOutbox(cwd, client, jobId, { collection: 'bgm', docId: c.id, data: { title: c.title, source: c.source, durationSec: c.durationSec, bpm: c.bpm || null, mood: c.moodTags.join(', ') || null, note: c.rationale, file: c.localPath, chosen: false } });
+for (const c of candidates) board.appendOutbox(cwd, client, jobId, { collection: 'bgm', docId: c.id, data: { title: c.title, source: c.source, durationSec: c.durationSec, bpm: c.bpm || null, mood: c.moodTags.join(', ') || null, source: c.source, note: c.rationale, file: c.localPath, chosen: false } });
 console.log('bgm-options.json: ' + candidates.map(c => c.id + ' ' + c.title + ' (' + c.durationSec + ' s' + (c.bpm ? ', ' + c.bpm + ' bpm' : '') + ')').join('; ') + '. Three cards queued for the board; the person picks one there.');

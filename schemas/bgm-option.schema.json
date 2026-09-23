@@ -25,7 +25,7 @@
         "required": ["id", "source", "title", "durationSec", "bpm", "keyRoot", "keyMode", "licensing"],
         "properties": {
           "id": { "type": "string" },
-          "source": { "enum": ["suno", "musicbed", "artlist", "epidemic-sound", "library-local"] },
+          "source": { "enum": ["suno", "musicbed", "artlist", "epidemic-sound", "library-local", "elevenlabs-music"] },
           "title": { "type": "string" },
           "artist": { "type": ["string", "null"] },
           "durationSec": { "type": "number", "minimum": 0 },
