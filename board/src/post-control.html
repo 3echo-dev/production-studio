@@ -81,6 +81,7 @@ svg.i{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8;stro
 .gchip.ready{color:var(--scrub-ink);background:var(--scrub);border-color:var(--scrub)}
 .newp{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;align-items:end;margin-top:14px;padding:14px 16px;border:1px dashed var(--line2);border-radius:var(--r3)}
 .newp label{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--dim)}
+.newp label .opt{font-weight:400;color:var(--faint,var(--dim));opacity:.7;margin-left:4px}
 
 /* gate strip */
 .gates{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:18px 0 12px}
@@ -474,7 +475,7 @@ async function answer(req, value){
 async function createProject(form){
   const title=form.querySelector('[name=title]').value.trim(); if(!title){ toast('Give the project a title'); form.querySelector('[name=title]').focus(); return; }
   const id=slug(title)+'-'+Date.now().toString(36).slice(-4); const base='projects/'+id;
-  const doc={title, client:form.querySelector('[name=client]').value.trim(), driveFolder:form.querySelector('[name=drive]').value.trim(), preRelease:form.querySelector('[name=pre]').value.trim(), aspectRatio:form.querySelector('[name=aspect]').value, deliverableDurationSec:Number(form.querySelector('[name=duration]').value)||null, audioLed:form.querySelector('[name=led]').value==='audio', footageSource:(form.querySelector('[name=source]')||{}).value==='generated'?'generated':'shoot', status:'intake', createdAt:now(), createdBy:me};
+  const doc={title, client:form.querySelector('[name=client]').value.trim(), driveFolder:form.querySelector('[name=drive]').value.trim(), preRelease:form.querySelector('[name=pre]').value.trim(), referencesFolder:((form.querySelector('[name=refs]')||{}).value||'').trim()||null, aspectRatio:form.querySelector('[name=aspect]').value, deliverableDurationSec:Number(form.querySelector('[name=duration]').value)||null, audioLed:form.querySelector('[name=led]').value==='audio', footageSource:(form.querySelector('[name=source]')||{}).value==='generated'?'generated':'shoot', status:'intake', createdAt:now(), createdBy:me};
   // The bell rings first, on the press itself: a send to Claude is allowed only from a recent
   // viewer gesture, and the writes below take seconds. The order carries the seven answers, so
   // the woken turn starts the job without asking them again; the card lands a moment later.
@@ -497,7 +498,7 @@ function buildDocument(src){ const cut=src.indexOf('<svg width="0"'); const head
 async function bellLog(why, outcome, detail){ if(!db) return; const rec={at:now(), why, outcome, detail:detail==null?null:String(detail).slice(0,600), by:me, project:project&&project.id||null}; try{ await db.doc('bells/'+Date.now().toString(36)+Math.random().toString(36).slice(2,5)).set(rec); }catch(e){} try{ await db.doc('meta/bell').set(rec); }catch(e){} }
 // The slate form's project has a board id and no folder: the bell carries the order to start it,
 // so the woken turn runs new-post-project with the seven answers instead of asking them again.
-function slateOrderFor(d, id){ return 'This is a slate project with no job folder yet'+(id?', slate id '+id:'')+'. Run the new-post-project skill for it now, in this turn, with these answers already given: client '+(d.client||'not given, ask for it')+', title '+(d.title||'')+', footage folder '+(d.driveFolder||'not given, ask for it')+', pre-prod release folder '+(d.preRelease||'not given, ask for it')+', aspect ratio '+(d.aspectRatio||'not given')+', duration '+(d.deliverableDurationSec?d.deliverableDurationSec+' s':'not given, ask for it')+', '+(d.audioLed?'voice-over leads the cut (audioLed true)':'picture leads the cut (audioLed false)')+', footage '+(d.footageSource==='generated'?'generated per storyboard panel (footageSource generated; the footage folder is where the clips land)':'shot rushes (footageSource shoot)')+'. Ask nothing these answer. Scaffold the client if it does not exist, scaffold the job, write these into job.json, route, plan, board-sync.js open and push; when the job id exists run board-sync.js adopt with --from the slate id, push, and carry on to Gate A. Do not reply asking whether to start.'; }
+function slateOrderFor(d, id){ return 'This is a slate project with no job folder yet'+(id?', slate id '+id:'')+'. Run the new-post-project skill for it now, in this turn, with these answers already given: client '+(d.client||'not given, ask for it')+', title '+(d.title||'')+', footage folder '+(d.driveFolder||'not given, ask for it')+', pre-prod release folder '+(d.preRelease||'not given, ask for it')+', aspect ratio '+(d.aspectRatio||'not given')+', duration '+(d.deliverableDurationSec?d.deliverableDurationSec+' s':'not given, ask for it')+', '+(d.audioLed?'voice-over leads the cut (audioLed true)':'picture leads the cut (audioLed false)')+', references folder '+(d.referencesFolder||'the references/ folder inside the footage folder, if there is one')+', footage '+(d.footageSource==='generated'?'generated per storyboard panel (footageSource generated; the footage folder is where the clips land)':'shot rushes (footageSource shoot)')+'. Ask nothing these answer. Scaffold the client if it does not exist, scaffold the job, write these into job.json, route, plan, run scan-references.js and put its summary on the Intake item (ask only about what must be drawn from text), board-sync.js open and push; when the job id exists run board-sync.js adopt with --from the slate id, push, and carry on to Gate A. Do not reply asking whether to start.'; }
 function slateOrder(){ return project&&project.createdBy&&project.createdBy!=='pipeline'&&project.status!=='moved'&&project.driveFolder!=null ? slateOrderFor(project, project.id) : null; }
 // Consent is per board and per viewer; asking for it here, on the person's own press, holds the
 // dialog open instead of letting the first send fail with consent_required and fall back.
@@ -578,10 +579,11 @@ function slatePage(){
     <label>Client<input name="client" id="np-client" placeholder="3echo"></label>
     <label>Footage folder<input name="drive" id="np-drive" placeholder="Shoot / Day 01 …"></label>
     <label>Pre-prod release<input name="pre" id="np-pre" placeholder="Release package folder"></label>
+    <label>References <span class="opt">optional</span><input name="refs" id="np-refs" placeholder="characters, locations, wardrobe…"></label>
     <label>Aspect ratio<select name="aspect" id="np-aspect">${ASPECTS.map(a=>`<option>${a}</option>`).join('')}</select></label>
     <label>Duration (s)<input name="duration" id="np-duration" type="number" min="5" max="900" placeholder="30"></label>
     <label>Leads the cut<select name="led" id="np-led"><option value="picture">Picture</option><option value="audio">Voice-over</option></select></label>
-    <label>Footage<select name="source" id="np-source"><option value="shoot">Shot rushes</option><option value="generated">Generated per panel</option></select></label>
+    <label>Footage<select name="source" id="np-source" required><option value="" disabled selected>Choose…</option><option value="shoot">Shot rushes</option><option value="generated">Generated per panel</option></select></label>
     <button class="primary" type="submit">Open project</button>
   </form>
   ${modelPreview()}`;
@@ -631,6 +633,7 @@ function projectPage(id){
         <dt>Client</dt><dd>${esc(project.client||'')}</dd>
         <dt>Footage</dt><dd>${esc(project.driveFolder||'')}</dd>
         <dt>Pre-prod release</dt><dd>${esc(project.preRelease||'')}</dd>
+        ${project.referencesFolder?`<dt>References</dt><dd>${esc(project.referencesFolder)}</dd>`:''}
         <dt>Frame</dt><dd>${esc(project.aspectRatio||'')}${project.deliverableDurationSec?' · '+esc(project.deliverableDurationSec)+' s':''}${project.audioLed?' · audio-led':' · picture-led'}</dd>
         <dt>Status</dt><dd>${esc(statusWord(project.status))}</dd>
         <dt>Opened</dt><dd>${fmt(project.createdAt)} by ${esc(humanName(project.createdBy))}</dd>

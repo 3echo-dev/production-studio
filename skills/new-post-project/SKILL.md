@@ -12,7 +12,8 @@ user-invocable: false
 ## Inputs
 
 - `--client {slug}`, `--title "..."`.
-- `--drive-folder {path}` — shoot output with `footage/` and optional `audio/` subtrees.
+- `--drive-folder {path}` — shoot output with `footage/` and optional `audio/` subtrees, and an optional `references/` library.
+- `--references {path}` — optional: the reference library somewhere else (`referencesFolder` in job.json).
 - `--pre-release {path}` — pre-prod release package (script.md, storyboard.json, concept-breakdown.xlsx, call-sheet-day-*.pdf or .xlsx, storyboard/v{n}/P*.png).
 - Human XX: `--aspect-ratio`, `--deliverable-duration-sec`, `--audio-led`, optional `--reference-cut-path`, optional `--colour-direction`.
 
@@ -26,8 +27,9 @@ user-invocable: false
 5. If any XX flag is unset, park at `needs_input` and ask on the board via `board-sync.js ask`.
 6. Fill `templates/job.json` with the values. Validate against `schemas/job.schema.json`.
 7. Write `workspaces/{client}/jobs/{job-id}/job.json`.
-8. `route-job.js {job.json}` (exit 3 names what is still missing; it computes and binds `prePipelineReleaseHash`), then `plan-job.js`, `board-sync.js open` and push. Opened on the slate: `board-sync.js adopt {client} {job-id} --from {slate id}`, push.
-9. Report the path, the release hash, and any open XX. Nothing else.
+8. Take stock of the references: `scan-references.js {client} {job-id}` reads `referencesFolder` (default `{drive}/references`: `characters/`, `wardrobe/`, `locations/`, `props/`, `motion/`, optional `labels.json` aliases) against the storyboard and script, and for a generated job the clips already in `footage/generated/`. It writes `reference-inventory.json` and a plain summary: what is available, what each panel uses, which clips are already there (used as they are, not generated), what will be drawn from text, and what no panel mentions. Put the summary on the Intake item. Ask on the board only about the "drawn from text" list: add a reference now, or let the model draw it from the prompt. No library at all is fine: say every panel carries only its storyboard frame.
+9. `route-job.js {job.json}` (exit 3 names what is still missing; it computes and binds `prePipelineReleaseHash`), then `plan-job.js`, `board-sync.js open` and push. Opened on the slate: `board-sync.js adopt {client} {job-id} --from {slate id}`, push.
+10. Report the path, the release hash, the reference summary, and any open XX. Nothing else.
 
 ## Rules
 

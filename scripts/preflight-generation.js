@@ -43,7 +43,7 @@ if (kind === 'generate') {
   const scope = ['sample', 'batch'].includes(n) ? n : null; if (!scope) { console.error('generate takes sample or batch as its third argument'); process.exit(2); }
   const ap = (brief.approvals || {})[scope];
   if (!ap || !ap.by || !ap.at) { console.error('no ' + scope + ' approval on record in generation-brief.json; the yes comes from the board'); process.exit(3); }
-  const pending = (brief.panels || []).filter(p => p.status !== 'delivered');
+  const pending = (brief.panels || []).filter(p => !['delivered', 'provided'].includes(p.status));
   const todo = scope === 'sample' ? pending.slice(0, 1) : (ap.panels ? pending.filter(p => ap.panels.includes(String(p.id).toUpperCase())) : pending);
   if (!todo.length) { console.error('nothing left to generate for ' + scope); process.exit(3); }
   let ceilingG = 120; try { const m = fs.readFileSync(path.resolve(__dirname, '..', 'CONFIG.md'), 'utf8').match(/credit_ceiling_per_job:\s*(\d+)/); if (m) ceilingG = parseInt(m[1], 10); } catch {}

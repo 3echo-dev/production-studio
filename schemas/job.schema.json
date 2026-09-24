@@ -80,6 +80,10 @@
         "workspaceId": { "type": "string", "description": "The 3echo workspace that pays for the clips." }
       }
     },
+    "referencesFolder": {
+      "type": ["string", "null"],
+      "description": "Optional: the reference library (characters/, wardrobe/, locations/, props/, motion/, labels.json). Absent means driveFolder/references. Read by scan-references.js at intake and by the generation brief."
+    },
     "referenceCutPath": {
       "type": ["string", "null"],
       "description": "Optional: path to a reference edit the sequencer should study for pacing."

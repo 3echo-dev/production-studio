@@ -7,6 +7,13 @@
 //   node generate-clips.js <client> <job-id> quote <panelId> --credits N [--job-ref <agentc job id>]
 //   node generate-clips.js <client> <job-id> land <panelId> --file <mp4> | --url <https media url> [--job-ref <id>] [--credits N]
 //   node generate-clips.js <client> <job-id> status
+//   node generate-clips.js <client> <job-id> refs <panelId>              the reference files a panel carries, and which still need uploading
+//   node generate-clips.js <client> <job-id> asset <file> --id <assetId>  record an uploaded reference so it is never uploaded twice
+//
+// References: each panel carries its storyboard frame plus what the job's reference library holds for
+// it (characters, locations, wardrobe, props as images; motion as video), matched by lib-references.js
+// and named in the prompt ([Image 2] is MAYA ...). A panel whose clip is already in footage/generated/
+// is "provided": it is used as it is and never generated or charged.
 //
 // The brief is the request the spend guard reads (preflight-generation.js --kind generate): a
 // prompt, reference panel, duration and ratio per panel, and the approvals landed from the board.
@@ -17,12 +24,13 @@ const path = require('path');
 const { spawnSync } = require('child_process');
 const ws = require('./lib-workspace.js');
 const board = require('./lib-board.js');
+const R = require('./lib-references.js');
 
 const argv = process.argv.slice(2);
 const opt = name => { const i = argv.indexOf(name); return i >= 0 && argv[i + 1] ? argv[i + 1] : null; };
 const { client, jobId, dir, rest } = ws.resolveJobArgs(argv, argv);
 const cmd = rest[0];
-if (!client || !jobId || !['brief', 'approve', 'quote', 'land', 'status'].includes(cmd)) { console.error('usage: generate-clips.js <client> <job-id> brief|approve|quote|land|status ...'); process.exit(2); }
+if (!client || !jobId || !['brief', 'approve', 'quote', 'land', 'status', 'refs', 'asset'].includes(cmd)) { console.error('usage: generate-clips.js <client> <job-id> brief|approve|quote|land|status|refs|asset ...'); process.exit(2); }
 const job = JSON.parse(fs.readFileSync(path.join(dir, 'job.json'), 'utf8'));
 if (job.footageSource !== 'generated') { console.error('job.json footageSource is not "generated"; this job cuts shot footage.'); process.exit(3); }
 const briefPath = path.join(dir, 'generation-brief.json');
@@ -46,6 +54,7 @@ if (cmd === 'brief') {
   const headSec = gen.headSec == null ? 0.5 : Math.max(0, Number(gen.headSec) || 0);
   const prev = fs.existsSync(briefPath) ? JSON.parse(fs.readFileSync(briefPath, 'utf8')) : null;
   const keep = new Map(((prev || {}).panels || []).map(p => [p.id, p]));
+  const lib = R.scanLibrary(R.libraryRoot(job));
   const out = {
     schemaVersion: '1.0', jobId, generatedAt: new Date().toISOString(),
     model: 'agentc/seedance', ratio: RATIO[job.aspectRatio] || '16:9', resolution: gen.resolution || '720p', generateAudio: gen.generateAudio === true, workspaceId: gen.workspaceId || null,
@@ -57,18 +66,31 @@ if (cmd === 'brief') {
       const inSec = Math.max(0, Math.min(headSec, durationSec - useSec));
       const line = sceneLine(p.scene);
       // The prompt: the panel caption, the line spoken over it (mood only, the VO is added in the audio
-      // stages), and the frame. The reference-panel sentence is added by the orchestrator only when a
-      // panel image is actually attached as a reference asset.
+      // stages), the frame, and a legend naming every attached reference ([Image 1] is the storyboard
+      // frame, [Image 2] is MAYA ...) so the model knows what each picture is for.
       const voLine = line ? (line.match(/VO:\s*"([^"]+)"/i) || [])[1] || null : null;
       const action = line ? line.replace(/^Scene\s+\S+:?\s*/i, '').replace(/,?\s*VO:\s*"[^"]*"/i, '').trim().replace(/[.\s]+$/, '') : '';
       const capText = p.caption || p.description || ('Storyboard panel ' + p.id);
-      const prompt = [capText + '.', action && action.toLowerCase() !== capText.toLowerCase() ? action + '.' : null, voLine ? 'The moment carries the line "' + voLine + '" (unspoken; no dialogue, no lip movement).' : null, 'Live-action, cinematic, natural light, ' + (job.aspectRatio || '16:9') + ' frame, one continuous shot, subtle camera move; no text, no captions, no logos, no watermarks.'].filter(Boolean).join(' ');
-      return { id: p.id, storyOrder: p.storyOrder || null, scene: p.scene == null ? null : String(p.scene), prompt: old.promptOverride || prompt, referencePanel: path.join(rel, p.file || ('storyboard/v1/' + p.id + '.png')).replace(/\\/g, '/'), durationSec, useSec, inSec, ratio: RATIO[job.aspectRatio] || '16:9', idempotencyKey: jobId + '/generate/' + p.id, status: old.status === 'delivered' ? 'delivered' : 'pending', quotedCredits: old.quotedCredits || null, jobRef: old.jobRef || null, file: old.file || null, sha256: old.sha256 || null, credits: old.credits || null };
+      const referencePanel = path.join(rel, p.file || ('storyboard/v1/' + p.id + '.png')).replace(/\\/g, '/');
+      const words = [p.caption, p.description, p.shot, line].filter(Boolean).join('. ');
+      const needs = R.panelNeeds(p, words, lib);
+      const refs = R.attach(referencePanel, needs.found);
+      const prompt = [capText + '.', action && action.toLowerCase() !== capText.toLowerCase() ? action + '.' : null, voLine ? 'The moment carries the line "' + voLine + '" (unspoken; no dialogue, no lip movement).' : null, 'Live-action, cinematic, natural light, ' + (job.aspectRatio || '16:9') + ' frame, one continuous shot, subtle camera move; no text, no captions, no logos, no watermarks.', R.legend(refs)].filter(Boolean).join(' ');
+      // A clip already in footage/generated/ (reused from an earlier run, or dropped in by hand) is used as it is.
+      const have = old.status === 'delivered' ? null : ['.mp4', '.mov'].map(x => path.join(outDir, p.id + x)).find(f => fs.existsSync(f));
+      const status = old.status === 'delivered' ? 'delivered' : (have ? 'provided' : 'pending');
+      return { id: p.id, storyOrder: p.storyOrder || null, scene: p.scene == null ? null : String(p.scene), prompt: old.promptOverride || prompt, referencePanel, refs, fromText: needs.missing.map(m => ({ kind: m.kind, name: m.name })), durationSec, useSec, inSec, ratio: RATIO[job.aspectRatio] || '16:9', idempotencyKey: jobId + '/generate/' + p.id, status, quotedCredits: old.quotedCredits || null, jobRef: old.jobRef || null, file: have ? have.replace(/\\/g, '/') : (old.file || null), sha256: have ? board.sha256File(have) : (old.sha256 || null), credits: old.credits || null };
     }),
   };
   const missingRef = out.panels.filter(p => !fs.existsSync(p.referencePanel)).map(p => p.id);
   if (missingRef.length) { console.error('reference panel image missing for ' + missingRef.join(', ')); process.exit(1); }
   writeBrief(out);
+  const provided = out.panels.filter(p => p.status === 'provided').map(p => p.id);
+  const withRefs = out.panels.filter(p => p.refs.images.length > 1 || p.refs.videos.length).length;
+  const fromText = [...new Set(out.panels.flatMap(p => p.fromText.map(m => m.name)))];
+  if (!lib.exists) console.log('No reference library (' + (R.libraryRoot(job) || 'no footage folder') + '/characters, locations, wardrobe, props, motion); each panel carries only its storyboard frame.');
+  else console.log('References: ' + withRefs + ' panel(s) carry library references beyond the frame' + (fromText.length ? '; drawn from text (no reference): ' + fromText.join(', ') : '') + '. Run scan-references.js for the full inventory.');
+  if (provided.length) console.log('Already there, used as they are, not generated: ' + provided.join(', ') + '.');
   console.log('generation-brief.json: ' + out.panels.length + ' panel(s); the cut uses ' + out.panels.reduce((s, p) => s + p.useSec, 0) + ' s, the model is asked for ' + out.panels.reduce((s, p) => s + p.durationSec, 0) + ' s (' + headroomSec + ' s headroom per clip, window from ' + headSec + ' s in) at ' + out.ratio + ' ' + out.resolution + (out.generateAudio ? ' with model audio' : ', silent') + '. Quote the sample (first panel) with estimate_video_job and ask on the board before anything is spent.');
   process.exit(0);
 }
@@ -98,13 +120,32 @@ if (cmd === 'land') {
   p.status = 'delivered'; p.file = dest.replace(/\\/g, '/'); p.sha256 = board.sha256File(dest); p.landedAt = new Date().toISOString(); p.width = st.width; p.height = st.height; p.actualDurationSec = Number((info.format || {}).duration) || null;
   if (opt('--job-ref')) p.jobRef = opt('--job-ref'); if (opt('--credits')) p.credits = Number(opt('--credits'));
   writeBrief(b);
-  const left = b.panels.filter(x => x.status !== 'delivered').length;
+  const left = b.panels.filter(x => !['delivered', 'provided'].includes(x.status)).length;
   console.log(p.id + ' landed: ' + path.basename(dest) + ' ' + st.width + 'x' + st.height + ' ' + (p.actualDurationSec || 0).toFixed(1) + ' s (' + p.sha256.slice(0, 12) + '). ' + (left ? left + ' panel(s) still to generate.' : 'Every panel has a clip; run ingest-footage.js next.'));
   process.exit(0);
 }
+const cachePath = path.join(dir, 'reference-assets.json');
+const readCache = () => { try { return JSON.parse(fs.readFileSync(cachePath, 'utf8')); } catch { return {}; } };
+if (cmd === 'asset') {
+  const file = rest[1]; const id = opt('--id');
+  if (!file || !id) { console.error('usage: asset <file> --id <assetId>'); process.exit(2); }
+  if (!fs.existsSync(file)) { console.error('file not there: ' + file); process.exit(1); }
+  const c = readCache(); const sha = board.sha256File(file);
+  c[sha] = { file: file.replace(/\\/g, '/'), assetId: id, recordedAt: new Date().toISOString() };
+  fs.writeFileSync(cachePath, JSON.stringify(c, null, 2) + '\n'); console.log('recorded ' + path.basename(file) + ' as ' + id + '; every panel that uses it reuses this upload.'); process.exit(0);
+}
+if (cmd === 'refs') {
+  const b = readBrief(); const p = b.panels.find(x => x.id === rest[1]); if (!p) { console.error('usage: refs <panelId>'); process.exit(2); }
+  const c = readCache();
+  const withIds = list => (list || []).map(r => { const ok = fs.existsSync(r.file); const sha = ok ? board.sha256File(r.file) : null; return Object.assign({}, r, { assetId: sha && c[sha] ? c[sha].assetId : null, missingFile: !ok }); });
+  const refs = { panel: p.id, images: withIds(p.refs ? p.refs.images : [{ kind: 'frame', name: 'storyboard frame', file: p.referencePanel }]), videos: withIds(p.refs ? p.refs.videos : []) };
+  refs.toUpload = refs.images.concat(refs.videos).filter(r => !r.assetId && !r.missingFile).map(r => r.file);
+  refs.assetIds = refs.images.concat(refs.videos).map(r => r.assetId).filter(Boolean);
+  console.log(JSON.stringify(refs, null, 2)); process.exit(0);
+}
 if (cmd === 'status') {
-  const b = readBrief(); const done = b.panels.filter(p => p.status === 'delivered');
-  console.log('generate: ' + done.length + '/' + b.panels.length + ' delivered; approvals: ' + Object.keys(b.approvals || {}).join(', ') + (Object.keys(b.approvals || {}).length ? '' : 'none') + '; credits spent ' + done.reduce((s, p) => s + (Number(p.credits) || 0), 0));
+  const b = readBrief(); const done = b.panels.filter(p => p.status === 'delivered'); const given = b.panels.filter(p => p.status === 'provided');
+  console.log('generate: ' + done.length + '/' + b.panels.length + ' delivered' + (given.length ? ', ' + given.length + ' provided (used as they are)' : '') + '; approvals: ' + Object.keys(b.approvals || {}).join(', ') + (Object.keys(b.approvals || {}).length ? '' : 'none') + '; credits spent ' + done.reduce((s, p) => s + (Number(p.credits) || 0), 0));
   for (const p of b.panels) console.log('  ' + p.id + ' ' + p.status + (p.quotedCredits ? ' quoted ' + p.quotedCredits : '') + (p.file ? ' ' + path.basename(p.file) : ''));
   process.exit(0);
 }
