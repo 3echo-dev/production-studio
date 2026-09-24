@@ -3,6 +3,8 @@
 // Where it lives: job.referencesFolder, or <driveFolder>/references. Five kinds, one folder each:
 //
 //   references/characters/<name>/*.png|jpg|webp     one folder per person (or a single image named after them)
+//   (the folder names are forgiving: Cast, Backgrounds, 2. Props, Outfits, camera moves... see KIND_WORDS;
+//    the library itself may be called references, refs or assets, or be the footage folder itself)
 //   references/wardrobe/<name>/...                   costumes and outfits
 //   references/locations/<name>/...                  sets and places
 //   references/props/<name>/...                      objects that must look the same every time
@@ -26,25 +28,51 @@ const LIMITS = { image: 9, video: 3 };
 const PER_KIND = { characters: 4, wardrobe: 2, locations: 1, props: 2 };
 const NOT_NAMES = new Set(['INT', 'EXT', 'VO', 'V.O', 'O.S', 'OS', 'CU', 'ECU', 'MS', 'MCU', 'WS', 'EWS', 'POV', 'DAY', 'NIGHT', 'CUT', 'TO', 'FADE', 'IN', 'OUT', 'CONT', 'CONTINUOUS', 'LATER', 'SCENE', 'TBC', 'OTS', 'LS', 'TV', 'AI', 'SFX', 'BGM', 'TITLE', 'SUPER', 'THE', 'A', 'AND', 'OF']);
 
+// Folder names people actually use, per kind: any case, singular or plural, spaces, - or _.
+const KIND_WORDS = {
+  characters: ['characters', 'character', 'chars', 'cast', 'talent', 'talents', 'actors', 'actor', 'actress', 'people', 'person', 'faces', 'face', 'models', 'model', 'influencers', 'influencer'],
+  wardrobe: ['wardrobe', 'wardrobes', 'costumes', 'costume', 'outfits', 'outfit', 'clothes', 'clothing', 'styling', 'looks'],
+  locations: ['locations', 'location', 'backgrounds', 'background', 'bg', 'bgs', 'backdrops', 'backdrop', 'sets', 'set', 'places', 'place', 'environments', 'environment', 'env', 'envs', 'plates', 'scenery'],
+  props: ['props', 'prop', 'objects', 'object', 'items', 'item', 'products', 'product', 'packshots', 'packshot'],
+  motion: ['motion', 'motions', 'movement', 'movements', 'camera', 'camera moves', 'camera move', 'moves', 'reference videos', 'ref videos', 'videos', 'video'],
+};
+const ROOT_WORDS = ['references', 'reference', 'refs', 'ref', 'assets', 'library'];
 const norm = s => String(s || '').toLowerCase().replace(/[_\-]+/g, ' ').replace(/\s+/g, ' ').trim();
+const kindOf = folder => { const n = norm(folder).replace(/^\d+\s*[.)]?\s*/, ''); return Object.keys(KIND_WORDS).find(k => KIND_WORDS[k].includes(n)) || null; };
 const fwd = p => p.replace(/\\/g, '/');
 const esc = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
+// The library: job.referencesFolder, else a folder in the footage folder named references, refs,
+// assets... (any case), else the footage folder itself when it holds kind folders directly.
 function libraryRoot(job) {
   if (job.referencesFolder) return job.referencesFolder;
-  return job.driveFolder ? path.join(job.driveFolder, 'references') : null;
+  if (!job.driveFolder) return null;
+  const def = path.join(job.driveFolder, 'references');
+  if (!fs.existsSync(job.driveFolder)) return def;
+  const dirs = fs.readdirSync(job.driveFolder, { withFileTypes: true }).filter(e => e.isDirectory());
+  const named = dirs.find(e => ROOT_WORDS.includes(norm(e.name).replace(/^\d+\s*[.)]?\s*/, '')));
+  if (named) return path.join(job.driveFolder, named.name);
+  if (dirs.some(e => kindOf(e.name))) return job.driveFolder;
+  return def;
 }
 
 // Every item in the library: { kind, name, key, aliases, images[], videos[] }
 function scanLibrary(root) {
-  const lib = { root: root ? fwd(root) : null, exists: !!(root && fs.existsSync(root)), items: [] };
+  const lib = { root: root ? fwd(root) : null, exists: !!(root && fs.existsSync(root)), items: [], folders: {}, unrecognised: [] };
   if (!lib.exists) return lib;
   let labels = {};
   try { labels = JSON.parse(fs.readFileSync(path.join(root, 'labels.json'), 'utf8')); } catch { labels = {}; }
+  // Map each top-level folder to a kind by its name; a folder no kind claims is reported, not guessed.
+  const kindDirs = {};
+  for (const e of fs.readdirSync(root, { withFileTypes: true })) {
+    if (!e.isDirectory() || e.name.startsWith('.')) continue;
+    const k = kindOf(e.name);
+    if (k) { (kindDirs[k] = kindDirs[k] || []).push(path.join(root, e.name)); lib.folders[e.name] = k; }
+    else if (!['footage', 'audio'].includes(norm(e.name))) lib.unrecognised.push(e.name);
+  }
   for (const kind of KINDS) {
-    const kd = path.join(root, kind);
-    if (!fs.existsSync(kd) || !fs.statSync(kd).isDirectory()) continue;
     const groups = new Map();
+    for (const kd of kindDirs[kind] || [])
     for (const e of fs.readdirSync(kd, { withFileTypes: true })) {
       if (e.name.startsWith('.')) continue;
       const full = path.join(kd, e.name);
@@ -144,4 +172,4 @@ function legend(refs) {
   return parts.length ? 'References: ' + parts.join('; ') + '.' : '';
 }
 
-module.exports = { KINDS, LIMITS, libraryRoot, scanLibrary, panelNeeds, attach, legend, capitalNames };
+module.exports = { KINDS, KIND_WORDS, LIMITS, kindOf, libraryRoot, scanLibrary, panelNeeds, attach, legend, capitalNames };

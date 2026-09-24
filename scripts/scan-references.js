@@ -64,7 +64,7 @@ function build(job, dir) {
   for (const k of R.KINDS) available[k] = lib.items.filter(i => i.kind === k).map(i => ({ name: i.name, images: i.images.length, videos: i.videos.length, aliases: i.aliases }));
   return {
     schemaVersion: '1.0', jobId: job.jobId, scannedAt: new Date().toISOString(),
-    library: { root: lib.root, exists: lib.exists },
+    library: { root: lib.root, exists: lib.exists, folders: lib.folders || {}, unrecognised: lib.unrecognised || [] },
     available,
     panels: rows,
     fromText: [...fromText.values()],
@@ -85,6 +85,9 @@ function summary(inv) {
   else {
     const have = R.KINDS.map(k => inv.available[k].length ? k + ': ' + inv.available[k].map(i => i.name + ' (' + (i.images || i.videos) + ')').join(', ') : null).filter(Boolean);
     out.push('Reference library ' + inv.library.root + (have.length ? '' : ' is empty.'));
+    const mapped = Object.entries(inv.library.folders || {}).filter(([f, k]) => f.toLowerCase() !== k);
+    if (mapped.length) out.push('  read as    ' + mapped.map(([f, k]) => f + ' → ' + k).join(', '));
+    if ((inv.library.unrecognised || []).length) out.push('  not used   ' + inv.library.unrecognised.join(', ') + ' (a folder name no kind matches: rename it, or ask to have it read as characters, wardrobe, locations, props or motion)');
     have.forEach(h => out.push('  available  ' + h));
   }
   if (inv.footage) {
