@@ -2,7 +2,7 @@
   "name": "creative-studio-post",
   "displayName": "Creative Studio Post",
   "description": "Runs the studio's post-production pipeline end to end: shot footage + audio files + the pre-prod release package (script, storyboard, concept breakdown) become a first cut, three BGM options, a synced audio track, on-demand B-roll variants and motion-graphic alphas, delivered as an FCPXML bundle the editor drops straight into Premiere Pro. Sibling to creative-studio-pipeline; extends the AgentC MCP with sequence, BGM, sync, B-roll and export tools.",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "keywords": [
     "post-production",
     "first cut",
