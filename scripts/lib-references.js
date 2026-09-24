@@ -52,48 +52,100 @@ function libraryRoot(job) {
   const dirs = fs.readdirSync(job.driveFolder, { withFileTypes: true }).filter(e => e.isDirectory());
   const named = dirs.find(e => ROOT_WORDS.includes(norm(e.name).replace(/^\d+\s*[.)]?\s*/, '')));
   if (named) return path.join(job.driveFolder, named.name);
-  if (dirs.some(e => kindOf(e.name))) return job.driveFolder;
+  if (dirs.some(e => kindOf(e.name) || holdsKinds(path.join(job.driveFolder, e.name)))) return job.driveFolder;
   return def;
 }
 
-// Every item in the library: { kind, name, key, aliases, images[], videos[] }
-function scanLibrary(root) {
-  const lib = { root: root ? fwd(root) : null, exists: !!(root && fs.existsSync(root)), items: [], folders: {}, unrecognised: [] };
+// A shared library can be split by project: <library>/<project>/<kind>/... plus <library>/shared/<kind>/...
+// This project takes its own folder (matched by title or job slug) and shared/, never another project's.
+const SHARED_WORDS = ['shared', 'common', 'global', 'general', 'all projects', 'all'];
+const squash = s => norm(s).replace(/[^a-z0-9]+/g, '');
+function projectKeys(scope) {
+  const keys = new Set();
+  if (scope && scope.title) keys.add(squash(scope.title));
+  if (scope && scope.jobId) { keys.add(squash(scope.jobId)); const slug = String(scope.jobId).replace(/^job-\d{8}-\d{4}-/, ''); keys.add(squash(slug)); }
+  keys.delete('');
+  return keys;
+}
+const holdsKinds = dir => { try { return fs.readdirSync(dir, { withFileTypes: true }).some(e => e.isDirectory() && kindOf(e.name)); } catch { return false; } };
+
+// Every item in the library: { kind, name, key, aliases, images[], videos[], scope, sources[], clash }
+// scope: { title, jobId, driveFolder } of the job reading it.
+function scanLibrary(root, scope) {
+  const lib = { root: root ? fwd(root) : null, exists: !!(root && fs.existsSync(root)), items: [], folders: {}, unrecognised: [], layout: 'flat', project: null, shared: null, otherProjects: [], warnings: [] };
   if (!lib.exists) return lib;
   let labels = {};
   try { labels = JSON.parse(fs.readFileSync(path.join(root, 'labels.json'), 'utf8')); } catch { labels = {}; }
-  // Map each top-level folder to a kind by its name; a folder no kind claims is reported, not guessed.
-  const kindDirs = {};
-  for (const e of fs.readdirSync(root, { withFileTypes: true })) {
-    if (!e.isDirectory() || e.name.startsWith('.')) continue;
+  // Which folders feed this project: kind folders at the top (flat), or a project folder plus shared/.
+  const sources = [];   // { dir, kind, level: 'project'|'shared'|'flat', label }
+  const keys = projectKeys(scope);
+  const top = fs.readdirSync(root, { withFileTypes: true }).filter(e => e.isDirectory() && !e.name.startsWith('.'));
+  const projectDirs = top.filter(e => !kindOf(e.name) && holdsKinds(path.join(root, e.name)));
+  if (projectDirs.length) lib.layout = 'by-project';
+  for (const e of top) {
     const k = kindOf(e.name);
-    if (k) { (kindDirs[k] = kindDirs[k] || []).push(path.join(root, e.name)); lib.folders[e.name] = k; }
-    else if (!['footage', 'audio'].includes(norm(e.name))) lib.unrecognised.push(e.name);
+    if (k) { sources.push({ dir: path.join(root, e.name), kind: k, level: lib.layout === 'by-project' ? 'shared' : 'flat', label: e.name }); lib.folders[e.name] = k; continue; }
+    if (projectDirs.includes(e)) {
+      const sq = squash(e.name);
+      const level = SHARED_WORDS.map(squash).includes(sq) ? 'shared' : (keys.has(sq) ? 'project' : null);
+      if (!level) { lib.otherProjects.push(e.name); continue; }
+      if (level === 'project') lib.project = e.name; else lib.shared = e.name;
+      for (const s of fs.readdirSync(path.join(root, e.name), { withFileTypes: true })) {
+        const k2 = s.isDirectory() ? kindOf(s.name) : null;
+        if (k2) { sources.push({ dir: path.join(root, e.name, s.name), kind: k2, level, label: e.name + '/' + s.name }); lib.folders[e.name + '/' + s.name] = k2; }
+      }
+      continue;
+    }
+    if (!['footage', 'audio'].includes(norm(e.name))) lib.unrecognised.push(e.name);
   }
+  if (lib.layout === 'by-project' && !lib.project) lib.warnings.push({ code: 'no-project-folder', text: 'The library is split by project, but no folder matches this project' + (scope && scope.title ? ' ("' + scope.title + '")' : '') + '. Only ' + (lib.shared ? 'the shared folder' : 'nothing') + ' is used; ' + lib.otherProjects.length + ' other project folder(s) are ignored.' });
+  const inside = scope && scope.driveFolder && fwd(path.resolve(root)).toLowerCase().startsWith(fwd(path.resolve(scope.driveFolder)).toLowerCase());
+  if (lib.layout === 'flat' && scope && scope.driveFolder && !inside) lib.warnings.push({ code: 'unscoped-shared', text: 'The library is outside this project\'s folder and is not split by project, so it may hold other projects\' pictures. Only items this script names are used; check the list before approving.' });
+  // One entry per (kind, name). The same name from two folders at the same level is a clash; a project
+  // item over a shared one of the same name is an override, not a clash.
   for (const kind of KINDS) {
-    const groups = new Map();
-    for (const kd of kindDirs[kind] || [])
-    for (const e of fs.readdirSync(kd, { withFileTypes: true })) {
-      if (e.name.startsWith('.')) continue;
-      const full = path.join(kd, e.name);
-      if (e.isDirectory()) {
-        const files = fs.readdirSync(full).filter(f => !f.startsWith('.')).sort().map(f => path.join(full, f));
-        groups.set(e.name, (groups.get(e.name) || []).concat(files));
-      } else if (IMG.test(e.name) || VID.test(e.name)) {
-        const name = e.name.replace(/\.[^.]+$/, '').replace(/[_\-\s]+\d+$/, '') || e.name;
-        groups.set(name, (groups.get(name) || []).concat([full]));
+    const byKey = new Map();
+    for (const src of sources.filter(s => s.kind === kind)) {
+      const groups = new Map();
+      for (const e of fs.readdirSync(src.dir, { withFileTypes: true })) {
+        if (e.name.startsWith('.')) continue;
+        const full = path.join(src.dir, e.name);
+        if (e.isDirectory()) groups.set(e.name, (groups.get(e.name) || []).concat(fs.readdirSync(full).filter(f => !f.startsWith('.')).sort().map(f => path.join(full, f))));
+        else if (IMG.test(e.name) || VID.test(e.name)) { const nm = e.name.replace(/\.[^.]+$/, '').replace(/[_\-\s]+\d+$/, '') || e.name; groups.set(nm, (groups.get(nm) || []).concat([full])); }
+      }
+      for (const [name, files] of groups) {
+        const entry = { name, files, level: src.level, label: src.label };
+        const key = norm(name);
+        (byKey.get(key) || byKey.set(key, []).get(key)).push(entry);
       }
     }
-    for (const [name, files] of groups) {
-      const lab = ((labels[kind] || {})[name]) || ((labels[kind] || {})[norm(name)]) || {};
+    for (const [key, entries] of byKey) {
+      const best = ['project', 'flat', 'shared'].find(l => entries.some(e => e.level === l));
+      const chosen = entries.filter(e => e.level === best);
+      const lab = ((labels[kind] || {})[chosen[0].name]) || ((labels[kind] || {})[key]) || {};
+      const files = chosen[0].files;
       lib.items.push({
-        kind, name, key: norm(name), aliases: (lab.aliases || []).map(norm).filter(Boolean), note: lab.note || null,
+        kind, name: chosen[0].name, key, aliases: (lab.aliases || []).map(norm).filter(Boolean), note: lab.note || null,
         images: files.filter(f => IMG.test(f)).map(fwd), videos: files.filter(f => VID.test(f)).map(fwd),
+        scope: best, sources: chosen.map(e => e.label),
+        overrides: entries.some(e => e.level !== best) ? entries.filter(e => e.level !== best).map(e => e.label) : null,
+        clash: chosen.length > 1 ? chosen.map(e => e.label) : null,
       });
     }
   }
   return lib;
 }
+
+// One fingerprint for the pictures a panel sends: kind, name and the bytes of every file.
+function refsHash(refs) {
+  const crypto = require('crypto');
+  const parts = (refs.images || []).concat(refs.videos || []).map(r => {
+    let sha = 'missing'; try { sha = crypto.createHash('sha256').update(fs.readFileSync(r.file)).digest('hex'); } catch {}
+    return r.kind + '|' + r.name + '|' + sha;
+  });
+  return crypto.createHash('sha256').update(parts.join('\n')).digest('hex');
+}
+const hasLibraryRefs = refs => !!refs && ((refs.images || []).some(r => r.kind !== 'frame') || (refs.videos || []).length > 0);
 
 function asList(v) { return v == null ? [] : (Array.isArray(v) ? v : [v]).map(String).filter(Boolean); }
 
@@ -120,6 +172,7 @@ function mentions(text, item) {
 function panelNeeds(panel, words, lib) {
   const found = [];     // { kind, name, item }
   const missing = [];   // { kind, name, why }
+  const clashes = [];   // { kind, name, sources } — two different pictures share the name: a person decides
   const byKind = k => lib.items.filter(i => i.kind === k);
   const explicit = { characters: asList(panel.characters), locations: asList(panel.location || panel.locations), wardrobe: asList(panel.wardrobe), props: asList(panel.props) };
   for (const kind of ['characters', 'wardrobe', 'locations', 'props']) {
@@ -142,7 +195,9 @@ function panelNeeds(panel, words, lib) {
   // Motion: by panel id, by scene, or by name in the words.
   const motion = byKind('motion').filter(i => i.key === norm(panel.id) || (panel.scene != null && (i.key === 'scene ' + String(panel.scene) || i.key === 's' + String(panel.scene))) || mentions(words, i));
   for (const m of motion) found.push({ kind: 'motion', name: m.name, item: m });
-  return { found, missing };
+  // A clashing item is never attached: which picture is meant is a person's call.
+  for (let i = found.length - 1; i >= 0; i--) if (found[i].item.clash) { clashes.push({ kind: found[i].kind, name: found[i].name, sources: found[i].item.clash }); found.splice(i, 1); }
+  return { found, missing, clashes };
 }
 
 // The reference list one generation request carries, in the order the prompt names them.
@@ -172,4 +227,6 @@ function legend(refs) {
   return parts.length ? 'References: ' + parts.join('; ') + '.' : '';
 }
 
-module.exports = { KINDS, KIND_WORDS, LIMITS, kindOf, libraryRoot, scanLibrary, panelNeeds, attach, legend, capitalNames };
+const scopeOf = job => ({ title: job.title || null, jobId: job.jobId || null, driveFolder: job.driveFolder || null });
+
+module.exports = { KINDS, KIND_WORDS, LIMITS, kindOf, libraryRoot, scanLibrary, scopeOf, panelNeeds, attach, legend, refsHash, hasLibraryRefs, capitalNames };

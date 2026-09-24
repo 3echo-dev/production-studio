@@ -32,11 +32,13 @@ export function refuseBrollWithoutRequest({ command, cwd }) {
   if (fs.existsSync(briefPath)) {
     try {
       const b = JSON.parse(fs.readFileSync(briefPath, 'utf8'));
-      const pending = (b.panels || []).filter(p => p.status !== 'delivered');
+      const pending = (b.panels || []).filter(p => !['delivered', 'provided'].includes(p.status));
       const scope = (b.panels || []).some(p => p.status === 'delivered') ? 'batch' : 'sample';
       const ap = (b.approvals || {})[scope];
       if (!pending.length) return 'Generation refused: every panel already has a clip.';
       if (!ap || !ap.by || !ap.at) return 'Generation refused: no ' + scope + ' approval on record from the board.';
+      if (pending.some(p => (p.clashes || []).length)) return 'Generation refused: two different reference pictures share a name; a person picks one first.';
+      if (pending.some(p => p.libraryRefs) && !((b.approvals || {}).refs || {}).by) return 'Generation refused: the reference set has not been approved on the board.';
       return null;
     } catch { return 'Generation refused: generation-brief.json is unreadable.'; }
   }

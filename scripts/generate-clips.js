@@ -9,6 +9,8 @@
 //   node generate-clips.js <client> <job-id> status
 //   node generate-clips.js <client> <job-id> refs <panelId>              the reference files a panel carries, and which still need uploading
 //   node generate-clips.js <client> <job-id> asset <file> --id <assetId>  record an uploaded reference so it is never uploaded twice
+//   node generate-clips.js <client> <job-id> refset [--json]              the reference set per panel, as a person approves it on the board
+//   node generate-clips.js <client> <job-id> approve refs --by <who> --at <iso>   fingerprint the approved set; a file swapped later voids it
 //
 // References: each panel carries its storyboard frame plus what the job's reference library holds for
 // it (characters, locations, wardrobe, props as images; motion as video), matched by lib-references.js
@@ -30,7 +32,7 @@ const argv = process.argv.slice(2);
 const opt = name => { const i = argv.indexOf(name); return i >= 0 && argv[i + 1] ? argv[i + 1] : null; };
 const { client, jobId, dir, rest } = ws.resolveJobArgs(argv, argv);
 const cmd = rest[0];
-if (!client || !jobId || !['brief', 'approve', 'quote', 'land', 'status', 'refs', 'asset'].includes(cmd)) { console.error('usage: generate-clips.js <client> <job-id> brief|approve|quote|land|status|refs|asset ...'); process.exit(2); }
+if (!client || !jobId || !['brief', 'approve', 'quote', 'land', 'status', 'refs', 'asset', 'refset'].includes(cmd)) { console.error('usage: generate-clips.js <client> <job-id> brief|approve|quote|land|status|refs|asset|refset ...'); process.exit(2); }
 const job = JSON.parse(fs.readFileSync(path.join(dir, 'job.json'), 'utf8'));
 if (job.footageSource !== 'generated') { console.error('job.json footageSource is not "generated"; this job cuts shot footage.'); process.exit(3); }
 const briefPath = path.join(dir, 'generation-brief.json');
@@ -54,7 +56,7 @@ if (cmd === 'brief') {
   const headSec = gen.headSec == null ? 0.5 : Math.max(0, Number(gen.headSec) || 0);
   const prev = fs.existsSync(briefPath) ? JSON.parse(fs.readFileSync(briefPath, 'utf8')) : null;
   const keep = new Map(((prev || {}).panels || []).map(p => [p.id, p]));
-  const lib = R.scanLibrary(R.libraryRoot(job));
+  const lib = R.scanLibrary(R.libraryRoot(job), R.scopeOf(job));
   const out = {
     schemaVersion: '1.0', jobId, generatedAt: new Date().toISOString(),
     model: 'agentc/seedance', ratio: RATIO[job.aspectRatio] || '16:9', resolution: gen.resolution || '720p', generateAudio: gen.generateAudio === true, workspaceId: gen.workspaceId || null,
@@ -79,7 +81,7 @@ if (cmd === 'brief') {
       // A clip already in footage/generated/ (reused from an earlier run, or dropped in by hand) is used as it is.
       const have = old.status === 'delivered' ? null : ['.mp4', '.mov'].map(x => path.join(outDir, p.id + x)).find(f => fs.existsSync(f));
       const status = old.status === 'delivered' ? 'delivered' : (have ? 'provided' : 'pending');
-      return { id: p.id, storyOrder: p.storyOrder || null, scene: p.scene == null ? null : String(p.scene), prompt: old.promptOverride || prompt, referencePanel, refs, fromText: needs.missing.map(m => ({ kind: m.kind, name: m.name })), durationSec, useSec, inSec, ratio: RATIO[job.aspectRatio] || '16:9', idempotencyKey: jobId + '/generate/' + p.id, status, quotedCredits: old.quotedCredits || null, jobRef: old.jobRef || null, file: have ? have.replace(/\\/g, '/') : (old.file || null), sha256: have ? board.sha256File(have) : (old.sha256 || null), credits: old.credits || null };
+      return { id: p.id, storyOrder: p.storyOrder || null, scene: p.scene == null ? null : String(p.scene), prompt: old.promptOverride || prompt, referencePanel, refs, libraryRefs: R.hasLibraryRefs(refs), refsHash: R.refsHash(refs), fromText: needs.missing.map(m => ({ kind: m.kind, name: m.name })), clashes: needs.clashes.map(c => ({ kind: c.kind, name: c.name, sources: c.sources })), durationSec, useSec, inSec, ratio: RATIO[job.aspectRatio] || '16:9', idempotencyKey: jobId + '/generate/' + p.id, status, quotedCredits: old.quotedCredits || null, jobRef: old.jobRef || null, file: have ? have.replace(/\\/g, '/') : (old.file || null), sha256: have ? board.sha256File(have) : (old.sha256 || null), credits: old.credits || null };
     }),
   };
   const missingRef = out.panels.filter(p => !fs.existsSync(p.referencePanel)).map(p => p.id);
@@ -95,7 +97,15 @@ if (cmd === 'brief') {
   process.exit(0);
 }
 if (cmd === 'approve') {
-  const scope = rest[1]; if (!['sample', 'batch'].includes(scope) || !opt('--by') || !opt('--at')) { console.error('usage: approve sample|batch --by <who> --at <iso> [--credits N]'); process.exit(2); }
+  const scope = rest[1]; if (!['sample', 'batch', 'refs'].includes(scope) || !opt('--by') || !opt('--at')) { console.error('usage: approve sample|batch|refs --by <who> --at <iso> [--credits N]'); process.exit(2); }
+  if (scope === 'refs') {
+    const b = readBrief();
+    const blocked = b.panels.filter(p => (p.clashes || []).length);
+    if (blocked.length) { console.error('cannot approve the reference set: name clash in ' + blocked.map(p => p.id + ' (' + p.clashes.map(c => c.name).join(', ') + ')').join('; ') + '. Resolve it and run brief again.'); process.exit(3); }
+    const panels = {}; for (const p of b.panels) if (p.libraryRefs) panels[p.id] = R.refsHash(p.refs);
+    b.approvals = b.approvals || {}; b.approvals.refs = { by: opt('--by'), at: opt('--at'), channel: 'board', panels };
+    writeBrief(b); console.log('reference set approved by ' + opt('--by') + ' for ' + Object.keys(panels).length + ' panel(s); each is fingerprinted, so a file changed later needs a new yes.'); process.exit(0);
+  }
   const b = readBrief(); b.approvals = b.approvals || {}; b.approvals[scope] = { by: opt('--by'), at: opt('--at'), credits: opt('--credits') ? Number(opt('--credits')) : null, channel: 'board', panels: opt('--panels') ? opt('--panels').split(',').map(s => s.trim().toUpperCase()).filter(Boolean) : null };
   writeBrief(b); console.log(scope + ' approved by ' + opt('--by') + (opt('--credits') ? ' for ' + opt('--credits') + ' credits' : '') + '; recorded in generation-brief.json.'); process.exit(0);
 }
@@ -142,6 +152,15 @@ if (cmd === 'refs') {
   refs.toUpload = refs.images.concat(refs.videos).filter(r => !r.assetId && !r.missingFile).map(r => r.file);
   refs.assetIds = refs.images.concat(refs.videos).map(r => r.assetId).filter(Boolean);
   console.log(JSON.stringify(refs, null, 2)); process.exit(0);
+}
+if (cmd === 'refset') {
+  const b = readBrief();
+  const rows = b.panels.filter(p => p.libraryRefs || (p.clashes || []).length).map(p => ({ id: p.id, uses: (p.refs.images.filter(r => r.kind !== 'frame').concat(p.refs.videos)).map(r => r.name + ' (' + path.basename(r.file) + ')'), clashes: (p.clashes || []).map(c => c.name + ': ' + c.sources.join(' vs ')), approved: !!(b.approvals && b.approvals.refs && b.approvals.refs.panels[p.id] === R.refsHash(p.refs)) }));
+  if (argv.includes('--json')) { console.log(JSON.stringify(rows, null, 2)); process.exit(0); }
+  if (!rows.length) { console.log('No panel carries library references; each sends only its storyboard frame. Nothing to approve.'); process.exit(0); }
+  console.log('Reference set to approve before any clip is generated:');
+  for (const r of rows) console.log('  ' + r.id + ': ' + (r.uses.join(', ') || 'frame only') + (r.clashes.length ? '  [NAME CLASH: ' + r.clashes.join('; ') + ']' : '') + (r.approved ? '  (approved)' : ''));
+  process.exit(0);
 }
 if (cmd === 'status') {
   const b = readBrief(); const done = b.panels.filter(p => p.status === 'delivered'); const given = b.panels.filter(p => p.status === 'provided');

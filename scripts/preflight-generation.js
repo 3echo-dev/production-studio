@@ -46,6 +46,15 @@ if (kind === 'generate') {
   const pending = (brief.panels || []).filter(p => !['delivered', 'provided'].includes(p.status));
   const todo = scope === 'sample' ? pending.slice(0, 1) : (ap.panels ? pending.filter(p => ap.panels.includes(String(p.id).toUpperCase())) : pending);
   if (!todo.length) { console.error('nothing left to generate for ' + scope); process.exit(3); }
+  // The pictures each clip carries: no clash left, and exactly the set a person approved (fingerprinted).
+  const R = require('./lib-references.js');
+  const clash = todo.filter(p => (p.clashes || []).length);
+  if (clash.length) { console.error('name clash in the references of ' + clash.map(p => p.id + ' (' + p.clashes.map(c => c.name).join(', ') + ')').join('; ') + '; a person picks which picture is meant first'); process.exit(3); }
+  const refAp = (brief.approvals || {}).refs;
+  for (const p of todo.filter(x => x.libraryRefs)) {
+    if (!refAp || !refAp.panels || !refAp.panels[p.id]) { console.error('the reference set for ' + p.id + ' has not been approved on the board (generate-clips.js refset, then approve refs)'); process.exit(3); }
+    if (refAp.panels[p.id] !== R.refsHash(p.refs)) { console.error('the references for ' + p.id + ' changed since they were approved (a file was swapped or edited); ask again'); process.exit(3); }
+  }
   let ceilingG = 120; try { const m = fs.readFileSync(path.resolve(__dirname, '..', 'CONFIG.md'), 'utf8').match(/credit_ceiling_per_job:\s*(\d+)/); if (m) ceilingG = parseInt(m[1], 10); } catch {}
   let spentG = 0; try { const m = fs.readFileSync(path.join(jobDir, 'status.md'), 'utf8').match(/credits_spent:\s*(\d+)/); if (m) spentG = parseInt(m[1], 10); } catch {}
   const est = todo.reduce((s, p) => s + (Number(p.quotedCredits) || (p.durationSec >= 10 ? 8 : 4)), 0);

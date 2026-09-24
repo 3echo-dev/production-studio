@@ -38,14 +38,16 @@ function build(job, dir) {
   const rel = job.prePipelineReleaseFolder;
   const sb = JSON.parse(fs.readFileSync(path.join(rel, 'storyboard.json'), 'utf8'));
   const script = fs.existsSync(path.join(rel, 'script.md')) ? fs.readFileSync(path.join(rel, 'script.md'), 'utf8') : '';
-  const lib = R.scanLibrary(R.libraryRoot(job));
+  const lib = R.scanLibrary(R.libraryRoot(job), R.scopeOf(job));
   const clipsDir = job.driveFolder ? path.join(job.driveFolder, 'footage', 'generated') : null;
   const panels = (sb.panels || []).slice().sort((a, b) => (a.storyOrder || 0) - (b.storyOrder || 0) || String(a.id).localeCompare(String(b.id)));
   const used = new Set();
   const fromText = new Map();
+  const clashes = new Map();
   const rows = panels.map(p => {
     const words = [p.caption, p.description, p.shot, sceneLine(script, p.scene)].filter(Boolean).join('. ');
-    const { found, missing } = R.panelNeeds(p, words, lib);
+    const { found, missing, clashes: cl } = R.panelNeeds(p, words, lib);
+    cl.forEach(c => { const k = c.kind + '/' + c.name.toLowerCase(); if (!clashes.has(k)) clashes.set(k, Object.assign({ panels: [] }, c)); clashes.get(k).panels.push(p.id); });
     found.forEach(f => used.add(f.kind + '/' + f.item.key));
     missing.forEach(m => { const k = m.kind + '/' + m.name.toLowerCase(); if (!fromText.has(k)) fromText.set(k, { kind: m.kind, name: m.name, why: m.why, panels: [] }); fromText.get(k).panels.push(p.id); });
     const frame = path.join(rel, p.file || ('storyboard/v1/' + p.id + '.png'));
@@ -57,17 +59,19 @@ function build(job, dir) {
       clip: clip ? clip.replace(/\\/g, '/') : null,
       uses: found.map(f => ({ kind: f.kind, name: f.name })),
       fromText: missing.map(m => ({ kind: m.kind, name: m.name })),
+      clashes: cl.map(c => ({ kind: c.kind, name: c.name })),
       refs,
     };
   });
   const available = {};
-  for (const k of R.KINDS) available[k] = lib.items.filter(i => i.kind === k).map(i => ({ name: i.name, images: i.images.length, videos: i.videos.length, aliases: i.aliases }));
+  for (const k of R.KINDS) available[k] = lib.items.filter(i => i.kind === k).map(i => ({ name: i.name, images: i.images.length, videos: i.videos.length, aliases: i.aliases, scope: i.scope, from: i.sources, overrides: i.overrides, clash: i.clash }));
   return {
     schemaVersion: '1.0', jobId: job.jobId, scannedAt: new Date().toISOString(),
-    library: { root: lib.root, exists: lib.exists, folders: lib.folders || {}, unrecognised: lib.unrecognised || [] },
+    library: { root: lib.root, exists: lib.exists, layout: lib.layout, project: lib.project, shared: lib.shared, otherProjects: lib.otherProjects, folders: lib.folders || {}, unrecognised: lib.unrecognised || [], warnings: lib.warnings },
     available,
     panels: rows,
     fromText: [...fromText.values()],
+    clashes: [...clashes.values()],
     unused: lib.items.filter(i => !used.has(i.kind + '/' + i.key)).map(i => ({ kind: i.kind, name: i.name })),
     footage: job.footageSource === 'generated' ? { provided: rows.filter(r => r.footage === 'provided').map(r => r.id), generate: rows.filter(r => r.footage === 'generate').map(r => r.id) } : null,
   };
@@ -85,6 +89,8 @@ function summary(inv) {
   else {
     const have = R.KINDS.map(k => inv.available[k].length ? k + ': ' + inv.available[k].map(i => i.name + ' (' + (i.images || i.videos) + ')').join(', ') : null).filter(Boolean);
     out.push('Reference library ' + inv.library.root + (have.length ? '' : ' is empty.'));
+    if (inv.library.layout === 'by-project') out.push('  scope      this project: ' + (inv.library.project || 'no folder found') + (inv.library.shared ? ' + ' + inv.library.shared : '') + (inv.library.otherProjects.length ? '; ignored: ' + inv.library.otherProjects.join(', ') : ''));
+    (inv.library.warnings || []).forEach(w => out.push('  WARNING    ' + w.text));
     const mapped = Object.entries(inv.library.folders || {}).filter(([f, k]) => f.toLowerCase() !== k);
     if (mapped.length) out.push('  read as    ' + mapped.map(([f, k]) => f + ' → ' + k).join(', '));
     if ((inv.library.unrecognised || []).length) out.push('  not used   ' + inv.library.unrecognised.join(', ') + ' (a folder name no kind matches: rename it, or ask to have it read as characters, wardrobe, locations, props or motion)');
@@ -97,12 +103,17 @@ function summary(inv) {
     const bits = [];
     if (p.uses.length) bits.push('uses ' + p.uses.map(u => u.name).join(', '));
     if (p.fromText.length) bits.push('from text ' + p.fromText.map(u => u.name).join(', '));
+    if (p.clashes.length) bits.push('NAME CLASH ' + p.clashes.map(u => u.name).join(', '));
     if (p.footage === 'provided') bits.push('clip provided');
     if (bits.length) out.push('  ' + p.id + '  ' + bits.join(' · '));
   }
   if (inv.fromText.length) {
     out.push('Needs a reference or will be drawn from text:');
     inv.fromText.forEach(m => out.push('  ' + m.kind.replace(/s$/, '') + ' "' + m.name + '" in ' + m.panels.join(', ') + ' (' + m.why + ')'));
+  }
+  if (inv.clashes.length) {
+    out.push('Two different pictures share a name; nothing is generated for these panels until a person picks one (rename one, or remove it):');
+    inv.clashes.forEach(c => out.push('  ' + c.kind.replace(/s$/, '') + ' "' + c.name + '" in ' + c.sources.join(' and ') + ' (used by ' + c.panels.join(', ') + ')'));
   }
   if (inv.unused.length) out.push('In the library but no panel mentions it: ' + inv.unused.map(u => u.kind.replace(/s$/, '') + ' ' + u.name).join(', ') + '. Check the spelling, or add an alias in references/labels.json.');
   return out;

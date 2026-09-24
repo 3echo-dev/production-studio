@@ -99,8 +99,9 @@ assert.deepStrictEqual(refs.assetIds, ['asset-apartment']); assert.strictEqual(r
 // ---- the spend guard does not count the provided clip
 fs.writeFileSync(path.join(jobDir, 'status.md'), '# status\ncredits_spent: 0\n');
 ok(run('generate-clips.js', ['acme', jobId, 'approve', 'batch', '--by', 'creative-director', '--at', new Date().toISOString(), '--credits', '28']), 'approve batch');
-r = run('preflight-generation.js', ['acme', jobId, 'batch', '--kind', 'generate']);
-assert.ok(!/P02/.test(r.stdout + r.stderr) || /P01|P03/.test(r.stdout + r.stderr), 'P02 is not in the batch to generate:\n' + r.stdout + r.stderr);
+ok(run('generate-clips.js', ['acme', jobId, 'approve', 'refs', '--by', 'creative-director', '--at', new Date().toISOString()]), 'approve refs');
+r = run('preflight-generation.js', ['acme', jobId, 'batch', '--kind', 'generate']); ok(r, 'preflight batch');
+assert.ok(/of 2 clip\(s\)/.test(r.stdout), 'P02 is provided, so the batch is P01 and P03 only:\n' + r.stdout);
 r = run('generate-clips.js', ['acme', jobId, 'status']); ok(r, 'status');
 assert.ok(/1 provided/.test(r.stdout), r.stdout);
 
