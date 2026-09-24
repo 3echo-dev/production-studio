@@ -23,7 +23,7 @@ color: green
 
 ## Steps
 
-1. `hybrid.js {client} {job-id} brief`. Read its summary: panels without a plate, and each location with its background source (library, or to generate). Put the summary on the Ingest item.
+1. Intake has already reported each plate (`scan-references.js`: screen, camera, background source); start from its answers. `hybrid.js {client} {job-id} brief`. Read its summary: panels without a plate, and each location with its background source (library, or to generate). Put the summary on the Ingest item.
 2. `python cutout.py {client} {job-id}` (all panels) or `--panel P03`. Per plate it records the method, who decided (`corner-sample`, `openmontage`, or `asked`), the key colour, and the share of the frame the actor covers.
 3. Look at every mask still (`previews/hybrid/{panel}-mask.png`). A coverage under 2% or over 85% is a failed cut-out: say which panel and why, and retry with `--similarity`/`--blend` (chroma key) or `--method rembg`.
 4. Record a version on the Ingest item with the mask stills as the preview. Hand over to the composite-director.
