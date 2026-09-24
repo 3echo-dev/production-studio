@@ -4,6 +4,7 @@
 // Usage:
 //   preflight-generation.js {client} {job-id} {n} --kind broll|mograph
 //   preflight-generation.js {client} {job-id} sample|batch --kind generate     (generation-brief.json)
+//   preflight-generation.js {client} {job-id} batch --kind backgrounds          (hybrid-brief.json)
 //
 // Checks:
 //   1. Job dir exists.
@@ -30,11 +31,28 @@ for (let i = 3; i < args.length; i++) {
 }
 if (!client || !jobId || !n) { console.error('usage: preflight-generation.js {client} {job-id} {n} --kind broll|mograph'); process.exit(2); }
 const kind = flags.kind;
-if (!['broll', 'mograph', 'generate'].includes(kind)) { console.error('--kind must be broll, mograph or generate'); process.exit(2); }
+if (!['broll', 'mograph', 'generate', 'backgrounds'].includes(kind)) { console.error('--kind must be broll, mograph, generate or backgrounds'); process.exit(2); }
 
 const jobDir = lib.jobRoot(process.cwd(), client, jobId);
 if (!fs.existsSync(jobDir)) { console.error('job dir missing: ' + jobDir); process.exit(1); }
 
+// backgrounds: a hybrid job's generated backgrounds carry one approval, landed from the board.
+if (kind === 'backgrounds') {
+  const bp = path.join(jobDir, 'hybrid-brief.json');
+  if (!fs.existsSync(bp)) { console.error('no hybrid-brief.json yet; run hybrid.js brief first'); process.exit(3); }
+  let b; try { b = JSON.parse(fs.readFileSync(bp, 'utf8')); } catch (e) { console.error('hybrid-brief.json: invalid JSON (' + e.message + ')'); process.exit(1); }
+  const ap = (b.approvals || {}).backgrounds;
+  if (!ap || !ap.by || !ap.at) { console.error('no background approval on record in hybrid-brief.json; the yes comes from the board'); process.exit(3); }
+  const todo = Object.entries(b.backgrounds || {}).filter(([k, x]) => x.source === 'generate' && x.status !== 'delivered' && (!ap.keys || ap.keys.includes(k)));
+  if (!todo.length) { console.error('no background left to generate'); process.exit(3); }
+  let ceilingB = 120; try { const m = fs.readFileSync(path.resolve(__dirname, '..', 'CONFIG.md'), 'utf8').match(/credit_ceiling_per_job:\s*(\d+)/); if (m) ceilingB = parseInt(m[1], 10); } catch {}
+  let spentB = 0; try { const m = fs.readFileSync(path.join(jobDir, 'status.md'), 'utf8').match(/credits_spent:\s*(\d+)/); if (m) spentB = parseInt(m[1], 10); } catch {}
+  const est = todo.reduce((s, [, x]) => s + (Number(x.quotedCredits) || 1), 0);
+  if (Number(ap.credits) && est > Number(ap.credits)) { console.error('the backgrounds estimate (' + est + ') is above the ' + ap.credits + ' credits approved on the board; ask again'); process.exit(1); }
+  if (spentB + est > ceilingB) { console.error('ceiling ' + ceilingB + ' would be exceeded (spent=' + spentB + ', est=' + est + ')'); process.exit(1); }
+  console.log('preflight ok: ' + todo.length + ' background(s) approved by ' + ap.by + ' for ' + (ap.credits || 'unstated') + ' credits; est ' + est + ', spent ' + spentB + '/' + ceilingB);
+  process.exit(0);
+}
 // generate: the brief carries one approval per scope (sample, then batch) landed from the board.
 if (kind === 'generate') {
   const briefPath = path.join(jobDir, 'generation-brief.json');

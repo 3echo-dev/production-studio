@@ -99,7 +99,8 @@ else { R.workflowId = wf.workflowId || wf.id; R.workflowVersion = wf.version || 
 const jobDir = path.dirname(path.resolve(jobPath));
 const resolveDir = p => (p ? (path.isAbsolute(p) ? p : path.resolve(jobDir, p)) : null);
 const generated = job.footageSource === 'generated';
-if (job.footageSource && !['shoot', 'generated'].includes(job.footageSource)) missing('footageSource (shoot or generated)');
+const hybrid = job.footageSource === 'hybrid';
+if (job.footageSource && !['shoot', 'generated', 'hybrid'].includes(job.footageSource)) missing('footageSource (shoot, generated or hybrid)');
 // A generated job (one AI clip per panel) hands over no call sheets: there was no shoot day.
 const REQUIRED_RELEASE = ['script.md', 'storyboard.json', 'concept-breakdown.xlsx'];
 const rel = resolveDir(job.prePipelineReleaseFolder);
@@ -142,6 +143,7 @@ if (drive) {
   const clips = count(path.join(drive, 'footage'), MEDIA);
   if (!clips && generated) say('Rule 3: no clips yet; the generate stage makes one per panel under footage/generated');
   else if (!clips) { R.blockers.push('the shoot footage (no clips under ' + ws.fwd(path.join(drive, 'footage')) + ')'); say('Rule 3: no footage'); }
+  else if (hybrid && !count(path.join(drive, 'footage', 'plates'), MEDIA)) { R.blockers.push('the actor plates (a hybrid job needs one per panel under ' + ws.fwd(path.join(drive, 'footage', 'plates')) + ')'); say('Rule 3: no plates'); }
   else say('Rule 3: ' + clips + ' clip' + (clips === 1 ? '' : 's') + ' under footage/');
   if (clips && !generated && !count(path.join(drive, 'proxies'), MEDIA)) risk('no_proxies');
   const vo = count(path.join(drive, 'audio', 'vo'), AUDIO);
@@ -156,6 +158,7 @@ if (job.referenceCutPath) tag('has_reference_cut');
 if (job.colourDirection) tag('has_colour_direction');
 if (['9:16', '4:5'].includes(job.aspectRatio)) tag('vertical');
 if (generated) { tag('generated_footage'); risk('credit_spend'); }
+if (hybrid) { tag('hybrid_footage'); risk('credit_spend'); }
 if (Number.isInteger(job.deliverableDurationSec) && job.deliverableDurationSec > 180) risk('long_deliverable');
 say('Rule 4: tags ' + (R.tags.join(', ') || 'none'));
 

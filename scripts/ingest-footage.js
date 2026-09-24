@@ -61,7 +61,10 @@ function proxyFor(file, base) {
 }
 
 const footageDir = path.join(drive, 'footage');
-const clipFiles = walk(footageDir, MEDIA);
+// A hybrid job's cut is made of its composites: the plates, cut-outs and backgrounds they were built
+// from are inputs to the composite (recorded in hybrid-brief.json), not clips to cut.
+const HYBRID_INPUTS = /[\\/](plates|cutout|backgrounds)[\\/]/i;
+const clipFiles = walk(footageDir, MEDIA).filter(f => job.footageSource !== 'hybrid' || !HYBRID_INPUTS.test(path.relative(footageDir, f).split(path.sep).join('/').replace(/^/, '/')));
 if (!clipFiles.length) { console.error('No clips under ' + fwd(footageDir) + '. Intake needs at least one.'); process.exit(3); }
 const clips = [];
 for (const f of clipFiles) {

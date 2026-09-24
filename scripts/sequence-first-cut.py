@@ -99,7 +99,7 @@ def main(argv):
     clips = [c for c in manifest.get("clips", []) if Path(c["path"]).exists()]
     if not clips: die("no clips from the manifest exist on disk")
     # --by-panel: a generated job has one clip per panel, named after it; no frame matching, the whole clip is the cut.
-    if "--by-panel" in argv or job.get("footageSource") == "generated":
+    if "--by-panel" in argv or job.get("footageSource") in ("generated", "hybrid"):
         return by_panel(job, job_id, job_dir, manifest, panels, clips)
 
     sys.path.insert(0, str(om_root))

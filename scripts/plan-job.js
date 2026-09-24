@@ -56,10 +56,13 @@ for (const r of kept) {
   const gate = states.ROW_GATE[n] || '';
   // A generated job makes its clips in the ingest row and cuts them by panel id in the sequence row.
   const gen = (route.tags || []).includes('generated_footage');
-  const skill = gen && n === 2 ? 'generate-clips' : gen && n === 3 ? 'sequence-first-cut --by-panel' : cell(r['skill-invoked']);
-  const output = gen && n === 2 ? 'generation-brief.json, footage/generated/P*.mp4, manifest.json' : gen && n === 11 ? cell(r['output-artefact']) + ', bundle/master.mp4' : cell(r['output-artefact']);
-  const agentName = gen && n === 2 ? 'orchestrator' : agent;
-  out += '| ' + [n, gen && n === 2 ? 'generate + ingest' : cell(r.state), output, agentName, gate ? 'orchestrator' : agentName, agentName === owner ? 'owner' : ownership, skill, output, states.ROW_STATE[n] || '', gate, 'pending', ''].join(' | ') + ' |\n';
+  // A hybrid job cuts the actor out of each plate, lays it over its location's background, and
+  // cuts the composites by panel id: plate-director, then composite-director, in the ingest row.
+  const hyb = (route.tags || []).includes('hybrid_footage');
+  const skill = gen && n === 2 ? 'generate-clips' : hyb && n === 2 ? 'hybrid-plates, hybrid-composite' : (gen || hyb) && n === 3 ? 'sequence-first-cut --by-panel' : cell(r['skill-invoked']);
+  const output = gen && n === 2 ? 'generation-brief.json, footage/generated/P*.mp4, manifest.json' : hyb && n === 2 ? 'hybrid-brief.json, footage/cutout/P*.mov, footage/composite/P*.mp4, manifest.json' : gen && n === 11 ? cell(r['output-artefact']) + ', bundle/master.mp4' : cell(r['output-artefact']);
+  const agentName = gen && n === 2 ? 'orchestrator' : hyb && n === 2 ? 'plate-director' : agent;
+  out += '| ' + [n, gen && n === 2 ? 'generate + ingest' : hyb && n === 2 ? 'plates + backgrounds + composite + ingest' : cell(r.state), output, agentName, gate ? 'orchestrator' : agentName, agentName === owner ? 'owner' : ownership, skill, output, states.ROW_STATE[n] || '', gate, 'pending', ''].join(' | ') + ' |\n';
 }
 fs.writeFileSync(outPath, out);
 if (args.includes('--human')) console.log('Planned: ' + kept.length + ' steps, ' + gates.length + ' of them waiting on you.');

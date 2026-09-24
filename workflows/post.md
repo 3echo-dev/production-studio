@@ -23,6 +23,10 @@ Read left to right. `State after` is the next state on a clean pass. `Rollback t
 
 A job with `footageSource: generated` (a microdrama, one AI clip per storyboard panel) runs the same table. Row 2 is the generate stage (`generate-clips` skill: brief, sample quoted and approved on the board, batch, then ingest of `footage/generated/`), row 3 cuts by panel id (`sequence-first-cut.py --by-panel`), and row 11 adds `bundle/master.mp4` (`render-preview.js --stage master`) since there is no editor to hand to. The release needs no call sheets. Credits are the only spend and every scope has its yes on the board first.
 
+## Hybrid footage
+
+A job with `footageSource: hybrid` (real actors, AI backgrounds) runs the same table. Row 2 is plates, backgrounds, composite and ingest: the plate-director briefs the plates and locations (`hybrid.js brief`) and cuts the actor out of every plate as a transparent layer (`cutout.py`: chroma key on any green or blue screen, rembg otherwise, OpenMontage's detector as a second opinion); the composite-director gets a background per location (the reference library's picture, or one generated on AgentC after a quote and a yes), lays the actor over it (`composite.py`) and checks the actor's pixels are unchanged. Ingest catalogues only `footage/composite/`; row 3 cuts by panel id. The actor is never redrawn. Rules: `playbooks/hybrid-rules.md`.
+
 ## State machine invariants
 
 - Every `State after` and `Rollback to` value points at a real state in this table.

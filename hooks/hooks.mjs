@@ -1,13 +1,14 @@
 // Function-hook guards. Off unless CLAUDE_CODE_ENABLE_FUNCTION_HOOKS=1 and hooks.json
 // declares a "modules" entry. Every guard refuses the tool call itself.
 //
-// Six refusing guards:
+// Seven refusing guards:
 //  1. B-roll generation without a matching broll-requests/{n}.json signed by a human
 //  2. Sync stage start without a signed bgm-choice.json
 //  3. Any spend past credit_ceiling_per_job in CONFIG.md
 //  4. Any spend without a matching yes on record
 //  5. manifest.json written by anything but ingest-footage
 //  6. Delivery export in any format but FCPXML
+//  7. A hybrid job's background image job without the background yes on record
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -55,6 +56,21 @@ export function refuseBrollWithoutRequest({ command, cwd }) {
   return null;
 }
 
+// A hybrid job's backgrounds are image jobs: no create_image_job without the background yes.
+export function refuseBackgroundWithoutApproval({ command, cwd }) {
+  if (!/create_image_job/.test(command)) return null;
+  const bp = path.join(cwd, 'hybrid-brief.json');
+  if (!fs.existsSync(bp)) return null;
+  try {
+    const b = JSON.parse(fs.readFileSync(bp, 'utf8'));
+    const pending = Object.values(b.backgrounds || {}).filter(x => x.source === 'generate' && x.status !== 'delivered');
+    if (!pending.length) return 'Background generation refused: every location already has a background.';
+    const ap = (b.approvals || {}).backgrounds;
+    if (!ap || !ap.by || !ap.at) return 'Background generation refused: no background approval on record from the board.';
+    return null;
+  } catch { return 'Background generation refused: hybrid-brief.json is unreadable.'; }
+}
+
 export function refuseSyncWithoutBgmChoice({ command, cwd }) {
   if (!/audio-sync|sync_audio_track/.test(command)) return null;
   const choice = path.join(cwd, 'bgm-choice.json');
@@ -94,6 +110,7 @@ export function refuseNonFcpxmlExport({ command }) {
 
 export const guards = [
   refuseBrollWithoutRequest,
+  refuseBackgroundWithoutApproval,
   refuseSyncWithoutBgmChoice,
   refuseOverCeiling,
   refuseManifestWrite,

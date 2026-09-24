@@ -1,14 +1,64 @@
 {
   "agents": [
-    { "id": "orchestrator", "file": "agents/orchestrator.md", "role": "Walks the post workflow table. Reads state, invokes the director for the row, checks output artefact exists, advances." },
-    { "id": "post-intake-director", "file": "agents/post-intake-director.md", "role": "Validates the pre-prod release package + Drive folder path + project id. Emits project.json." },
-    { "id": "ingest-director", "file": "agents/ingest-director.md", "role": "Reads the Drive folder, catalogs clips + audio, computes checksums, emits manifest.json." },
-    { "id": "sequence-director", "file": "agents/sequence-director.md", "role": "Frame-matches storyboard against manifest, picks best takes, emits rough EDL + preview timeline." },
-    { "id": "bgm-supervisor", "file": "agents/bgm-supervisor.md", "role": "Reads script tone + storyboard beats, requests three BGM candidates locally (no MCP tool), presents to human." },
-    { "id": "audio-engineer", "file": "agents/audio-engineer.md", "role": "Owns VO drop-in and audio sync (VO + BGM + SFX aligned to picture)." },
-    { "id": "broll-director", "file": "agents/broll-director.md", "role": "Handles on-demand B-roll requests. Calls create_video_job on AgentC (SeeDance). Does not auto-splice." },
-    { "id": "mograph-director", "file": "agents/mograph-director.md", "role": "Builds infographic lower thirds and motion-graphic alpha exports via Remotion." },
-    { "id": "premiere-packager", "file": "agents/premiere-packager.md", "role": "Builds the FCPXML + bundle folder tree for editor handoff." },
-    { "id": "review-director", "file": "agents/review-director.md", "role": "Runs the review-pass skill before every gate; blocks or clears based on rubric." }
+    {
+      "id": "orchestrator",
+      "file": "agents/orchestrator.md",
+      "role": "Walks the post workflow table. Reads state, invokes the director for the row, checks output artefact exists, advances."
+    },
+    {
+      "id": "post-intake-director",
+      "file": "agents/post-intake-director.md",
+      "role": "Validates the pre-prod release package + Drive folder path + project id. Emits project.json."
+    },
+    {
+      "id": "ingest-director",
+      "file": "agents/ingest-director.md",
+      "role": "Reads the Drive folder, catalogs clips + audio, computes checksums, emits manifest.json."
+    },
+    {
+      "id": "plate-director",
+      "file": "agents/plate-director.md",
+      "role": "Hybrid jobs: briefs plates and locations, cuts the actor out of each plate as a transparent layer (chroma key or rembg). Never redraws the actor."
+    },
+    {
+      "id": "composite-director",
+      "file": "agents/composite-director.md",
+      "role": "Hybrid jobs: a background per location (library, or generated after a yes), the actor composited over it, the performance check."
+    },
+    {
+      "id": "sequence-director",
+      "file": "agents/sequence-director.md",
+      "role": "Frame-matches storyboard against manifest, picks best takes, emits rough EDL + preview timeline."
+    },
+    {
+      "id": "bgm-supervisor",
+      "file": "agents/bgm-supervisor.md",
+      "role": "Reads script tone + storyboard beats, requests three BGM candidates locally (no MCP tool), presents to human."
+    },
+    {
+      "id": "audio-engineer",
+      "file": "agents/audio-engineer.md",
+      "role": "Owns VO drop-in and audio sync (VO + BGM + SFX aligned to picture)."
+    },
+    {
+      "id": "broll-director",
+      "file": "agents/broll-director.md",
+      "role": "Handles on-demand B-roll requests. Calls create_video_job on AgentC (SeeDance). Does not auto-splice."
+    },
+    {
+      "id": "mograph-director",
+      "file": "agents/mograph-director.md",
+      "role": "Builds infographic lower thirds and motion-graphic alpha exports via Remotion."
+    },
+    {
+      "id": "premiere-packager",
+      "file": "agents/premiere-packager.md",
+      "role": "Builds the FCPXML + bundle folder tree for editor handoff."
+    },
+    {
+      "id": "review-director",
+      "file": "agents/review-director.md",
+      "role": "Runs the review-pass skill before every gate; blocks or clears based on rubric."
+    }
   ]
 }

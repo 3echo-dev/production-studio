@@ -23,7 +23,7 @@ user-invocable: false
 1. `scaffold-job.js {client} {slug} "{title}"` writes the folder, `status.md` and a `job.json` whose declarations are null; the id is `job-{YYYYMMDD}-{HHMM}-{slug}`.
 2. Validate `--pre-release` contains every required file. Missing = hard stop.
 3. The release hash is the router's: `route-job.js` computes it over the required files and writes it into `job.json`.
-4. Validate `--drive-folder` exists and has at least one clip in `footage/`. A generated job (`footageSource: generated`) needs only the folder: the generate stage fills `footage/generated/`, and the release needs no call sheets.
+4. Validate `--drive-folder` exists and has at least one clip in `footage/`. A generated job (`footageSource: generated`) needs only the folder: the generate stage fills `footage/generated/`, and the release needs no call sheets. A hybrid job (`footageSource: hybrid`, real actors with AI backgrounds) needs one actor plate per panel under `footage/plates/` (named after the panel, or mapped in `plates.json`).
 5. If any XX flag is unset, park at `needs_input` and ask on the board via `board-sync.js ask`.
 6. Fill `templates/job.json` with the values. Validate against `schemas/job.schema.json`.
 7. Write `workspaces/{client}/jobs/{job-id}/job.json`.
