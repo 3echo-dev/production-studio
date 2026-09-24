@@ -55,7 +55,9 @@ if (check.status !== 0) {
 
 // build-fcpxml.py reads workspaces/{client}/jobs/{job}/... relative to its cwd, so it runs at the root.
 const rootDir = ws.root(argv);
-const build = spawnSync('python', [path.join(__dirname, 'build-fcpxml.py'), client, jobId], { cwd: rootDir, encoding: 'utf8', env: { ...process.env, PYTHONUTF8: '1' } });
+// macOS and most Linux ship python3 only; Windows usually has python.
+const PY = spawnSync('python', ['--version']).status === 0 ? 'python' : 'python3';
+const build = spawnSync(PY, [path.join(__dirname, 'build-fcpxml.py'), client, jobId], { cwd: rootDir, encoding: 'utf8', env: { ...process.env, PYTHONUTF8: '1' } });
 if (build.status !== 0) { console.error('build-fcpxml.py failed (exit ' + build.status + '):'); console.error((build.stderr || build.stdout || '').trim()); process.exit(1); }
 
 const bundle = path.join(dir, 'bundle');
