@@ -1,7 +1,7 @@
 ---
 name: sequence-first-cut
 description: >-
-  Frame-matches storyboard panels against ingested footage using OpenMontage's CLIP ViT-L/14 embedder. Emits rough-edl.json plus timeline.png preview strip. Unmatched panels park for human take-picks. Use at the sequence stage.
+  Frame-matches storyboard panels against ingested footage using CLIP ViT-B/32 (scripts/clip_match.py). Emits rough-edl.json plus timeline.png preview strip. Unmatched panels park for human take-picks. Use at the sequence stage.
 metadata:
   version: 0.1.0
 user-invocable: false
@@ -14,12 +14,12 @@ user-invocable: false
 - `job.json` for `aspectRatio`, `deliverableDurationSec`, `audioLed`, optional `referenceCutPath`.
 - `manifest.json` for clips.
 - Pre-prod `storyboard.json` and `storyboard/v{n}/P*.png`.
-- OpenMontage `$OM_ROOT/lib/clip_embedder.py` (prepend `$OM_ROOT` to sys.path).
+- `scripts/clip_match.py` (needs numpy, torch, transformers).
 
 ## Steps
 
-1. Load every panel PNG. Embed with `clip_embedder.embed_images(panel_paths)`.
-2. For each clip in manifest, sample frames every 1 second (from `media_profiles.sample_stride_sec`). Embed with `clip_embedder.embed_video_frames(clip_path, stride=1.0)`.
+1. Load every panel PNG. Embed with `clip_match.embed_images(panel_paths)`.
+2. For each clip in manifest, sample frames every 1 second with ffmpeg and embed them the same way.
 3. Cosine similarity: panel → all clip frames. Top-5 candidates per panel.
 4. Assemble EDL: one cut per panel in storyboard order. Cut window = 3s centred on best-match frame, clamped by `deliverableDurationSec / panelCount`.
 5. Panels with best score below `0.28` → `unmatchedPanels[]`; no cut.
@@ -46,6 +46,6 @@ Does not sync audio (that is `audio-sync`), does not modify the storyboard, does
 
 | Failure | Fix |
 |---|---|
-| `check-om.js` non-zero this session | Stop; OpenMontage is not resolvable |
+| torch or transformers missing | Stop; `check-deps.js --setup` has the install line |
 | Panels have no matches at any threshold | Warn; the shoot may not cover the storyboard |
 | GPU unavailable, CPU too slow | Reduce stride to 2s; retry |

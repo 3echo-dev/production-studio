@@ -128,20 +128,22 @@ function hybridCheck(job, dir, rows) {
   const byId = new Map(brief.panels.map(p => [p.id, p]));
   for (const r of rows) {
     const p = byId.get(r.id); if (!p) continue;
+    if (p.keep) { r.keep = p.keep; r.plate = null; r.background = null; continue; }
     const bg = brief.backgrounds[p.background];
     const look = p.plate && probe && probe.plates ? probe.plates[p.plate] : null;
     r.plate = p.plate;
     r.screen = look && !look.error ? look.screen : undefined;
     r.cutout = !p.plate ? null : method !== 'auto' ? method : look && !look.error ? (look.screen ? 'chromakey' : 'rembg') : 'unchecked';
     r.cameraMoves = look && look.camera ? look.camera.moving : null;
-    r.background = { key: p.background, name: bg.name, source: bg.source, status: bg.status, credits: bg.source === 'generate' && bg.status !== 'delivered' ? 1 : 0 };
+    r.background = { key: p.background, name: bg.name, source: bg.source, status: bg.status, credits: bg.source === 'generate' && bg.status !== 'delivered' ? 1 : 0, continuityOf: bg.continuityOf || null };
+    r.pictureArea = look && look.pictureArea ? look.pictureArea : null;
   }
   const toGen = Object.entries(brief.backgrounds).filter(([, b]) => b.source === 'generate' && b.status !== 'delivered');
   return {
-    plates: rows.filter(r => r.plate).length, noPlate: rows.filter(r => r.footage === 'hybrid' && !r.plate).map(r => r.id),
+    plates: rows.filter(r => r.plate).length, noPlate: rows.filter(r => r.footage === 'hybrid' && !r.plate && !r.keep).map(r => r.id), kept: rows.filter(r => r.keep).map(r => r.id),
     rembgInstalled: probe && !probe.error ? probe.rembgInstalled : null, probeError: probe && probe.error ? probe.error : null,
     needRembg: rows.filter(r => r.cutout === 'rembg').map(r => r.id), cameraMoves: rows.filter(r => r.cameraMoves).map(r => r.id),
-    backgrounds: Object.entries(brief.backgrounds).map(([k, b]) => ({ key: k, name: b.name, source: b.source, status: b.status, panels: b.panels })),
+    backgrounds: Object.entries(brief.backgrounds).map(([k, b]) => ({ key: k, name: b.name, source: b.source, status: b.status, panels: b.panels, continuityOf: b.continuityOf || null })),
     backgroundsToGenerate: toGen.map(([k]) => k), backgroundCredits: toGen.length,
   };
 }
@@ -165,9 +167,9 @@ function gapsOf(inv, rushes, hybrid, audio, job) {
   if (rushes && !rushes.clips) g.push({ kind: 'rushes', text: 'No rushes under footage/: the shoot folder is empty.' });
   if (rushes && rushes.scenesWithout.length) g.push({ kind: 'rushes', scenes: rushes.scenesWithout, text: 'No clip names scene ' + rushes.scenesWithout.join(', ') + (rushes.untagged ? ' (' + rushes.untagged + ' clip(s) carry no scene in the name; they may still match by picture)' : '') + '.' });
   if (audio.voLines && audio.voShort) g.push({ kind: 'vo', text: 'VO: ' + audio.voTakes + ' take(s) for ' + audio.voLines + ' script line(s)' + (audio.voTakes ? '' : '; the cut is music-only') + ': add takes under audio/vo, or confirm the lines are not voiced.' });
-  if (audio.bgmShort && !job.audioLed) g.push({ kind: 'bgm', text: 'Music: ' + audio.bgm.length + ' track(s) under audio/bgm; the shortlist needs 3. Add tracks, or mark music not applicable.' });
+  if (audio.bgmShort && !job.audioLed) g.push({ kind: 'bgm', text: audio.bgm.length ? 'Music: ' + audio.bgm.length + ' track(s) supplied (' + audio.bgm.join(', ') + '). Use ' + (audio.bgm.length === 1 ? 'it' : 'one of them') + ' as the music, or add tracks for a shortlist of three.' : 'Music: none under audio/bgm. Add at least one track (three for a shortlist), or mark music not applicable.' });
   // On a hybrid job a location with no picture is the background to generate, already listed above.
-  const text = inv.fromText.filter(m => !(hybrid && !hybrid.error && m.kind === 'locations'));
+  const text = job.footageSource === 'generated' ? inv.fromText : [];
   if (text.length) g.push({ kind: 'references', text: text.length + ' name(s) with no reference picture (' + text.map(m => m.name).join(', ') + '): add one, or let them be drawn from text.' });
   if (inv.clashes.length) g.push({ kind: 'clash', text: inv.clashes.length + ' name clash(es) in the library: a person picks which picture is meant.' });
   return g;
@@ -181,7 +183,7 @@ function sceneLine(script, scene) {
 
 function summary(inv) {
   const out = [];
-  if (!inv.library.exists) out.push('No reference library at ' + (inv.library.root || '(no footage folder)') + '. Every character, place and costume will be drawn from the prompt and the storyboard frame alone.');
+  if (!inv.library.exists) out.push('No reference library at ' + (inv.library.root || '(no footage folder)') + (inv.footageSource === 'generated' ? '. Every character, place and costume will be drawn from the prompt and the storyboard frame alone.' : '. None is needed: the actors are filmed' + (inv.footageSource === 'hybrid' ? ', and each background is from the library or generated (below).' : '.')));
   else {
     const have = R.KINDS.map(k => inv.available[k].length ? k + ': ' + inv.available[k].map(i => i.name + ' (' + (i.images || i.videos) + ')').join(', ') : null).filter(Boolean);
     out.push('Reference library ' + inv.library.root + (have.length ? '' : ' is empty.'));
@@ -199,29 +201,31 @@ function summary(inv) {
   const h = inv.hybrid;
   if (h && h.error) out.push('Hybrid: ' + h.error);
   else if (h) {
-    out.push('Hybrid: ' + h.plates + ' of ' + inv.panels.length + ' panel(s) have an actor plate; backgrounds: ' + h.backgrounds.map(b => b.name + ' (' + (b.source === 'library' ? 'library, free' : b.status === 'delivered' ? 'generated' : 'to generate, 1 credit') + ')').join(', ') + '.');
+    out.push('Hybrid: ' + h.plates + ' of ' + inv.panels.length + ' panel(s) have an actor plate' + (h.kept.length ? ', ' + h.kept.join(', ') + ' kept as they are' : '') + '; backgrounds: ' + h.backgrounds.map(b => b.name + ' (' + (b.source === 'library' ? 'library, free' : b.status === 'delivered' ? 'generated' : 'to generate, 1 credit') + ')').join(', ') + '.');
     if (h.probeError) out.push('  plates not looked at (' + h.probeError + '): screen and camera are unchecked; they are checked again at the cut-out.');
     else if (h.needRembg.length) out.push('  AI cut-out (rembg) needed for ' + h.needRembg.join(', ') + ': ' + (h.rembgInstalled ? 'installed on this machine.' : 'NOT installed on this machine.'));
   }
   for (const p of inv.panels) {
     const bits = [];
-    if (p.footage === 'hybrid') {
-      if (!p.plate) bits.push('plate MISSING: add footage/plates/' + p.id + '.mov');
+    if (p.footage === 'hybrid' && p.keep) bits.push('kept as it is (' + path.basename(p.keep) + '): no cut-out, no background');
+    else if (p.footage === 'hybrid') {
+      if (!p.plate) bits.push('plate MISSING: add footage/plates/' + p.id + '.mov (or footage/keep/' + p.id + '.mp4 to use a clip as it is)');
       else {
         bits.push('plate ✓');
         bits.push(p.screen === undefined ? 'screen unchecked' : p.screen ? p.screen + ' screen' : 'no screen: AI cut-out' + (inv.hybrid.rembgInstalled ? '' : ' (rembg not installed)'));
+        if (p.pictureArea) bits.push('letterboxed ' + p.pictureArea.w + 'x' + p.pictureArea.h + ' (bars kept)');
         if (p.cameraMoves) bits.push('camera moves: a still background will not track it');
       }
       if (p.background) bits.push('background ' + p.background.name + ' (' + (p.background.source === 'library' ? 'library, free' : p.background.credits ? 'generate, 1 credit' : 'generated') + ')');
     }
     if (p.footage === 'shoot' && inv.rushes && inv.rushes.tagged && p.rushes != null) bits.push(p.rushes ? p.rushes + ' rush clip(s) for scene ' + p.scene : 'no clip names scene ' + p.scene);
     if (p.uses.length) bits.push('uses ' + p.uses.map(u => u.name).join(', '));
-    if (p.fromText.length) bits.push('from text ' + p.fromText.map(u => u.name).join(', '));
+    if (p.fromText.length && inv.footageSource === 'generated') bits.push('from text ' + p.fromText.map(u => u.name).join(', '));
     if (p.clashes.length) bits.push('NAME CLASH ' + p.clashes.map(u => u.name).join(', '));
     if (p.footage === 'provided') bits.push('clip provided');
     if (bits.length) out.push('  ' + p.id + '  ' + bits.join(' · '));
   }
-  if (inv.fromText.length) {
+  if (inv.fromText.length && inv.footageSource === 'generated') {
     out.push('Needs a reference or will be drawn from text:');
     inv.fromText.forEach(m => out.push('  ' + m.kind.replace(/s$/, '') + ' "' + m.name + '" in ' + m.panels.join(', ') + ' (' + m.why + ')'));
   }

@@ -11,10 +11,16 @@
 //   node hybrid.js <client> <job-id> status
 //
 // Plates: footage/plates/, one file per panel named after it (P03.mov), or footage/plates/plates.json
-// mapping panel ids to files ({"P03": "day-01/A001_C004.mov"}). Locations: the storyboard's
-// `location` field, else a location the reference library holds and the panel names, else the scene.
+// mapping panel ids to files ({"P03": "day-01/A001_C004.mov"}). A panel with no actor to cut out (a
+// pack shot, an end card) is kept as it is: footage/keep/{panel}.*, used in the cut unchanged, no
+// background. Locations: the storyboard's `location` field, else a location the reference library
+// holds and the panel names, else the scene.
 // A background is the library's picture of that location (provided, no credits) or one generated on
-// AgentC after a quote and a yes on the board. This script never spends.
+// AgentC after a quote and a yes on the board. job.hybrid.backgroundPer "location" (default) makes one
+// background per location, shared by its panels; "panel" makes one per panel, each from its own
+// camera angle (the panel's storyboard frame), the first of a location being the continuity reference
+// the others are generated against (continuityOf), so they read as the same place and light.
+// This script never spends.
 // Exit 0 ok · 1 fault · 2 usage · 3 not ready
 const fs = require('fs');
 const path = require('path');
@@ -51,27 +57,42 @@ if (cmd === 'brief') {
   const sceneLine = s => { if (s == null) return null; const m = script.match(new RegExp('^\\s*Scene\\s+' + String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b[^\\n]*', 'im')); return m ? m[0].trim() : null; };
   let mapping = {}; try { mapping = JSON.parse(fs.readFileSync(path.join(platesDir, 'plates.json'), 'utf8')); } catch { mapping = {}; }
   const plateFiles = walk(platesDir).filter(f => MEDIA.test(f));
-  const plateFor = id => { if (mapping[id]) { const f = path.join(platesDir, mapping[id]); return fs.existsSync(f) ? f : null; } return plateFiles.find(f => path.parse(f).name.toUpperCase() === String(id).toUpperCase()) || null; };
+  const keepDir = path.join(job.driveFolder, 'footage', 'keep');
+  const keepFiles = walk(keepDir).filter(f => MEDIA.test(f));
+  const keepFor = id => { const m = mapping[id]; if (m && typeof m === 'object' && m.keep) { const f = path.join(platesDir, m.keep); return fs.existsSync(f) ? f : null; } return keepFiles.find(f => path.parse(f).name.toUpperCase() === String(id).toUpperCase()) || null; };
+  const per = ((job.hybrid || {}).backgroundPer || 'location') === 'panel' ? 'panel' : 'location';
+  const anchors = {};
+  const plateFor = id => { if (typeof mapping[id] === 'string') { const f = path.join(platesDir, mapping[id]); return fs.existsSync(f) ? f : null; } return plateFiles.find(f => path.parse(f).name.toUpperCase() === String(id).toUpperCase()) || null; };
   const lib = R.scanLibrary(R.libraryRoot(job), R.scopeOf(job));
   const prev = fs.existsSync(briefPath) ? JSON.parse(fs.readFileSync(briefPath, 'utf8')) : null;
   const oldPanels = new Map(((prev || {}).panels || []).map(p => [p.id, p]));
   const oldBg = (prev || {}).backgrounds || {};
   const backgrounds = {};
   const rows = panels.map(p => {
+    const kept = keepFor(p.id);
+    if (kept) return { id: p.id, scene: p.scene == null ? null : String(p.scene), storyOrder: p.storyOrder || null, durationSec: p.durationSec || null, keep: fwd(kept), keepSha: board.sha256File(kept), plate: null, plateSha: null, background: null, cutout: null, composite: null, status: 'keep' };
     const line = sceneLine(p.scene);
     const words = [p.caption, p.description, p.shot, line].filter(Boolean).join('. ');
     const needs = R.panelNeeds(p, words, lib);
     const libLoc = needs.found.find(f => f.kind === 'locations');
     const named = p.location || (libLoc && libLoc.name) || null;
-    const key = norm(named || ('scene ' + (p.scene == null ? p.id : p.scene)));
+    const locKey = norm(named || ('scene ' + (p.scene == null ? p.id : p.scene)));
+    const libItem = libLoc && norm(libLoc.name) === locKey ? libLoc.item : lib.items.find(i => i.kind === 'locations' && (i.key === locKey || i.aliases.includes(locKey)));
+    // A library picture is one picture: every panel of that location shares it whatever backgroundPer says.
+    const key = per === 'panel' && !(libItem && libItem.images.length) ? locKey + ' ' + String(p.id).toLowerCase() : locKey;
     if (!backgrounds[key]) {
-      const item = libLoc && norm(libLoc.name) === key ? libLoc.item : lib.items.find(i => i.kind === 'locations' && (i.key === key || i.aliases.includes(key)));
+      const item = libItem;
+      const anchor = per === 'panel' ? (anchors[locKey] = anchors[locKey] || key) : null;
       const old = oldBg[key] || {};
-      const frame = fwd(path.join(rel, p.file || ('storyboard/v1/' + p.id + '.png')));
+      // The framing reference: the plate's frame with the actor blanked out (cutout.py writes it), else
+      // the storyboard frame. A reference showing the actor invites the model to draw a person.
+      const oldCut = (oldPanels.get(p.id) || {}).cutout;
+      const frame = oldCut && oldCut.cleanFrame && fs.existsSync(oldCut.cleanFrame) ? oldCut.cleanFrame : fwd(path.join(rel, p.file || ('storyboard/v1/' + p.id + '.png')));
+      const cam = [...new Set((words.match(/\b(low[- ]angle|high[- ]angle|eye[- ]level|looking up|overhead|extreme close[- ]up|medium close[- ]up|close[- ]up|wide shot|medium shot|long lens|wide lens)\b/gi) || []).map(w => w.toLowerCase()))];
       if (item && item.images.length) backgrounds[key] = { name: named || key, source: 'library', file: item.images[0], sha256: board.sha256File(item.images[0]), status: 'provided', panels: [] };
       else backgrounds[key] = {
-        name: named || key, source: 'generate', status: old.status === 'delivered' ? 'delivered' : 'pending', file: old.status === 'delivered' ? old.file : null, sha256: old.status === 'delivered' ? old.sha256 : null,
-        prompt: old.promptOverride || ['An empty ' + (named || ('set for scene ' + p.scene)) + ', with no people in it, as a film background plate for a live-action scene.', words ? 'The scene: ' + words.replace(/,?\s*VO:\s*"[^"]*"/i, '') + '.' : null, 'Keep the framing, camera height and light direction of the storyboard frame; leave the space the actor stands in clear.', 'Photographic, cinematic, natural light, ' + (job.aspectRatio || '16:9') + ' frame; no text, no people, no logos.'].filter(Boolean).join(' '),
+        name: (named || locKey) + (key !== locKey ? ' (' + p.id + ')' : ''), location: locKey, source: 'generate', continuityOf: anchor && anchor !== key ? anchor : null, status: old.status === 'delivered' ? 'delivered' : 'pending', file: old.status === 'delivered' ? old.file : null, sha256: old.status === 'delivered' ? old.sha256 : null,
+        prompt: old.promptOverride || ['An empty ' + (named || ('set for scene ' + p.scene)) + ', with no people in it, as a film background plate for a live-action shot.', cam.length ? 'Camera: ' + cam.join(', ') + '.' : null, 'Match the camera angle, height, horizon and light direction of the reference image. Anything standing in the reference (a person, a grey shape) is not part of the background: fill that space with more of the place, never a person or an object.', anchor && anchor !== key ? 'The same place, time of day and light as the continuity reference image, seen from this shot\'s camera angle.' : null, 'Photographic, cinematic, natural light, ' + (job.aspectRatio || '16:9') + ' frame; no text, no people, no products, no logos.'].filter(Boolean).join(' '),
         referenceFrame: frame, ratio: job.aspectRatio || '16:9', idempotencyKey: jobId + '/background/' + key.replace(/\s+/g, '-'),
         quotedCredits: old.quotedCredits || null, jobRef: old.jobRef || null, credits: old.credits || null, panels: [],
       };
@@ -91,13 +112,14 @@ if (cmd === 'brief') {
   });
   const out = { schemaVersion: '1.0', jobId, generatedAt: new Date().toISOString(), library: { root: lib.root, layout: lib.layout, project: lib.project, warnings: lib.warnings }, cutoutMethod: (job.hybrid || {}).cutout || 'auto', approvals: (prev || {}).approvals || {}, backgrounds, panels: rows };
   writeBrief(out);
-  const noPlate = rows.filter(r => !r.plate).map(r => r.id);
+  const noPlate = rows.filter(r => !r.plate && !r.keep).map(r => r.id);
+  const kept = rows.filter(r => r.keep).map(r => r.id);
   const gen = Object.entries(backgrounds).filter(([, b]) => b.source === 'generate' && b.status !== 'delivered');
   const lines = [];
-  lines.push('hybrid-brief.json: ' + rows.length + ' panel(s), ' + (rows.length - noPlate.length) + ' with an actor plate' + (noPlate.length ? '; no plate for ' + noPlate.join(', ') : '') + '.');
+  lines.push('hybrid-brief.json: ' + rows.length + ' panel(s), ' + rows.filter(r => r.plate).length + ' with an actor plate' + (kept.length ? ', ' + kept.join(', ') + ' kept as they are' : '') + (noPlate.length ? '; no plate for ' + noPlate.join(', ') : '') + '.');
   lines.push('Backgrounds: ' + Object.keys(backgrounds).length + ' location(s)');
-  for (const [k, b] of Object.entries(backgrounds)) lines.push('  ' + b.name + ' (' + b.panels.join(', ') + '): ' + (b.source === 'library' ? 'from the library, ' + path.basename(b.file) : b.status === 'delivered' ? 'generated, ' + path.basename(b.file) : 'to generate'));
-  if (gen.length) lines.push(gen.length + ' background(s) to generate: quote the first on AgentC (create_image_job is 1 credit per image) and ask on the board before anything is spent.');
+  for (const [k, b] of Object.entries(backgrounds)) lines.push('  ' + b.name + (b.name.endsWith('(' + b.panels.join(', ') + ')') ? '' : ' (' + b.panels.join(', ') + ')') + ': ' + (b.source === 'library' ? 'from the library, ' + path.basename(b.file) : b.status === 'delivered' ? 'generated, ' + path.basename(b.file) : 'to generate' + (b.continuityOf ? ', after ' + backgrounds[b.continuityOf].name + ' and with it as the continuity reference' : '')));
+  if (gen.length) lines.push(gen.length + ' background(s) to generate, 1 credit each (create_image_job): ask once on the board for all of them before anything is spent.');
   (lib.warnings || []).forEach(w => lines.push('WARNING ' + w.text));
   console.log(lines.join('\n'));
   process.exit(0);
@@ -115,6 +137,7 @@ if (cmd === 'approve') {
 }
 if (cmd === 'land') {
   const b = readBrief(); const key = norm(rest[1]); const bg = b.backgrounds[key]; if (!bg) { console.error('no background ' + rest[1] + ' in the brief'); process.exit(2); }
+  if (bg.continuityOf && b.backgrounds[bg.continuityOf] && b.backgrounds[bg.continuityOf].status !== 'delivered') { console.error(bg.name + ' is generated against ' + b.backgrounds[bg.continuityOf].name + ', which has not landed yet; land that one first'); process.exit(3); }
   const ap = (b.approvals || {}).backgrounds; if (!ap) { console.error('no background approval on record; nothing lands without a yes from the board'); process.exit(3); }
   if (ap.keys && !ap.keys.includes(key)) { console.error(bg.name + ' is outside the approved backgrounds (' + ap.keys.join(', ') + ')'); process.exit(3); }
   board.ensureDir(bgDir);
@@ -133,7 +156,7 @@ if (cmd === 'land') {
 if (cmd === 'status') {
   const b = readBrief();
   const bgs = Object.values(b.backgrounds);
-  console.log('hybrid: ' + b.panels.filter(p => p.composite).length + '/' + b.panels.filter(p => p.plate).length + ' composited; backgrounds ' + bgs.filter(x => ['provided', 'delivered'].includes(x.status)).length + '/' + bgs.length + ' ready; credits spent ' + bgs.reduce((s, x) => s + (Number(x.credits) || 0), 0));
-  for (const p of b.panels) console.log('  ' + p.id + ' ' + p.status + (p.cutout ? ' · cut-out ' + p.cutout.method : '') + (p.composite ? ' · actor kept ' + p.composite.actorPreservedPct + '%' : '') + ' · ' + b.backgrounds[p.background].name);
+  console.log('hybrid: ' + b.panels.filter(p => p.composite).length + '/' + b.panels.filter(p => p.plate).length + ' composited, ' + b.panels.filter(p => p.keep).length + ' kept as they are; backgrounds ' + bgs.filter(x => ['provided', 'delivered'].includes(x.status)).length + '/' + bgs.length + ' ready; credits spent ' + bgs.reduce((s, x) => s + (Number(x.credits) || 0), 0));
+  for (const p of b.panels) console.log('  ' + p.id + ' ' + p.status + (p.keep ? ' · ' + path.basename(p.keep) + ' as it is' : '') + (p.cutout ? ' · cut-out ' + p.cutout.method : '') + (p.composite ? ' · actor kept ' + p.composite.actorPreservedPct + '%' : '') + (p.background ? ' · ' + b.backgrounds[p.background].name : ''));
   process.exit(0);
 }

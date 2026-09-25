@@ -1,13 +1,13 @@
 #!/usr/bin/env python
-"""sequence-first-cut: match storyboard panels to the best take with OpenMontage's CLIP embedder.
+"""sequence-first-cut: match storyboard panels to the best take with CLIP (scripts/clip_match.py).
 
 Usage:
-    python sequence-first-cut.py <client> <job-id> [--stride 1.0] [--threshold 0.28] [--om-root <dir>]
+    python sequence-first-cut.py <client> <job-id> [--stride 1.0] [--threshold 0.28]
 
 Run from the workspace root (the folder that holds workspaces/). Reads job.json, manifest.json
 and the pre-prod storyboard.json + panels. Samples one frame per `stride` seconds from every
-clip with ffmpeg, embeds panels and frames with lib/clip_embedder.py (CLIP ViT-B/32 through
-transformers), and writes rough-edl.json (one cut per panel in storyboard order, a window
+clip with ffmpeg, embeds panels and frames with clip_match.py (CLIP ViT-B/32 through
+transformers, the same model and scores OpenMontage's embedder gives), and writes rough-edl.json (one cut per panel in storyboard order, a window
 centred on the best frame, clamped by the deliverable duration) and timeline.png (the matched
 frame per cut, labelled). Panels under the threshold go to unmatchedPanels for a human pick.
 
@@ -80,7 +80,7 @@ def by_panel(job, job_id, job_dir, manifest, panels, clips):
 
 
 def main(argv):
-    if len(argv) < 3: die("usage: sequence-first-cut.py <client> <job-id> [--stride 1.0] [--threshold 0.28] [--om-root <dir>] [--by-panel]", 2)
+    if len(argv) < 3: die("usage: sequence-first-cut.py <client> <job-id> [--stride 1.0] [--threshold 0.28] [--by-panel]", 2)
     client, job_id = argv[1], argv[2]
     opt = lambda k, d: argv[argv.index(k) + 1] if k in argv and argv.index(k) + 1 < len(argv) else d
     stride = float(opt("--stride", "1.0")); threshold = float(opt("--threshold", "0.28"))
@@ -102,11 +102,12 @@ def main(argv):
     if "--by-panel" in argv or job.get("footageSource") in ("generated", "hybrid"):
         return by_panel(job, job_id, job_dir, manifest, panels, clips)
 
-    sys.path.insert(0, str(om_root))
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
     try:
-        from lib import clip_embedder
+        import clip_match as clip_embedder
+        import torch, transformers  # noqa: F401  (fail here, plainly, rather than mid-run)
     except Exception as e:
-        die("OpenMontage clip_embedder could not be imported from %s: %s (pip install transformers torch)" % (om_root, e))
+        die("picture matching needs numpy, torch and transformers (%s): pip install numpy torch transformers" % e)
     import numpy as np
     try:
         from PIL import Image, ImageDraw

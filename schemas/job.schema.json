@@ -84,7 +84,9 @@
       "type": "object",
       "description": "Only with footageSource hybrid: how the actor is cut out and laid over the background.",
       "properties": {
-        "cutout": { "enum": ["auto", "chromakey", "rembg"], "description": "auto: OpenMontage decides per plate (chroma key on a clean green or blue screen, AI segmentation otherwise). Default auto." },
+        "cutout": { "enum": ["auto", "chromakey", "rembg"], "description": "auto: decided per plate from its own corner colour (chroma key on a green or blue screen, AI segmentation otherwise). Default auto." },
+        "rembgModel": { "enum": ["u2net", "isnet-general-use", "birefnet-general-lite", "birefnet-general", "u2net_human_seg"], "description": "The AI cut-out model when a plate has no screen. u2net (default): the main subject, so a held product stays with the actor. birefnet-general-lite: finest hair, 20-35x slower on a CPU. u2net_human_seg: the person only, a held product is dropped." },
+        "backgroundPer": { "enum": ["location", "panel"], "description": "location: one background per location, shared by its panels (default). panel: one per panel from its own camera angle, the first of each location the continuity reference for the rest." },
         "similarity": { "type": "number", "minimum": 0.01, "maximum": 0.5, "description": "Chroma key: how close to the screen colour is removed. Default 0.12." },
         "blend": { "type": "number", "minimum": 0, "maximum": 0.5, "description": "Chroma key: edge softness. Default 0.08." },
         "match": { "type": "number", "minimum": 0, "maximum": 1, "description": "How far the background brightness is moved towards the actor's. Default 0.5; 0 turns it off." },

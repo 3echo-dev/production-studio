@@ -32,14 +32,14 @@ We use OpenMontage as a library, not as a doctrine.
 
 - `lib/clip_embedder.py` is imported by `sequence-first-cut`. The model is `ViT-L/14` unless CONFIG.md changes it.
 - `remotion-composer/` is invoked by `mograph-generate`. Only the five shipping templates (cinematic, explainer, talkinghead, collageburst, lyricoverlay) are supported without extension.
-- Gate A and Gate B records are ours: `record-approval.js` and `board-sync.js pull` write `approvals/`, hash-bound, and `check-approval.js` verifies them. OpenMontage `lib/checkpoint.py` is checked present by `check-om.js` but not called.
+- Gate A and Gate B records are ours: `record-approval.js` and `board-sync.js pull` write `approvals/`, hash-bound, and `check-approval.js` verifies them. OpenMontage's `lib/checkpoint.py` is not used.
 - `lib/media_profiles.py` is consulted by `ingest-footage` for codec presets.
 - `lib/delivery_promise.py` is a promise classifier in OpenMontage, not a bundle validator; `scripts/build-bundle.js` checks the bundle before Gate B.
 - We do NOT call OpenMontage's executive-producer. Our orchestrator drives the workflow table.
 - We do NOT lift the documentary-montage pipeline. Our sequence is storyboard-driven, not CLIP-thematic.
 - We do NOT use OpenMontage's delivery renderer. Our output is FCPXML + bundle for Premiere, not a rendered MP4.
 
-`om_root` in CONFIG.md points at the checkout. `check-om.js` fails start-of-session if the four modules and the composer are not there.
+`om_root` in CONFIG.md points at the checkout. Only mograph uses it; `check-om.js` reports at start of session whether the composer is there.
 
 ## Money
 

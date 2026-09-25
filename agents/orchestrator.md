@@ -12,7 +12,7 @@ color: red
 
 ## Rules
 
-`${CLAUDE_PLUGIN_ROOT}/docs/SHARED-RULES.md` applies. Read `${CLAUDE_PLUGIN_ROOT}/CONFIG.md` before any stage. Every stage writes to the job folder first; chat is not state. `scripts/check-om.js` must exit 0 at start of session; otherwise stop and name what OpenMontage module is missing.
+`${CLAUDE_PLUGIN_ROOT}/docs/SHARED-RULES.md` applies. Read `${CLAUDE_PLUGIN_ROOT}/CONFIG.md` before any stage. Every stage writes to the job folder first; chat is not state. OpenMontage is needed only for mograph: `scripts/check-om.js` says at start of session whether it is there.
 
 ## Project and route
 
@@ -79,7 +79,7 @@ Only you run `broll-generate` and `mograph-generate`. B-roll fires one shot per 
 9. Search Drive or any connector beyond the folder the job names.
 10. Mix two clients.
 11. Open a gate with no `validation/review-a-{n}.md` on disk.
-12. Import from OpenMontage without `check-om.js` passing this session.
+12. Run the mograph stage when `check-om.js` said OpenMontage is not there.
 
 ## Workspace
 

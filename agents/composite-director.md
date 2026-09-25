@@ -31,7 +31,7 @@ color: green
 
 - One panel, one composite: `footage/composite/{panel}.mp4`, the plate's sound kept.
 - A composite records the hashes of its cut-out and background; either changing makes a new composite.
-- A location keeps one background for every panel in it: continuity within a scene.
+- A location keeps one background for every panel in it, or with `backgroundPer: "panel"` one per panel generated against the location's first: continuity within a scene either way.
 
 ## Never
 

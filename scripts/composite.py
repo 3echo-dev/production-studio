@@ -6,7 +6,7 @@ Usage:
 
 Run from the workspace root after cutout.py. Per panel with a cut-out and a ready background
 (library or delivered in hybrid-brief.json) it writes footage/composite/<panel>.mp4: the background
-scaled to cover the plate's frame, its brightness nudged towards the actor's (--match, 0 = off),
+scaled to cover the plate's picture (inside any letterbox bars, which stay black), its brightness nudged towards the actor's (--match, 0 = off),
 the cut-out laid on top, the plate's own sound kept. It then checks the performance was not touched:
 on five frames it compares the actor's pixels in the composite with the plate's (inside the fully
 opaque part of the cut-out) and records the share kept. Below --min-preserved the panel is flagged,
@@ -72,6 +72,8 @@ def main(argv):
             waiting.append(p["id"] + " (background " + (bg.get("name") or p["background"]) + " not ready)"); continue
         plate = Path(p["plate"]); info = probe(plate)
         W, H, dur, fps = info["width"], info["height"], info["duration"], info["fps"]
+        area = (p.get("cutout") or {}).get("pictureArea") or {"x": 0, "y": 0, "w": W, "h": H}
+        AX, AY, AW, AH = area["x"], area["y"], area["w"], area["h"]
         is_video = Path(bg["file"]).suffix.lower() in (".mp4", ".mov", ".m4v", ".webm")
         tmp = Path(tempfile.mkdtemp(prefix="comp-"))
         try:
@@ -80,13 +82,14 @@ def main(argv):
             grab(cut, mid, tmp / "cut.png", rgba=True)
             ca = Image.open(tmp / "cut.png").convert("RGBA"); alpha = ca.getchannel("A")
             if is_video: grab(bg["file"], 0.5, tmp / "bg.png")
-            bgi = Image.open(tmp / "bg.png" if is_video else bg["file"]).convert("RGB").resize((W, H))
+            bgi = Image.open(tmp / "bg.png" if is_video else bg["file"]).convert("RGB").resize((AW, AH))
             a_l = luma(ca.convert("RGB"), alpha.point(lambda v: 255 if v > 200 else 0)); b_l = luma(bgi)
             shift = max(-0.15, min(0.15, (a_l - b_l) / 255.0 * match)) if match else 0.0
             out = out_dir / (p["id"] + ".mp4")
             bg_in = (["-stream_loop", "-1", "-t", "%.3f" % dur, "-i", bg["file"]] if is_video else ["-loop", "1", "-t", "%.3f" % dur, "-i", bg["file"]])
-            fc = ("[0:v]scale=%d:%d:force_original_aspect_ratio=increase,crop=%d:%d,setsar=1,fps=%.4f,eq=brightness=%.4f[bg];"
-                  "[bg][1:v]overlay=0:0:shortest=1,format=yuv420p[v]") % (W, H, W, H, fps, shift)
+            # The background covers the picture area only; letterbox or pillarbox bars stay black.
+            fc = ("[0:v]scale=%d:%d:force_original_aspect_ratio=increase,crop=%d:%d,setsar=1,fps=%.4f,eq=brightness=%.4f,pad=%d:%d:%d:%d:black[bg];"
+                  "[bg][1:v]overlay=0:0:shortest=1,format=yuv420p[v]") % (AW, AH, AW, AH, fps, shift, W, H, AX, AY)
             cmd = ["ffmpeg", "-v", "error", "-y"] + bg_in + ["-i", str(cut), "-i", str(plate), "-filter_complex", fc, "-map", "[v]"]
             if info["audio"]: cmd += ["-map", "2:a", "-c:a", "aac", "-b:a", "192k"]
             cmd += ["-c:v", "libx264", "-preset", "medium", "-crf", "16", "-t", "%.3f" % dur, str(out)]

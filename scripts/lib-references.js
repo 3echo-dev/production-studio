@@ -52,7 +52,7 @@ function libraryRoot(job) {
   const dirs = fs.readdirSync(job.driveFolder, { withFileTypes: true }).filter(e => e.isDirectory());
   const named = dirs.find(e => ROOT_WORDS.includes(norm(e.name).replace(/^\d+\s*[.)]?\s*/, '')));
   if (named) return path.join(job.driveFolder, named.name);
-  if (dirs.some(e => kindOf(e.name) || holdsKinds(path.join(job.driveFolder, e.name)))) return job.driveFolder;
+  if (dirs.some(e => !SHOOT_DIRS.test(e.name) && (kindOf(e.name) || holdsKinds(path.join(job.driveFolder, e.name))))) return job.driveFolder;
   return def;
 }
 
@@ -67,6 +67,7 @@ function projectKeys(scope) {
   keys.delete('');
   return keys;
 }
+const SHOOT_DIRS = /^(footage|audio|day[-_ ]?\d+|plates|keep|cutout|composite|backgrounds|generated|vo|bgm|sfx)$/i;
 const holdsKinds = dir => { try { return fs.readdirSync(dir, { withFileTypes: true }).some(e => e.isDirectory() && kindOf(e.name)); } catch { return false; } };
 
 // Every item in the library: { kind, name, key, aliases, images[], videos[], scope, sources[], clash }
@@ -80,7 +81,7 @@ function scanLibrary(root, scope) {
   const sources = [];   // { dir, kind, level: 'project'|'shared'|'flat', label }
   const keys = projectKeys(scope);
   const top = fs.readdirSync(root, { withFileTypes: true }).filter(e => e.isDirectory() && !e.name.startsWith('.'));
-  const projectDirs = top.filter(e => !kindOf(e.name) && holdsKinds(path.join(root, e.name)));
+  const projectDirs = top.filter(e => !SHOOT_DIRS.test(e.name) && !kindOf(e.name) && holdsKinds(path.join(root, e.name)));
   if (projectDirs.length) lib.layout = 'by-project';
   for (const e of top) {
     const k = kindOf(e.name);
@@ -96,7 +97,7 @@ function scanLibrary(root, scope) {
       }
       continue;
     }
-    if (!['footage', 'audio'].includes(norm(e.name))) lib.unrecognised.push(e.name);
+    if (!SHOOT_DIRS.test(e.name)) lib.unrecognised.push(e.name);
   }
   if (lib.layout === 'by-project' && !lib.project) lib.warnings.push({ code: 'no-project-folder', text: 'The library is split by project, but no folder matches this project' + (scope && scope.title ? ' ("' + scope.title + '")' : '') + '. Only ' + (lib.shared ? 'the shared folder' : 'nothing') + ' is used; ' + lib.otherProjects.length + ' other project folder(s) are ignored.' });
   const inside = scope && scope.driveFolder && fwd(path.resolve(root)).toLowerCase().startsWith(fwd(path.resolve(scope.driveFolder)).toLowerCase());
@@ -152,7 +153,7 @@ function asList(v) { return v == null ? [] : (Array.isArray(v) ? v : [v]).map(St
 // The screenplay convention: a character is written in capitals. Phrases of capital words, 2+ letters.
 function capitalNames(text) {
   const out = new Set();
-  for (const m of String(text || '').matchAll(/\b([A-Z][A-Z'\.]+(?:\s+[A-Z][A-Z'\.]+){0,2})\b/g)) {
+  for (const m of String(text || '').matchAll(/\b([A-Z][A-Z'\.]*(?:-[A-Z][A-Z'\.]*)*[A-Z'\.](?:\s+[A-Z][A-Z'\.\-]+){0,2})\b/g)) {
     const words = m[1].split(/\s+/).filter(w => !NOT_NAMES.has(w.replace(/\.$/, '')));
     if (!words.length) continue;
     const phrase = m[1].replace(/\.$/, '');

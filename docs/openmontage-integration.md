@@ -1,14 +1,15 @@
 # OpenMontage integration
 
-This plugin depends on OpenMontage as a Python + Node library. It does not depend on OpenMontage's orchestrator, executive-producer, or delivery renderer.
+OpenMontage is optional: only the mograph stage uses it, through `remotion-composer/`. OpenMontage is AGPL; nothing of it is copied into this plugin (MIT), it is called in place. It does not depend on OpenMontage's orchestrator, executive-producer, or delivery renderer.
 
 ## What we import
 
 | OpenMontage module | Used by our skill | Purpose |
 |---|---|---|
-| `lib/clip_embedder.py` | `sequence-first-cut` | CLIP ViT-L/14 embedding of storyboard panels and footage frames; nearest-neighbour retrieval to match panel → clip. |
-| `lib/checkpoint.py` | (not used) | Checked present by `check-om.js`. Our gate records are `approvals/*.json`, written by record-approval.js and board-sync.js pull, verified by check-approval.js. |
-| `lib/media_profiles.py` | `ingest-footage` | Codec / container presets for ProRes, DNxHD, H.264, AAC, WAV. |
+| `lib/clip_embedder.py` | (replaced) | `scripts/clip_match.py` loads the same model (openai/clip-vit-base-patch32) itself; checked on real frames to give identical scores (difference 0.0). |
+| `lib/checkpoint.py` | (not used) | Our gate records are `approvals/*.json`, written by record-approval.js and board-sync.js pull, verified by check-approval.js. |
+| `lib/media_profiles.py` | (not used) | Ingest reads codecs from ffprobe. |
+| `tools/video/green_screen_processor.py` | (replaced) | Its detector tests pure #00FF00 only; `cutout.py` samples the plate's own screen colour. |
 | `lib/delivery_promise.py` | (not used) | A promise classifier (motion-led, source-led ...), not a bundle validator. The bundle contract is checked by `scripts/build-bundle.js` on the Gate A hashes instead. |
 | `schemas/artifacts/` | test suite | Reused as fixtures for our own artefact validation harness. |
 | `remotion-composer/` (Node) | `mograph-generate` | Five templates: Cinematic, Explainer, TalkingHead, CollageBurst, LyricOverlay. Rendered to ProRes 4444 with alpha. |
@@ -24,14 +25,8 @@ This plugin depends on OpenMontage as a Python + Node library. It does not depen
 ## Resolution
 
 1. `CONFIG.md` sets `om_root`. Default: `~/Desktop/OpenMontage`.
-2. `scripts/check-om.js` runs at start of session and fails if:
-   - `$OM_ROOT/lib/clip_embedder.py` is missing
-   - `$OM_ROOT/lib/checkpoint.py` is missing
-   - `$OM_ROOT/lib/media_profiles.py` is missing
-   - `$OM_ROOT/lib/delivery_promise.py` is missing
-   - `$OM_ROOT/remotion-composer/package.json` is missing
-3. For Python: skills prepend `$OM_ROOT` to `sys.path` at run time, or expect a `pip install -e $OM_ROOT`.
-4. For Node: `mograph-generate` cd's into `$OM_ROOT/remotion-composer` and runs `npx remotion render` with our props.
+2. `scripts/check-om.js` reports at start of session whether `$OM_ROOT/remotion-composer/package.json` is there. It never refuses the session; the mograph director refuses without it.
+3. For Node: `mograph-generate` cd's into `$OM_ROOT/remotion-composer` and runs `npx remotion render` with our props.
 
 ## Versions we pin against
 

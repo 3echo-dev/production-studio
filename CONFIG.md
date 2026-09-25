@@ -79,7 +79,7 @@ verbose: false
 | `preflight_media_download` | `preflight-media.js` runs before the first generation. Exit 3 means the host is unreachable: stop before spend. | Instruction; the pre-spend gate `preflight-generation.js` is **Mechanical (function hook)**. |
 | `manifest_from_ingest_only` | manifest.json is written by `ingest-footage` and nothing else. | **Mechanical (function hook)** on `manifest.json`; Instruction elsewhere. |
 | `board_push_after_every_row` | Every row ends with `board-sync.js push` and an acknowledged batch. | Instruction; `scripts/hooks/turn.js` warns when a turn ends with an outbox that was never pushed. |
-| `require_om_root` | `check-om.js` fails start-of-session when clip_embedder.py or remotion-composer/package.json is not at OM_ROOT. | **Mechanical.** |
+| `require_om_root` | Only mograph needs OpenMontage: `check-om.js` reports at start of session whether remotion-composer is at OM_ROOT. | Report; the mograph director refuses without it. |
 | `verbose: false` | Files carry content, not explanations of the system. Chat says what is waiting and what to do. | Instruction. |
 
 File length is not a setting. `scripts/test/structure.smoke.js` enforces 900 words per agent and 700 per skill, and fails the build.

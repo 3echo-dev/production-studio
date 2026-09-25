@@ -4,8 +4,8 @@
     python probe-plates.py <plate> [<plate> ...]
 
 Prints one JSON object: per plate its screen (the corner colour cutout.py keys on: green, blue, or
-none, meaning AI segmentation is needed) and whether the camera moves (the four corners, where the
-set or the screen is, compared across three frames; a still background cannot track a moving
+none, meaning AI segmentation is needed), any letterbox or pillarbox bars, and whether the camera
+moves (the four corners of the picture inside the bars, compared across three frames; a still background cannot track a moving
 camera). Plus whether rembg is installed on this machine. Reads only; writes nothing.
 Exit 0 ok · 2 usage
 """
@@ -14,7 +14,7 @@ import importlib.util, json, shutil, sys, tempfile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from cutout import frame_at, key_colour, probe  # noqa: E402
+from cutout import frame_at, key_colour, picture_area, probe  # noqa: E402
 
 MOVE_THRESHOLD = 10.0  # mean corner difference (0..255) between frames above which the camera is taken to move
 
@@ -22,7 +22,7 @@ def corners(img, s):
     w, h = img.size
     return [img.crop((x, y, x + s, y + s)) for (x, y) in [(0, 0), (w - s, 0), (0, h - s), (w - s, h - s)]]
 
-def camera_move(plate, info):
+def camera_move(plate, info, area=None):
     from PIL import Image, ImageChops, ImageStat
     tmp = Path(tempfile.mkdtemp(prefix="move-"))
     try:
@@ -30,7 +30,9 @@ def camera_move(plate, info):
         if d <= 0.2: return {"moving": None, "score": None}
         frames = []
         for i, t in enumerate([d * 0.15, d * 0.5, d * 0.85]):
-            f = tmp / ("f%d.png" % i); frame_at(plate, t, f); frames.append(Image.open(f).convert("L"))
+            f = tmp / ("f%d.png" % i); frame_at(plate, t, f); im = Image.open(f).convert("L")
+            if area: im = im.crop((area["x"], area["y"], area["x"] + area["w"], area["y"] + area["h"]))
+            frames.append(im)
         s = max(8, min(frames[0].size) // 8)
         diffs = []
         for a, b in zip(frames, frames[1:]):
@@ -48,10 +50,11 @@ def main(argv):
     for p in argv:
         try:
             info = probe(p)
-            colour = key_colour(p, info)
+            area = picture_area(p, info)
+            colour = key_colour(p, info, area)
             out["plates"][p] = {"durationSec": round(info["duration"], 3), "width": info["width"], "height": info["height"],
                                 "screen": colour["kind"] if colour else None, "keyHex": colour["hex"] if colour else None,
-                                "camera": camera_move(p, info)}
+                                "pictureArea": area, "camera": camera_move(p, info, area)}
         except Exception as e:  # an unreadable plate is reported, not fatal
             out["plates"][p] = {"error": str(e)[-300:]}
     print(json.dumps(out))

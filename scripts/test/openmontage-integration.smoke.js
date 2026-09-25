@@ -1,29 +1,19 @@
 #!/usr/bin/env node
-// OpenMontage is resolvable: the four required Python modules and remotion-composer/package.json
-// exist at OM_ROOT. Skipped if OM_ROOT is missing (does not fail the build; check-om.js is the
-// runtime gate).
+// OpenMontage is optional: only mograph uses it (remotion-composer). When the checkout is present the
+// composer must be there; when it is absent the rest of the plugin must not need it: nothing outside
+// the mograph director and its skill may name clip_embedder or OpenMontage's green-screen detector.
 const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
 
+const PLUGIN = path.resolve(__dirname, '..', '..');
 const OM_ROOT = process.env.OM_ROOT || path.join(process.env.HOME || process.env.USERPROFILE || '', 'Desktop', 'OpenMontage');
+if (fs.existsSync(OM_ROOT)) assert.ok(fs.existsSync(path.join(OM_ROOT, 'remotion-composer', 'package.json')), 'OpenMontage at ' + OM_ROOT + ' has no remotion-composer');
 
-if (!fs.existsSync(OM_ROOT)) {
-  console.log(`skip om_root not present at ${OM_ROOT}; set OM_ROOT to run this test`);
-  console.log('openmontage integration verification passed');
-  process.exit(0);
+const scripts = fs.readdirSync(path.join(PLUGIN, 'scripts')).filter(f => /\.(js|py)$/.test(f));
+for (const f of scripts) {
+  const s = fs.readFileSync(path.join(PLUGIN, 'scripts', f), 'utf8');
+  assert.ok(!/from lib import clip_embedder|green_screen_processor/.test(s), f + ' still imports OpenMontage code');
 }
-
-const REQUIRED = [
-  'lib/clip_embedder.py',
-  'lib/checkpoint.py',
-  'lib/media_profiles.py',
-  'lib/delivery_promise.py',
-  'remotion-composer/package.json',
-];
-
-const missing = REQUIRED.filter(rel => !fs.existsSync(path.join(OM_ROOT, rel)));
-assert.deepStrictEqual(missing, [], 'OpenMontage missing files:\n  ' + missing.join('\n  '));
-
-console.log(`ok   OpenMontage at ${OM_ROOT}: ${REQUIRED.length} required files present`);
+console.log('ok   OpenMontage optional: ' + (fs.existsSync(OM_ROOT) ? 'present, composer found' : 'absent') + '; no script imports it');
 console.log('openmontage integration verification passed');

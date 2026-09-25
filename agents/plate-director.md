@@ -4,8 +4,7 @@ description: >
   Hybrid jobs only (footageSource "hybrid": real actors, AI backgrounds). Reads the actor plates,
   writes hybrid-brief.json (plate per panel, location per panel, background per location), and
   cuts the actor out of each plate as a transparent layer with scripts/cutout.py: chroma key on
-  any green or blue screen, AI segmentation (rembg) otherwise, OpenMontage's detector as a second
-  opinion. Never redraws the actor. Use in the ingest row of a hybrid job, and again when a plate
+  any green or blue screen, AI segmentation (rembg) otherwise, letterbox bars kept. Never redraws the actor. Use in the ingest row of a hybrid job, and again when a plate
   changes.
 model: sonnet
 color: green
@@ -18,14 +17,14 @@ color: green
 ## Inputs
 
 - `job.json` with `footageSource: "hybrid"` and optional `hybrid` settings (`cutout`, `similarity`, `blend`).
-- `{drive}/footage/plates/`: one plate per storyboard panel, named after it (`P03.mov`), or `plates.json` mapping panel ids to files.
+- `{drive}/footage/plates/`: one plate per storyboard panel, named after it (`P03.mov`), or `plates.json` mapping panel ids to files. `{drive}/footage/keep/{panel}.*` for a panel used as it is (no actor to cut out).
 - The pre-prod release (`storyboard.json`, `script.md`, panel frames) and the reference library (`scan-references.js`).
 
 ## Steps
 
 1. Intake has already reported each plate (`scan-references.js`: screen, camera, background source); start from its answers. `hybrid.js {client} {job-id} brief`. Read its summary: panels without a plate, and each location with its background source (library, or to generate). Put the summary on the Ingest item.
-2. `python cutout.py {client} {job-id}` (all panels) or `--panel P03`. Per plate it records the method, who decided (`corner-sample`, `openmontage`, or `asked`), the key colour, and the share of the frame the actor covers.
-3. Look at every mask still (`previews/hybrid/{panel}-mask.png`). A coverage under 2% or over 85% is a failed cut-out: say which panel and why, and retry with `--similarity`/`--blend` (chroma key) or `--method rembg`.
+2. `python cutout.py {client} {job-id}` (all panels) or `--panel P03`. Per plate it records the method, who decided (`corner-sample`, `no-screen`, or `asked`), any letterbox (`pictureArea`), the key colour, and the share of the frame the actor covers.
+3. Look at every mask still (`previews/hybrid/{panel}-mask.png`), and at what the actor holds: a product that disappeared or turned see-through fails the panel. A coverage under 2% or over 85% is a failed cut-out: say which panel and why, and retry with `--similarity`/`--blend` (chroma key) or `--method rembg`.
 4. Record a version on the Ingest item with the mask stills as the preview. Hand over to the composite-director.
 
 ## Contracts
