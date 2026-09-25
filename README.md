@@ -19,6 +19,23 @@ Six stages, in JGN's whiteboard order:
 
 The plugin **does not** render a final master. It delivers **assets to a folder + one FCPXML** so the editor opens Premiere Pro and finishes the pass with the automated legwork already done. Target: reach 70-80% of a first cut in one day.
 
+## Setting up a machine
+
+Every session starts with a one-line check of this machine (`scripts/check-deps.js`). It names anything missing and what it is needed for. For the full list with install commands, run:
+
+```
+node scripts/check-deps.js --setup
+```
+
+| Item | Needed | For |
+|---|---|---|
+| ffmpeg (with ffprobe), node, python 3, Pillow | required | every job |
+| OpenMontage (at `~/Desktop/OpenMontage`, or `OM_ROOT`) | optional | shoot jobs (matching rushes to panels by picture), mograph |
+| numpy, torch, transformers | optional | shoot jobs, the same picture matching |
+| rembg (`pip install "rembg[cpu]"`; downloads a 176 MB model on first use) | optional | hybrid jobs, only for actors shot without a green or blue screen |
+
+Nothing is installed by the plugin. A stage that needs a missing optional item stops with a plain message; the rest of the pipeline runs. Works on Windows and macOS (`python` falls back to `python3`). rembg runs on the CPU anywhere, about 30 s for 2 s of 480p footage; `rembg[gpu]` in its own environment is faster on an NVIDIA card.
+
 ## MCP dependency
 
 Same AgentC server as pre-prod; no new server-side tools. The pipeline uses the existing `create_video_job` (SeeDance, B-roll), `create_image_job` (GPT image, mograph plates), `upload_asset`, `wait_for_job`, `get_job_result` and `fetch_asset_bytes`. Sequencing, BGM shortlisting, audio sync and the FCPXML export are local scripts and OpenMontage libraries (`docs/agentc-integration.md`, `docs/openmontage-integration.md`).

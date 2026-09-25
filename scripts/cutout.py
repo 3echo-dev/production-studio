@@ -70,7 +70,7 @@ def key_colour(plate, info):
         im = Image.open(f).convert("RGB"); w, h = im.size; s = max(8, min(w, h) // 12)
         px = []
         for (x, y) in [(0, 0), (w - s, 0), (0, h - s), (w - s, h - s)]:
-            px += list(im.crop((x, y, x + s, y + s)).getdata())
+            c = im.crop((x, y, x + s, y + s)); px += list(c.get_flattened_data() if hasattr(c, "get_flattened_data") else c.getdata())
         r = sum(p[0] for p in px) / len(px); g = sum(p[1] for p in px) / len(px); b = sum(p[2] for p in px) / len(px)
         if g > 90 and g > r * 1.35 and g > b * 1.2: kind = "green"
         elif b > 90 and b > r * 1.35 and b > g * 1.2: kind = "blue"
@@ -90,11 +90,11 @@ def cut_rembg(plate, out, info):
         from rembg import remove, new_session
     except Exception:
         die("rembg is not installed, so a plate without a green or blue screen cannot be cut out yet. "
-            "Green-screen plates work without it. Install it in the pipeline environment: pip install rembg (rembg[gpu] with CUDA for speed).", 3)
+            "Green-screen plates work without it. Install it in the pipeline environment: pip install 'rembg[cpu]' (or 'rembg[gpu]' with CUDA for speed); check-deps.js --setup lists it.", 3)
     from PIL import Image
     tmp = Path(tempfile.mkdtemp(prefix="rembg-"))
     try:
-        run(["ffmpeg", "-v", "error", "-y", "-i", str(plate), "-vsync", "0", str(tmp / "f%06d.png")])
+        run(["ffmpeg", "-v", "error", "-y", "-i", str(plate), "-fps_mode", "passthrough", str(tmp / "f%06d.png")])
         session = new_session("u2net_human_seg")
         frames = sorted(tmp.glob("f*.png"))
         for f in frames:
