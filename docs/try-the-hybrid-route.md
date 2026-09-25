@@ -10,6 +10,15 @@ claude plugin marketplace add 3echo-dev/CS-post-production
 claude plugin install creative-studio-post@3echo-post
 ```
 
+Already added the marketplace before? Claude Code keeps its first copy of it, so a new version
+only arrives after an update (`claude plugin list` shows the installed version; this guide needs
+0.2.7 or later):
+
+```
+claude plugin marketplace update 3echo-post
+claude plugin update creative-studio-post@3echo-post
+```
+
 Restart Claude Code. The first line of every session checks the machine; for the full list with
 install commands:
 
