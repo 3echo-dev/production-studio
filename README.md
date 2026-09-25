@@ -36,6 +36,8 @@ node scripts/check-deps.js --setup
 
 Nothing is installed by the plugin. A stage that needs a missing optional item stops with a plain message; the rest of the pipeline runs. Works on Windows and macOS (`python` falls back to `python3`). rembg runs on the CPU anywhere, about 30 s for 2 s of 480p footage; `rembg[gpu]` in its own environment is faster on an NVIDIA card.
 
+To try the hybrid route (real actors, new backgrounds) end to end: `docs/try-the-hybrid-route.md`.
+
 ## MCP dependency
 
 Same AgentC server as pre-prod; no new server-side tools. The pipeline uses the existing `create_video_job` (SeeDance, B-roll), `create_image_job` (GPT image, mograph plates), `upload_asset`, `wait_for_job`, `get_job_result` and `fetch_asset_bytes`. Sequencing, BGM shortlisting, audio sync and the FCPXML export are local scripts and OpenMontage libraries (`docs/agentc-integration.md`, `docs/openmontage-integration.md`).
