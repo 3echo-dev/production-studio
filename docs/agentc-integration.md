@@ -29,7 +29,7 @@ Earlier drafts of the blueprint listed five "new AgentC tools" — this was wron
 
 | Earlier claim | Reality |
 |---|---|
-| `sequence_first_cut` | LOCAL Python — OpenMontage's `clip_embedder.py`. No MCP call. |
+| `sequence_first_cut` | LOCAL Python — `scripts/clip_match.py`. No MCP call. |
 | `suggest_bgm_options` | LOCAL — script tone parse + library lookup (Suno / Musicbed / Artlist API calls, not AgentC). |
 | `sync_audio_track` | LOCAL — ffmpeg on the box. No MCP call. |
 | `render_broll_variant` | Thin skill-level wrapper over `create_video_job`. Adds the B-roll tag to the manifest; not a new server tool. |

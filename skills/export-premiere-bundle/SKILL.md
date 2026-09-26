@@ -16,7 +16,6 @@ user-invocable: false
 - `synced-track.json` — audio mix (sha256-bound to EDL).
 - `bundle/broll/*.mp4`, `bundle/mograph/*.mov`, `bundle/audio/synced-track.wav`, `bundle/audio/waveform.png`.
 - `mograph-requests/*.json` for mograph placement times.
-- OpenMontage `$OM_ROOT/lib/delivery_promise.py`.
 
 ## Steps
 

@@ -13,7 +13,7 @@ These are yours. Everything below them is machinery.
 | `credit_ceiling_per_job` | The most 3echo credits one project may spend on B-roll and mograph generation. | 120 |
 | `require_gate_*_human_approval` | Which gates stop and wait for a person on the board. Turning one off means that stage passes without anyone locking it. | all on |
 | `timezone` | The zone every timestamp in a workspace carries, unless `workspace.json` says otherwise. | Asia/Singapore |
-| `om_root` | Where the OpenMontage checkout lives. clip_embedder, remotion-composer, checkpoint and media_profiles are read from here. | `~/Desktop/OpenMontage` |
+| Mograph | Not in this file. The 3echo Motion composer ships in `vendor/3echo-motion/`; `scripts/mograph-setup.js` installs it once per machine to `~/.creative-studio-post/mograph` (or `MOGRAPH_HOME`). | not set up |
 | Where the work is kept | Not in this file. Run `set-root.js <folder>`, or pass `--root`, or set `CREATIVE_STUDIO_POST_ROOT`. | the current folder |
 | The board | Not in this file. `CREATIVE_STUDIO_POST_BOARD_URL`, or `boardUrl` in `.creative-studio-post/config.json`, or the default in `scripts/lib-board.js`. | the Post Control artifact |
 
@@ -24,7 +24,6 @@ Claude will not change them on request, will not behave as though they were chan
 max_parallel_agents: 3
 credit_ceiling_per_job: 120
 timezone: Asia/Singapore
-om_root: ~/Desktop/OpenMontage
 
 require_gate_a_human_approval: true        # Picture + audio lock: creative director, on the board
 require_gate_b_human_approval: true        # Delivery released: creative director or production lead, per bundle
@@ -58,10 +57,8 @@ manifest_from_ingest_only: true            # no agent types a clip path, checksu
 board_push_after_every_row: true           # a version on disk the board does not show is a person waiting for nothing
 board_land_before_resume: true             # the decision is probably already there
 
-# OpenMontage
-require_om_root: true                      # start-of-session check that om_root resolves
-clip_embedder_model: ViT-L/14              # CLIP variant for storyboard-to-footage matching
-remotion_composer_templates: [cinematic, explainer, talkinghead, collageburst, lyricoverlay]
+# Mograph (3echo Motion composer)
+mograph_templates: [title, endtag, captions, cinematic, explainer, talkinghead, collageburst, lyricoverlay]
 
 # Output style
 verbose: false
@@ -79,7 +76,7 @@ verbose: false
 | `preflight_media_download` | `preflight-media.js` runs before the first generation. Exit 3 means the host is unreachable: stop before spend. | Instruction; the pre-spend gate `preflight-generation.js` is **Mechanical (function hook)**. |
 | `manifest_from_ingest_only` | manifest.json is written by `ingest-footage` and nothing else. | **Mechanical (function hook)** on `manifest.json`; Instruction elsewhere. |
 | `board_push_after_every_row` | Every row ends with `board-sync.js push` and an acknowledged batch. | Instruction; `scripts/hooks/turn.js` warns when a turn ends with an outbox that was never pushed. |
-| `require_om_root` | Only mograph needs OpenMontage: `check-om.js` reports at start of session whether remotion-composer is at OM_ROOT. | Report; the mograph director refuses without it. |
+| `mograph_templates` | The templates `mograph-render.js` accepts, mapped to compositions in `scripts/lib-mograph.js`. `check-mograph.js` reports at start of session whether `mograph-setup.js` has run. | **Mechanical.** `mograph-render.js` refuses another template, and refuses to render before setup. |
 | `verbose: false` | Files carry content, not explanations of the system. Chat says what is waiting and what to do. | Instruction. |
 
 File length is not a setting. `scripts/test/structure.smoke.js` enforces 900 words per agent and 700 per skill, and fails the build.
@@ -98,8 +95,8 @@ With the flag on, `hooks/hooks.mjs` refuses: a B-roll generation before a matchi
 
 - Windows: use `python`, not `python3`. Use project-relative paths, never `/tmp`.
 - Set `PYTHONUTF8=1` for any Python reading markdown with curly quotes.
-- ffmpeg is on PATH (verify with `ffmpeg -version`). Node 20+ for Remotion.
-- OpenMontage lib: add OM_ROOT to sys.path or install via `pip install -e $OM_ROOT`.
+- ffmpeg is on PATH (verify with `ffmpeg -version`). Node 18+ for Remotion.
+- Mograph: `node scripts/mograph-setup.js` once per machine; `--check` says whether it is ready.
 - 3echo AgentC: video jobs via SeeDance (9 image + 3 video + 3 audio refs); image jobs via GPT image models (16 refs, 1 credit each).
 
 ## Function hooks (the refusing guards)

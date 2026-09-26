@@ -395,7 +395,7 @@ table.workflow tr:last-child td{border-bottom:0}
     <dt>Gates</dt><dd>2 · picture+audio, delivery</dd>
     <dt>Board</dt><dd><a href="https://claude.ai/artifact/5q9DJ3KAjiZ6KQqapY5gzG">Post Control</a> · published, private</dd>
     <dt>Tests</dt><dd>15 files · all green · 21 Sep 2026</dd>
-    <dt>Engine</dt><dd>OpenMontage lib</dd>
+    <dt>Engine</dt><dd>3echo Motion + local scripts</dd>
     <dt>Frame</dt><dd>our directors + gates</dd>
     <dt>Video engine</dt><dd>SeeDance (via AgentC)</dd>
     <dt>Image engine</dt><dd>GPT image (via AgentC)</dd>
@@ -565,7 +565,7 @@ table.workflow tr:last-child td{border-bottom:0}
         <li>storyboard → footage <span class="role">semantic match</span></li>
         <li>best-take ranking <span class="role">per storyboard panel</span></li>
       </ul>
-      <p class="note">OpenMontage's retriever, pointed at shoot footage instead of stock libraries. Beats naive frame diff.</p>
+      <p class="note">CLIP matching, pointed at shoot footage instead of stock libraries. Beats naive frame diff.</p>
     </div>
     <div class="rack">
       <div class="head"><h4>Motion graphics</h4><span class="badge">OM · remotion-composer</span></div>
@@ -575,7 +575,7 @@ table.workflow tr:last-child td{border-bottom:0}
         <li>TalkingHead <span class="role">lower thirds</span></li>
         <li>CollageBurst, LyricOverlay <span class="role">extras</span></li>
       </ul>
-      <p class="note">Five templates ship with OpenMontage. Alpha exports (ProRes 4444) drop into Premiere. Not a rewrite.</p>
+      <p class="note">Templates ship with the 3echo Motion composer. Alpha exports (ProRes 4444) drop into Premiere. Not a rewrite.</p>
     </div>
     <div class="rack">
       <div class="head"><h4>Assembly + sync</h4><span class="badge">LOCAL · ffmpeg</span></div>
@@ -594,7 +594,7 @@ table.workflow tr:last-child td{border-bottom:0}
         <li>board-sync.js pull <span class="role">board lock → hash-bound record</span></li>
         <li>check-approval.js <span class="role">refuses a changed file</span></li>
       </ul>
-      <p class="note">Hash-bound records survive a resume. OpenMontage's lib/checkpoint and delivery_promise are checked present but not called.</p>
+      <p class="note">Hash-bound records survive a resume.</p>
     </div>
     <div class="rack">
       <div class="head"><h4>Delivery format</h4><span class="badge">LOCAL · python (ours)</span></div>
@@ -603,7 +603,7 @@ table.workflow tr:last-child td{border-bottom:0}
         <li>build-fcpxml.py <span class="role">EDL + synced track → timeline</span></li>
         <li>opentimelineio, rsync <span class="role">planned, not built</span></li>
       </ul>
-      <p class="note">Written by us — OpenMontage's delivery outputs a rendered MP4; we need a Premiere project instead.</p>
+      <p class="note">Written by us — a rendered MP4 is not enough; we need a Premiere project.</p>
     </div>
   </div>
 </section>
@@ -612,7 +612,7 @@ table.workflow tr:last-child td{border-bottom:0}
   <div class="sec-h">
     <span class="n">05·5</span>
     <h2>Frame vs Engine</h2>
-    <p class="lede">Where the code comes from. Honest split so we don't rewrite work OpenMontage already did, and we don't inherit shapes that fight JGN's workflow.</p>
+    <p class="lede">Where the code comes from. Honest split so we don't rewrite work that already exists, and we don't inherit shapes that fight JGN's workflow.</p>
   </div>
   <div class="stack" style="grid-template-columns:repeat(auto-fit,minmax(300px,1fr))">
     <div class="rack">
@@ -646,7 +646,7 @@ table.workflow tr:last-child td{border-bottom:0}
         <li>delivery renderer → MP4 <span class="role">we need FCPXML</span></li>
         <li>lib/checkpoint, delivery_promise <span class="role">present, not called</span></li>
       </ul>
-      <p class="note">OpenMontage's opinions fit its use case; they'd fight ours. Take the libs, leave the doctrine.</p>
+      <p class="note">Other pipelines' opinions fit their use case; they'd fight ours. Take the libs, leave the doctrine.</p>
     </div>
   </div>
 </section>
@@ -660,7 +660,7 @@ table.workflow tr:last-child td{border-bottom:0}
     </div>
     <div class="a">
       <p><strong>No — and that's deliberate.</strong> The pipeline does not open a video editor of its own. It produces an FCPXML timeline and an asset bundle that Premiere Pro imports in one step, and the human editor finishes the pass there.</p>
-      <p>What runs locally is the <em>assembly engine</em> — ffmpeg for the sync pass, OpenMontage's Remotion composer for mograph, OpenMontage's CLIP embedder for storyboard-to-footage matching, our own python for the FCPXML build. These do the mechanical work: transcode proxies, align VO to picture, retrieve best takes, build alpha-channel overlays, write the timeline XML. They do not render a final master.</p>
+      <p>What runs locally is the <em>assembly engine</em> — ffmpeg for the sync pass, the 3echo Motion composer for mograph, a CLIP matcher for storyboard-to-footage matching, our own python for the FCPXML build. These do the mechanical work: transcode proxies, align VO to picture, retrieve best takes, build alpha-channel overlays, write the timeline XML. They do not render a final master.</p>
     </div>
     <div class="why">
       <div class="r"><span class="k">Why not build an editor</span><span class="v">Premiere Pro is where the editor's craft lives. Replacing it means competing with three decades of workflow. Wrong fight.</span></div>

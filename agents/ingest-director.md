@@ -17,7 +17,6 @@ color: cyan
 
 - `job.json` for `jobId` and `driveFolder`.
 - The Drive folder at `driveFolder`: `footage/day-*/`, `audio/{lav,boom,ambient,wild,vo}/`, optional `slates/`, optional `footage/*/proxies/`.
-- OpenMontage `lib/media_profiles.py` for known codec/container presets.
 
 ## Steps
 

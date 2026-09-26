@@ -78,7 +78,7 @@
     {
       "id": "hybrid-plates",
       "file": "skills/hybrid-plates/SKILL.md",
-      "role": "Hybrid jobs: briefs plates, locations and backgrounds (hybrid.js), cuts the actor out of every plate (cutout.py): chroma key or rembg, OpenMontage's detector as second opinion."
+      "role": "Hybrid jobs: briefs plates, locations and backgrounds (hybrid.js), cuts the actor out of every plate (cutout.py): chroma key or rembg."
     },
     {
       "id": "hybrid-composite",

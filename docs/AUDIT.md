@@ -37,11 +37,11 @@ Fifteen test files, all green on 21 Sep 2026. `scripts/test/runtime.e2e.js` is t
 
 ## Claims retired on 21 Sep 2026
 
-The first draft said the plugin would add five server-side tools to the AgentC MCP and would use OpenMontage's checkpoint and delivery-promise libraries. Neither is true of the build:
+The first draft said the plugin would add five server-side tools to the AgentC MCP and would use third-party checkpoint and delivery-promise libraries. Neither is true of the build:
 
 - No new server-side tools. Sequencing, the BGM shortlist, sync and export are local scripts; B-roll is the existing `create_video_job`. `docs/agentc-integration.md` has the mapping.
-- Gate records are the plugin's own (`record-approval.js`, `board-sync.js pull`, `check-approval.js`). OpenMontage `lib/checkpoint.py` is checked present and not called.
-- OpenMontage `delivery_promise` is a promise classifier, not a bundle validator. `build-bundle.js` checks the bundle against the Gate A hashes.
+- Gate records are the plugin's own (`record-approval.js`, `board-sync.js pull`, `check-approval.js`). No outside checkpoint library is called.
+- `build-bundle.js` checks the bundle against the Gate A hashes.
 - No music service is wired. Suno, Musicbed and Artlist appear in the first draft as options; the client supplies the BGM files.
 
 ## Where the state lives

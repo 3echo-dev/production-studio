@@ -12,7 +12,7 @@ color: red
 
 ## Rules
 
-`${CLAUDE_PLUGIN_ROOT}/docs/SHARED-RULES.md` applies. Read `${CLAUDE_PLUGIN_ROOT}/CONFIG.md` before any stage. Every stage writes to the job folder first; chat is not state. OpenMontage is needed only for mograph: `scripts/check-om.js` says at start of session whether it is there.
+`${CLAUDE_PLUGIN_ROOT}/docs/SHARED-RULES.md` applies. Read `${CLAUDE_PLUGIN_ROOT}/CONFIG.md` before any stage. Every stage writes to the job folder first; chat is not state. Mograph uses the 3echo Motion composer bundled in the plugin: `scripts/check-mograph.js` says at start of session whether `mograph-setup.js` has run.
 
 ## Project and route
 
@@ -79,8 +79,8 @@ Only you run `broll-generate` and `mograph-generate`. B-roll fires one shot per 
 9. Search Drive or any connector beyond the folder the job names.
 10. Mix two clients.
 11. Open a gate with no `validation/review-a-{n}.md` on disk.
-12. Run the mograph stage when `check-om.js` said OpenMontage is not there.
+12. Run the mograph stage before `mograph-setup.js --check` says ready, or render any way but `mograph-render.js`.
 
 ## Workspace
 
-Read everything from `${CLAUDE_PLUGIN_ROOT}` and `$OM_ROOT`; write only under `workspaces/`, `inputs/` and `.board/`. Resuming is `resume-post-project`: the files win over `status.md`; never resume past a gate.
+Read everything from `${CLAUDE_PLUGIN_ROOT}`; write only under `workspaces/`, `inputs/` and `.board/`. Resuming is `resume-post-project`: the files win over `status.md`; never resume past a gate.

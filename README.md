@@ -11,7 +11,7 @@ Six stages, in JGN's whiteboard order:
 1. **Sequence -> first cut.** Frame-match the storyboard against the ingested footage. Pick best takes. Emit a rough EDL.
 2. **BGM options.** Suggest three tracks informed by script tone and storyboard beats. Human picks one.
 3. **Voiceover drop-in.** Place VO on the timeline against script markers.
-4. **Audio syncing.** ffmpeg + remotion align VO, BGM and SFX against the picture cut. The "money shot."
+4. **Audio syncing.** ffmpeg aligns VO, BGM and SFX against the picture cut. The "money shot."
 5. **B-roll generation.** On-demand: editor types a shot ("two seconds, walking on road") and gets a variant saved to the project folder. Not auto-spliced.
 6. **Motion graphics.** Infographic lower thirds and mograph number reveals as alpha exports.
 
@@ -30,7 +30,7 @@ node scripts/check-deps.js --setup
 | Item | Needed | For |
 |---|---|---|
 | ffmpeg (with ffprobe), node, python 3, Pillow | required | every job |
-| OpenMontage (at `~/Desktop/OpenMontage`, or `OM_ROOT`) | optional | shoot jobs (matching rushes to panels by picture), mograph |
+| mograph setup (`node scripts/mograph-setup.js`, once; the 3echo Motion composer ships in the plugin) | optional | titles, end tags, captions |
 | numpy, torch, transformers | optional | shoot jobs, the same picture matching |
 | rembg (`pip install "rembg[cpu]"`; downloads a 176 MB model on first use) | optional | hybrid jobs, only for actors shot without a green or blue screen |
 
@@ -40,7 +40,7 @@ To try the hybrid route (real actors, new backgrounds) end to end: `docs/try-the
 
 ## MCP dependency
 
-Same AgentC server as pre-prod; no new server-side tools. The pipeline uses the existing `create_video_job` (SeeDance, B-roll), `create_image_job` (GPT image, mograph plates), `upload_asset`, `wait_for_job`, `get_job_result` and `fetch_asset_bytes`. Sequencing, BGM shortlisting, audio sync and the FCPXML export are local scripts and OpenMontage libraries (`docs/agentc-integration.md`, `docs/openmontage-integration.md`).
+Same AgentC server as pre-prod; no new server-side tools. The pipeline uses the existing `create_video_job` (SeeDance, B-roll), `create_image_job` (GPT image, mograph plates), `upload_asset`, `wait_for_job`, `get_job_result` and `fetch_asset_bytes`. Sequencing, BGM shortlisting, audio sync and the FCPXML export are local scripts (`docs/agentc-integration.md`, `docs/motion-composer.md`).
 
 ## Human gates
 

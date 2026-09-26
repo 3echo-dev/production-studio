@@ -13,7 +13,6 @@ user-invocable: false
 
 - `job.json` for `jobId` and `driveFolder`.
 - Drive folder at `driveFolder`: `footage/day-*/`, `audio/{lav,boom,ambient,wild,vo}/`, optional `slates/`.
-- OpenMontage `lib/media_profiles.py` for known codec presets.
 
 ## Steps
 

@@ -7,7 +7,7 @@ Usage:
 Run from the workspace root (the folder that holds workspaces/). Reads job.json, manifest.json
 and the pre-prod storyboard.json + panels. Samples one frame per `stride` seconds from every
 clip with ffmpeg, embeds panels and frames with clip_match.py (CLIP ViT-B/32 through
-transformers, the same model and scores OpenMontage's embedder gives), and writes rough-edl.json (one cut per panel in storyboard order, a window
+transformers, the same CLIP model and scores as the reference embedder), and writes rough-edl.json (one cut per panel in storyboard order, a window
 centred on the best frame, clamped by the deliverable duration) and timeline.png (the matched
 frame per cut, labelled). Panels under the threshold go to unmatchedPanels for a human pick.
 
@@ -84,7 +84,6 @@ def main(argv):
     client, job_id = argv[1], argv[2]
     opt = lambda k, d: argv[argv.index(k) + 1] if k in argv and argv.index(k) + 1 < len(argv) else d
     stride = float(opt("--stride", "1.0")); threshold = float(opt("--threshold", "0.28"))
-    om_root = Path(opt("--om-root", os.environ.get("OM_ROOT", str(Path.home() / "Desktop" / "OpenMontage"))))
     job_dir = Path("workspaces") / client / "jobs" / job_id
     job = json.loads((job_dir / "job.json").read_text(encoding="utf-8"))
     man_p = job_dir / "manifest.json"

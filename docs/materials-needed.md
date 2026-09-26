@@ -47,11 +47,11 @@ No Suno / Musicbed / Artlist MCP is wired in this session. For a real test today
 These installs are needed only once per machine to unlock the CLIP sequence stage and Remotion mograph stage:
 
 ```bash
-pip install open_clip_torch
-cd ~/Desktop/OpenMontage/remotion-composer && npm install
+pip install numpy torch transformers
+node scripts/mograph-setup.js
 ```
 
-Without them, the pipeline still runs — the sequence stage falls back to a human-authored EDL, and the mograph stage is skipped.
+Without them, the pipeline still runs: the sequence stage falls back to a human-authored EDL, and the mograph stage is skipped.
 
 ## Credit budget
 

@@ -69,8 +69,8 @@ assert.strictEqual(brief.backgrounds.harbour.source, 'generate'); assert.strictE
 assert.ok(/no people/.test(brief.backgrounds.harbour.prompt), 'a background prompt asks for an empty set');
 assert.deepStrictEqual(brief.panels.map(p => p.status), ['plate', 'plate']);
 
-// ---- cut-out: auto samples the screen colour from the corners and picks chroma key (with or without OpenMontage)
-r = py('cutout.py', ['3echo', jobId], { OM_ROOT: path.join(tmp, 'no-openmontage') }); ok(r, 'cutout');
+// ---- cut-out: auto samples the screen colour from the corners and picks chroma key
+r = py('cutout.py', ['3echo', jobId], {}); ok(r, 'cutout');
 brief = JSON.parse(fs.readFileSync(path.join(jobDir, 'hybrid-brief.json'), 'utf8'));
 for (const p of brief.panels) {
   assert.strictEqual(p.cutout.method, 'chromakey'); assert.strictEqual(p.cutout.decidedBy, 'corner-sample');

@@ -1,7 +1,7 @@
 ---
 name: sequence-director
 description: >
-  Frame-matches the pre-prod storyboard against the ingested footage using CLIP (scripts/clip_match.py, the same model and scores as OpenMontage's
+  Frame-matches the pre-prod storyboard against the ingested footage using CLIP (scripts/clip_match.py, the same model and scores as the reference
   ViT-L/14 embedder, picks the best take per panel, emits a rough EDL and a preview timeline
   PNG. The output is a first-cut proposal, not a final cut. Use at the sequence stage and after
   any manifest revision.

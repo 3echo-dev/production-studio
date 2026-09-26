@@ -20,7 +20,7 @@ color: cyan
 - `synced-track.json` — the audio mix, hash-bound to the EDL.
 - Every file under `bundle/` populated by earlier stages: `broll/`, `mograph/`, `audio/`.
 - Every file under `bundle/footage/` — selected takes transcoded to editing proxies where the codec is not editor-friendly (via `ingest-director`'s proxy pass).
-- `scripts/build-bundle.js` for the bundle check (OpenMontage delivery_promise is a promise classifier, not a validator).
+- `scripts/build-bundle.js` for the bundle check.
 
 ## Steps
 

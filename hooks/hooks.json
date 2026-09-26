@@ -10,7 +10,7 @@
           },
           {
             "type": "command",
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/check-om.js\""
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/check-mograph.js\""
           },
           {
             "type": "command",

@@ -13,7 +13,7 @@ const { spawnSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
-const OM_ROOT = process.env.OM_ROOT || path.join(process.env.HOME || process.env.USERPROFILE || '.', 'Desktop', 'OpenMontage');
+const MOGRAPH = require('./lib-mograph');
 const PLUGIN_ROOT = process.env.CLAUDE_PLUGIN_ROOT || path.resolve(__dirname, '..');
 const mac = process.platform === 'darwin';
 
@@ -34,7 +34,7 @@ const CHECKS = [
   { name: 'node', need: 'required', ok: has('node', ['--version']), for: 'every script', install: mac ? 'brew install node' : 'winget install OpenJS.NodeJS.LTS' },
   { name: 'python', need: 'required', ok: !!PY, for: 'cut-out, composite, FCPXML, sequence', install: mac ? 'brew install python' : 'winget install Python.Python.3.12' },
   { name: 'Pillow', need: 'required', ok: !!mods.PIL, for: 'previews, plate checks, cut-out, composite', install: pip + ' pillow' },
-  { name: 'openmontage', need: 'optional', ok: fs.existsSync(OM_ROOT), for: 'shoot jobs: matching rushes to panels by picture; mograph', install: 'git clone the OpenMontage repo to ' + OM_ROOT.replace(/\\/g, '/') + ' (or set OM_ROOT)' },
+  { name: 'mograph', need: 'optional', ok: MOGRAPH.status().ok, for: 'titles, end tags, captions (the 3echo Motion composer)', install: 'node "' + path.join(PLUGIN_ROOT, 'scripts', 'mograph-setup.js') + '"   (one time, needs network, a few minutes)' },
   { name: 'clip-matcher', need: 'optional', ok: !!(mods.numpy && mods.torch && mods.transformers), for: 'shoot jobs: matching rushes to panels by picture (generated and hybrid jobs cut by panel id without it)', install: pip + ' numpy torch transformers' },
   { name: 'rembg', need: 'optional', ok: !!(mods.rembg && mods.onnxruntime), for: 'hybrid jobs: cutting out an actor shot without a green or blue screen (screen plates do not need it)', install: pip + ' "rembg[cpu]"   (CPU; on Windows/Linux with an NVIDIA card, "rembg[gpu]" in its own venv is faster)' },
 ];

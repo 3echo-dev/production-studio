@@ -26,20 +26,19 @@ Nine things a human must declare or approve. The pipeline never fills an XX for 
 
 A blank stays a question. Unknown is not not-applicable.
 
-## OpenMontage boundary
+## Motion composer boundary
 
-We use OpenMontage as a library, not as a doctrine.
+The 3echo Motion composer renders mograph and nothing else.
 
-- `lib/clip_embedder.py` is imported by `sequence-first-cut`. The model is `ViT-L/14` unless CONFIG.md changes it.
-- `remotion-composer/` is invoked by `mograph-generate`. Only the five shipping templates (cinematic, explainer, talkinghead, collageburst, lyricoverlay) are supported without extension.
-- Gate A and Gate B records are ours: `record-approval.js` and `board-sync.js pull` write `approvals/`, hash-bound, and `check-approval.js` verifies them. OpenMontage's `lib/checkpoint.py` is not used.
-- `lib/media_profiles.py` is consulted by `ingest-footage` for codec presets.
-- `lib/delivery_promise.py` is a promise classifier in OpenMontage, not a bundle validator; `scripts/build-bundle.js` checks the bundle before Gate B.
-- We do NOT call OpenMontage's executive-producer. Our orchestrator drives the workflow table.
+- The composer ships inside the plugin at `vendor/3echo-motion/composer` (licence and notice next to it) and is rendered only through `scripts/mograph-render.js`. Eight templates: overlays `title`, `endtag`, `captions`; full-frame `cinematic`, `explainer`, `talkinghead`, `collageburst`, `lyricoverlay`.
+- Picture matching is `scripts/clip_match.py`, our own.
+- Gate A and Gate B records are ours: `record-approval.js` and `board-sync.js pull` write `approvals/`, hash-bound, and `check-approval.js` verifies them.
+- `scripts/build-bundle.js` checks the bundle before Gate B.
+- Our orchestrator drives the workflow table.
 - We do NOT lift the documentary-montage pipeline. Our sequence is storyboard-driven, not CLIP-thematic.
-- We do NOT use OpenMontage's delivery renderer. Our output is FCPXML + bundle for Premiere, not a rendered MP4.
+- Our output is FCPXML + bundle for Premiere, not a rendered MP4.
 
-`om_root` in CONFIG.md points at the checkout. Only mograph uses it; `check-om.js` reports at start of session whether the composer is there.
+Only mograph uses the composer; `check-mograph.js` reports at start of session whether `mograph-setup.js` has run on this machine.
 
 ## Money
 
@@ -97,8 +96,7 @@ Push. The card the person opened points at the job and hides; the job's own page
 
 - Windows-first. Use `python`, not `python3`. Set `PYTHONUTF8=1`.
 - `ffmpeg` and `ffprobe` on PATH.
-- Node 20+ for Remotion.
-- OpenMontage checkout on disk, path in CONFIG.md `om_root`.
+- Node 18+ for Remotion; `scripts/mograph-setup.js` run once per machine before the first mograph.
 - Timezone: `Asia/Singapore` by default.
 - Never write outside the workspace folder or into the plugin folder.
 - No shell heredocs. Multi-line files go via the Write tool.
