@@ -69,4 +69,6 @@ fs.mkdirSync(path.join(dir, 'runs'), { recursive: true });
 const out = path.join(dir, 'runs', item + '-v' + n + '.json');
 fs.writeFileSync(out, JSON.stringify(rec, null, 2) + '\n');
 board.appendOutbox(process.cwd(), client, jobId, { collection: 'runs', docId: item + '-v' + n, data: { ...rec, trace: JSON.stringify(rec.trace).length > 20000 ? [] : rec.trace, prompt: rec.prompt.slice(0, 20000), output: rec.output.slice(0, 40000) } });
+// The project's running cost, so the slate card and the Cost box never lag a run.
+require('./tally-cost.js').queue(board, process.cwd(), client, jobId, dir);
 console.log('Run recorded: ' + ws.fwd(out) + '. Queued for the board.');

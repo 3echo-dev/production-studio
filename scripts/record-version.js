@@ -49,13 +49,31 @@ if (lines.some(v => v.item === item && Number(v.n) === n)) { console.error('REFU
 const h = hashFile(target);
 const rel = path.relative(dir, target).split(path.sep).join('/');
 const at = ws.now(client, argv);
-const rec = { item, n, note, path: rel, hash: h.sha256, bytes: h.bytes, seat, at };
+// Every file this delivery produced, for the board's Files tab: the file itself, or every file
+// inside a folder version, plus anything named with --also (a file or a folder, relative to the
+// job, repeatable). jobDir is the job folder's full path, so the board can show where each file
+// sits on this computer. Capped so a large bundle does not bloat the board document.
+const FILES_CAP = 400;
+const found = [];
+const walk = p => {
+  let st; try { st = fs.statSync(p); } catch { return; }
+  if (st.isDirectory()) { for (const e of fs.readdirSync(p).sort()) if (!e.startsWith('.')) walk(path.join(p, e)); }
+  else found.push({ name: path.basename(p), path: path.relative(dir, p).split(path.sep).join('/'), bytes: st.size });
+};
+walk(abs);
+argv.forEach((a, i) => { if (a === '--also' && argv[i + 1]) walk(path.join(dir, argv[i + 1])); });
+const seen = new Set();
+const allFiles = found.filter(f => !seen.has(f.path) && seen.add(f.path));
+const files = allFiles.slice(0, FILES_CAP);
+const filesMore = allFiles.length - files.length;
+const jobDir = ws.fwd(path.resolve(dir));
+const rec = { item, n, note, path: rel, hash: h.sha256, bytes: h.bytes, seat, at, files, ...(filesMore ? { filesMore } : {}) };
 fs.appendFileSync(log, JSON.stringify(rec) + '\n');
 
 const cwd = process.cwd();
 const iso = new Date().toISOString();
-board.appendOutbox(cwd, client, jobId, { collection: 'versions', docId: item + '-v' + n, data: { item, n, note, file: rel, sha256: h.sha256, bytes: h.bytes, seat, at: iso, stamp: at } });
-board.appendOutbox(cwd, client, jobId, { collection: 'items', docId: item, op: 'update', data: { status, version: n, summary: note, file: rel, sha256: h.sha256, bytes: h.bytes, updatedBy: seat || 'pipeline', updatedAt: iso } });
+board.appendOutbox(cwd, client, jobId, { collection: 'versions', docId: item + '-v' + n, data: { item, n, note, file: rel, sha256: h.sha256, bytes: h.bytes, seat, at: iso, stamp: at, files, filesMore, jobDir } });
+board.appendOutbox(cwd, client, jobId, { collection: 'items', docId: item, op: 'update', data: { status, version: n, summary: note, file: rel, sha256: h.sha256, bytes: h.bytes, files, jobDir, updatedBy: seat || 'pipeline', updatedAt: iso } });
 let previewNote = '';
 const preview = opt('--preview');
 if (preview) {

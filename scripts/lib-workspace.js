@@ -77,7 +77,7 @@ function listJobs(client, argv) {
 
 // Flags that take a value. A flag missing from this list makes its value look like a
 // positional, which is how a title once turned into part of a file path.
-const VALUE_FLAGS = ['--root', '--out', '--config', '--job', '--client', '--by', '--comment', '--note',
+const VALUE_FLAGS = ['--root', '--also', '--out', '--config', '--job', '--client', '--by', '--comment', '--note',
   '--notes-file', '--next', '--blocked', '--item', '--n', '--seat', '--gate', '--file', '--preview',
   '--status', '--prompt-file', '--output-file', '--trace-file', '--model', '--turns', '--tokens',
   '--skills', '--started', '--decided-at', '--channel', '--title', '--activity', '--substep',
