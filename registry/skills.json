@@ -6,6 +6,11 @@
       "role": "Entry command. Starts or resumes a post-production project. Invoked as /creative-studio-post:post."
     },
     {
+      "id": "install",
+      "file": "skills/install/SKILL.md",
+      "role": "First-run setup: checks the tools this computer needs, asks, installs them and checks again; says how to connect AgentC."
+    },
+    {
       "id": "new-post-project",
       "file": "skills/new-post-project/SKILL.md",
       "role": "Creates a project.json from a Drive folder + pre-prod release package path + project id."

@@ -4,6 +4,7 @@
 //
 //   node check-deps.js            one line (the session-start hook)
 //   node check-deps.js --setup    the full list with install commands, for setting up a new machine
+//   node check-deps.js --json     the same as JSON (the install skill reads it)
 //
 // Required: every job needs them. Optional: only one route or one stage needs them; the rest of the
 // pipeline runs without, and the stage that needs one stops with a plain message. Nothing is ever
@@ -39,6 +40,13 @@ const CHECKS = [
   { name: 'rembg', need: 'optional', ok: !!(mods.rembg && mods.onnxruntime), for: 'hybrid jobs: cutting out an actor shot without a green or blue screen (screen plates do not need it)', install: pip + ' "rembg[cpu]"   (CPU; on Windows/Linux with an NVIDIA card, "rembg[gpu]" in its own venv is faster)' },
 ];
 
+// --json: the install skill's input. Fresh probe, one entry per tool, required ones first.
+if (process.argv.includes('--json')) {
+  const tools = CHECKS.map(c => ({ name: c.name, present: !!c.ok, required: c.need === 'required', why: c.for, install: c.install }));
+  tools.sort((x, y) => (y.required - x.required));
+  console.log(JSON.stringify({ platform: process.platform, python: PY, ready: tools.every(t => t.present || !t.required), tools }, null, 2));
+  process.exit(0);
+}
 if (process.argv.includes('--setup')) {
   console.log('creative-studio-post setup check (' + process.platform + ')\n');
   for (const c of CHECKS) console.log((c.ok ? '  ok      ' : c.need === 'required' ? '  MISSING ' : '  missing ') + c.name.padEnd(13) + c.need.padEnd(10) + c.for + (c.ok ? '' : '\n' + ' '.repeat(33) + 'install: ' + c.install));
@@ -51,5 +59,5 @@ let hooksArmed = 'off';
 try { if (JSON.parse(fs.readFileSync(path.join(PLUGIN_ROOT, 'hooks/hooks.json'), 'utf8')).modules) hooksArmed = 'armed'; } catch {}
 const line = CHECKS.map(c => c.name + ': ' + (c.ok ? 'ok' : c.need === 'required' ? 'MISSING' : 'missing')).join(' | ') + ' | function_hooks: ' + hooksArmed;
 const miss = CHECKS.filter(c => !c.ok);
-console.log('[creative-studio-post] ' + line + (miss.length ? '\n[creative-studio-post] ' + miss.map(c => c.name + (c.need === 'required' ? ' (REQUIRED)' : '') + ' is needed for ' + c.for).join('; ') + '. Run check-deps.js --setup for install commands.' : ''));
+console.log('[creative-studio-post] ' + line + (miss.length ? '\n[creative-studio-post] ' + miss.map(c => c.name + (c.need === 'required' ? ' (REQUIRED)' : '') + ' is needed for ' + c.for).join('; ') + '. Run /creative-studio-post:install to set them up.' : ''));
 process.exit(0);
