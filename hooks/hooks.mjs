@@ -9,6 +9,7 @@
 //  5. manifest.json written by anything but ingest-footage
 //  6. Delivery export in any format but FCPXML
 //  7. A hybrid job's background image job without the background yes on record
+//     (and guard 1 covers a hybrid job's motion-transfer video jobs: no create_video_job without that yes)
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -42,6 +43,21 @@ export function refuseBrollWithoutRequest({ command, cwd }) {
       if (pending.some(p => p.libraryRefs) && !((b.approvals || {}).refs || {}).by) return 'Generation refused: the reference set has not been approved on the board.';
       return null;
     } catch { return 'Generation refused: generation-brief.json is unreadable.'; }
+  }
+  // A hybrid job's motion-transfer panels (motion-transfer.js) carry one yes, bound to each panel's references.
+  const hybridPath = path.join(jobDir, 'hybrid-brief.json');
+  if (fs.existsSync(hybridPath)) {
+    try {
+      const b = JSON.parse(fs.readFileSync(hybridPath, 'utf8'));
+      const pending = (b.panels || []).filter(p => p.motion && p.motion.status !== 'delivered');
+      if (pending.length) {
+        const ap = (b.approvals || {}).motion;
+        if (!ap || !ap.by || !ap.at) return 'Motion transfer refused: no approval on record from the board.';
+        const ok = pending.filter(p => (!ap.panels || ap.panels.includes(String(p.id).toUpperCase())) && (ap.refs || {})[p.id] === p.motion.refVideoSha + ':' + p.motion.backgroundSha);
+        if (!ok.length) return 'Motion transfer refused: the approved shots changed or none is left; ask again on the board.';
+        return null;
+      }
+    } catch { return 'Motion transfer refused: hybrid-brief.json is unreadable.'; }
   }
   const requestsDir = path.join(jobDir, 'broll-requests');
   if (!fs.existsSync(requestsDir)) return 'B-roll generation refused: no broll-requests folder on disk.';

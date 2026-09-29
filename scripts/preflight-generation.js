@@ -5,6 +5,7 @@
 //   preflight-generation.js {client} {job-id} {n} --kind broll|mograph
 //   preflight-generation.js {client} {job-id} sample|batch --kind generate     (generation-brief.json)
 //   preflight-generation.js {client} {job-id} batch --kind backgrounds          (hybrid-brief.json)
+//   preflight-generation.js {client} {job-id} {panel} --kind motion             (hybrid-brief.json, motion transfer)
 //
 // Checks:
 //   1. Job dir exists.
@@ -31,11 +32,36 @@ for (let i = 3; i < args.length; i++) {
 }
 if (!client || !jobId || !n) { console.error('usage: preflight-generation.js {client} {job-id} {n} --kind broll|mograph'); process.exit(2); }
 const kind = flags.kind;
-if (!['broll', 'mograph', 'generate', 'backgrounds'].includes(kind)) { console.error('--kind must be broll, mograph, generate or backgrounds'); process.exit(2); }
+if (!['broll', 'mograph', 'generate', 'backgrounds', 'motion'].includes(kind)) { console.error('--kind must be broll, mograph, generate, backgrounds or motion'); process.exit(2); }
 
 const jobDir = lib.jobRoot(process.cwd(), client, jobId);
 if (!fs.existsSync(jobDir)) { console.error('job dir missing: ' + jobDir); process.exit(1); }
 
+// motion: a hybrid panel's motion-transfer clip (motion-transfer.js). One approval for the set,
+// bound to each panel's reference clip and background; the estimate is what is still to generate.
+if (kind === 'motion') {
+  const bp = path.join(jobDir, 'hybrid-brief.json');
+  if (!fs.existsSync(bp)) { console.error('no hybrid-brief.json yet; run hybrid.js brief first'); process.exit(3); }
+  let b; try { b = JSON.parse(fs.readFileSync(bp, 'utf8')); } catch (e) { console.error('hybrid-brief.json: invalid JSON (' + e.message + ')'); process.exit(1); }
+  const p = (b.panels || []).find(x => String(x.id).toUpperCase() === String(n).toUpperCase());
+  if (!p || !p.motion) { console.error(n + ' is not a motion-transfer panel; run motion-transfer.js brief'); process.exit(3); }
+  if (p.motion.status === 'delivered') { console.error(n + ' already has its motion-transfer clip'); process.exit(3); }
+  const ap = (b.approvals || {}).motion;
+  if (!ap || !ap.by || !ap.at) { console.error('no motion-transfer approval on record in hybrid-brief.json; the yes comes from the board'); process.exit(3); }
+  if (ap.panels && !ap.panels.includes(String(p.id).toUpperCase())) { console.error(p.id + ' is outside the approved panels'); process.exit(3); }
+  if ((ap.refs || {})[p.id] !== p.motion.refVideoSha + ':' + p.motion.backgroundSha) { console.error(p.id + ': the plate or background changed since the yes; ask again'); process.exit(3); }
+  if (!p.motion.assets || p.motion.assets.refVideoSha !== p.motion.refVideoSha || p.motion.assets.backgroundSha !== p.motion.backgroundSha) { console.error(p.id + ': upload the reference clip and background first (motion-transfer.js asset)'); process.exit(3); }
+  if (!Number(p.motion.quotedCredits)) { console.error(p.id + ': no quote on record (estimate_video_job, then motion-transfer.js quote)'); process.exit(3); }
+  let ceilingM = 120; try { const m = fs.readFileSync(path.resolve(__dirname, '..', 'CONFIG.md'), 'utf8').match(/credit_ceiling_per_job:\s*(\d+)/); if (m) ceilingM = parseInt(m[1], 10); } catch {}
+  let spentM = 0; try { const m = fs.readFileSync(path.join(jobDir, 'status.md'), 'utf8').match(/credits_spent:\s*(\d+)/); if (m) spentM = parseInt(m[1], 10); } catch {}
+  const all = (b.panels || []).filter(x => x.motion && (!ap.panels || ap.panels.includes(String(x.id).toUpperCase())));
+  const used = all.reduce((s, x) => s + (Number(x.motion.credits) || 0), 0);
+  const est = Number(p.motion.quotedCredits);
+  if (used + est > Number(ap.credits)) { console.error('this clip (' + est + ') would take the motion transfers to ' + (used + est) + ', above the ' + ap.credits + ' credits approved on the board; ask again'); process.exit(1); }
+  if (spentM + est > ceilingM) { console.error('ceiling ' + ceilingM + ' would be exceeded (spent=' + spentM + ', est=' + est + ')'); process.exit(1); }
+  console.log('preflight ok: motion transfer ' + p.id + ' approved by ' + ap.by + '; est ' + est + ', motion spent ' + used + '/' + ap.credits + ', job ' + spentM + '/' + ceilingM);
+  process.exit(0);
+}
 // backgrounds: a hybrid job's generated backgrounds carry one approval, landed from the board.
 if (kind === 'backgrounds') {
   const bp = path.join(jobDir, 'hybrid-brief.json');

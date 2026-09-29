@@ -23,9 +23,10 @@ color: green
 ## Steps
 
 1. Backgrounds. For each location `to generate`: the orchestrator quotes one on AgentC (`create_image_job`, 1 credit per image, the brief's `prompt`, the storyboard frame as reference, the job's ratio), records it with `hybrid.js quote {location} --credits N`, and asks on the board. On the yes, `hybrid.js approve backgrounds --by --at --credits`, generate, then `hybrid.js land {location} --url {media url} --credits N` in the same turn. A library location needs nothing.
-2. `python composite.py {client} {job-id}`. It waits, and says so, for any panel whose cut-out or background is not ready.
-3. Read each result: `actor kept` is the share of the actor's pixels unchanged from the plate (97% or more passes; compression costs about 1%). A flagged panel goes to the board with its before/after still; never pass it silently.
-4. Record a version on the Ingest item with the before/after stills. Then `ingest-footage.js` (it catalogues only `footage/composite/`), and the sequence row cuts by panel id.
+2. Motion-transfer panels (`hybrid.motionPanels`, camera moves) get their clip first through the orchestrator (skill `hybrid-motion`); composite then uses it as the background and pastes the plate's actor back on top.
+3. `python composite.py {client} {job-id}`. It waits, and says so, for any panel whose cut-out or background is not ready.
+4. Read each result: `actor kept` is the share of the actor's pixels unchanged from the plate (97% or more passes; compression costs about 1%). A flagged panel goes to the board with its before/after still; never pass it silently.
+5. Record a version on the Ingest item with the before/after stills. Then `ingest-footage.js` (it catalogues only `footage/composite/`), and the sequence row cuts by panel id.
 
 ## Contracts
 

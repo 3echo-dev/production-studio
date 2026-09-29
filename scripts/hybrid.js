@@ -62,6 +62,7 @@ if (cmd === 'brief') {
   const keepFor = id => { const m = mapping[id]; if (m && typeof m === 'object' && m.keep) { const f = path.join(platesDir, m.keep); return fs.existsSync(f) ? f : null; } return keepFiles.find(f => path.parse(f).name.toUpperCase() === String(id).toUpperCase()) || null; };
   const per = ((job.hybrid || {}).backgroundPer || 'location') === 'panel' ? 'panel' : 'location';
   const anchors = {};
+  const motionIds = ((job.hybrid || {}).motionPanels || []).map(x => String(x).toUpperCase());
   const plateFor = id => { if (typeof mapping[id] === 'string') { const f = path.join(platesDir, mapping[id]); return fs.existsSync(f) ? f : null; } return plateFiles.find(f => path.parse(f).name.toUpperCase() === String(id).toUpperCase()) || null; };
   const lib = R.scanLibrary(R.libraryRoot(job), R.scopeOf(job));
   const prev = fs.existsSync(briefPath) ? JSON.parse(fs.readFileSync(briefPath, 'utf8')) : null;
@@ -107,6 +108,8 @@ if (cmd === 'brief') {
       id: p.id, scene: p.scene == null ? null : String(p.scene), storyOrder: p.storyOrder || null, durationSec: p.durationSec || null,
       plate: plate ? fwd(plate) : null, plateSha, background: key,
       cutout: keep ? (old.cutout || null) : null, composite: keep ? (old.composite || null) : null,
+      // A motion-transfer panel (job.hybrid.motionPanels): motion-transfer.js fills this; a changed plate voids it.
+      motion: keep && old.motion && motionIds.includes(String(p.id).toUpperCase()) ? old.motion : null,
       status: !plate ? 'no-plate' : keep && old.composite ? old.status : (keep && old.cutout ? 'cut-out' : 'plate'),
     };
   });
@@ -157,6 +160,6 @@ if (cmd === 'status') {
   const b = readBrief();
   const bgs = Object.values(b.backgrounds);
   console.log('hybrid: ' + b.panels.filter(p => p.composite).length + '/' + b.panels.filter(p => p.plate).length + ' composited, ' + b.panels.filter(p => p.keep).length + ' kept as they are; backgrounds ' + bgs.filter(x => ['provided', 'delivered'].includes(x.status)).length + '/' + bgs.length + ' ready; credits spent ' + bgs.reduce((s, x) => s + (Number(x.credits) || 0), 0));
-  for (const p of b.panels) console.log('  ' + p.id + ' ' + p.status + (p.keep ? ' · ' + path.basename(p.keep) + ' as it is' : '') + (p.cutout ? ' · cut-out ' + p.cutout.method : '') + (p.composite ? ' · actor kept ' + p.composite.actorPreservedPct + '%' : '') + (p.background ? ' · ' + b.backgrounds[p.background].name : ''));
+  for (const p of b.panels) console.log('  ' + p.id + ' ' + p.status + (p.keep ? ' · ' + path.basename(p.keep) + ' as it is' : '') + (p.cutout ? ' · cut-out ' + p.cutout.method : '') + (p.motion ? ' · motion transfer ' + p.motion.status : '') + (p.composite ? ' · actor kept ' + p.composite.actorPreservedPct + '%' : '') + (p.background ? ' · ' + b.backgrounds[p.background].name : ''));
   process.exit(0);
 }

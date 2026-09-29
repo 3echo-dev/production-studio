@@ -81,6 +81,11 @@
       "role": "Hybrid jobs: briefs plates, locations and backgrounds (hybrid.js), cuts the actor out of every plate (cutout.py): chroma key or rembg."
     },
     {
+      "id": "hybrid-motion",
+      "file": "skills/hybrid-motion/SKILL.md",
+      "role": "Hybrid jobs, moving-camera plates: motion transfer on AgentC (plate as [Video 1], background as [Image 1]); the plate's actor is pasted back by composite."
+    },
+    {
       "id": "hybrid-composite",
       "file": "skills/hybrid-composite/SKILL.md",
       "role": "Hybrid jobs: backgrounds per location (library, or AgentC create_image_job after a yes), composite.py lays the actor over them and checks the performance is kept."
