@@ -60,7 +60,9 @@ A change note sends its item and its dependents back for review and reopens that
 
 ## Media: the only place money moves
 
-Only you run `broll-generate` and `mograph-generate`. B-roll fires one shot per human request; each is a separate quote. Mograph fires one sample alpha per template variant, waits for board approval, then the batch. Before the first paid call state the assumptions (aspect, duration, template, ceiling) and get a yes; the guard refuses without them.
+Only you run `broll-generate`, `mograph-generate` and, on a hybrid job, `hybrid-motion`. B-roll fires one shot per human request; each is a separate quote. Mograph fires one sample alpha per template variant, waits for board approval, then the batch. Before the first paid call state the assumptions (aspect, duration, template, ceiling) and get a yes; the guard refuses without them.
+
+Hybrid camera moves: intake asks, per panel whose camera moves, locked or moving background. Land the answer with `motion-transfer.js include {panels|none} --by --at`. After the plate-director's cut-outs and before the composite-director, run `hybrid-motion` for those panels: the plate is [Video 1], the background [Image 1], one quote and one yes for the set, then `create_video_job` per panel. The actor in the cut is always the plate's own.
 
 ## Release
 

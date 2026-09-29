@@ -58,7 +58,7 @@ const route = JSON.parse(fs.readFileSync(path.join(jobDir, 'route.json'), 'utf8'
 assert.ok(route.tags.includes('hybrid_footage') && route.riskFlags.includes('credit_spend'), 'hybrid tags: ' + route.tags);
 ok(run('plan-job.js', [path.join(jobDir, 'route.json')]), 'plan');
 const plan = fs.readFileSync(path.join(jobDir, 'plan.md'), 'utf8');
-assert.ok(/\| 2 \| plates \+ backgrounds \+ composite \+ ingest \|.*plate-director.*hybrid-plates, hybrid-composite/.test(plan), 'row 2 is the hybrid stage:\n' + plan);
+assert.ok(/\| 2 \| plates \+ backgrounds \+ motion \+ composite \+ ingest \|.*plate-director.*hybrid-plates, hybrid-motion, hybrid-composite/.test(plan), 'row 2 is the hybrid stage:\n' + plan);
 assert.ok(/\| 3 \|.*sequence-first-cut --by-panel/.test(plan), 'row 3 cuts by panel id');
 
 // ---- brief: the apartment comes from the library, the harbour is to generate

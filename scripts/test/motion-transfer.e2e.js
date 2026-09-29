@@ -46,9 +46,14 @@ ff(['-f', 'lavfi', '-i', 'color=c=0x3A4A8A:s=320x180', '-frames:v', '1', path.jo
 fs.mkdirSync(path.join(drive, 'audio', 'vo'), { recursive: true });
 
 const setJob = hybrid => { const j = JSON.parse(fs.readFileSync(path.join(jobDir, 'job.json'), 'utf8')); Object.assign(j, { aspectRatio: '16:9', deliverableDurationSec: 6, audioLed: false, driveFolder: drive, prePipelineReleaseFolder: release, footageSource: 'hybrid', hybrid }); writeJson(path.join(jobDir, 'job.json'), j); };
-setJob({ cutout: 'auto', motionPanels: ['P01'], motion: { resolution: '720p' } });
+setJob({ cutout: 'auto', motion: { resolution: '720p' } });
 ok(run('route-job.js', [path.join(jobDir, 'job.json')]), 'route');
 ok(run('plan-job.js', [path.join(jobDir, 'route.json')]), 'plan');
+assert.ok(/hybrid-plates, hybrid-motion, hybrid-composite/.test(fs.readFileSync(path.join(jobDir, 'plan.md'), 'utf8')), 'the plan names the motion skill');
+assert.strictEqual(run('motion-transfer.js', ['3echo', jobId, 'brief']).status, 3, 'no motion panel before a person says which');
+assert.strictEqual(run('motion-transfer.js', ['3echo', jobId, 'include', 'P01']).status, 2, 'include needs who and when');
+ok(run('motion-transfer.js', ['3echo', jobId, 'include', 'P01', '--by', 'creative-director', '--at', new Date().toISOString()]), 'include');
+assert.deepStrictEqual(JSON.parse(fs.readFileSync(path.join(jobDir, 'job.json'), 'utf8')).hybrid.motionPanels, ['P01']);
 ok(run('hybrid.js', ['3echo', jobId, 'brief']), 'hybrid brief');
 ok(py('cutout.py', ['3echo', jobId]), 'cutout');
 
@@ -97,7 +102,7 @@ assert.strictEqual(b.panels[0].status, 'needs-review', JSON.stringify(c)); asser
 assert.ok(/FLAGGED: the model's person drifted/.test(r.stdout), r.stdout);
 
 // ---- keepActor off: the model's own person is used, so its drift is the actor figure
-setJob({ cutout: 'auto', motionPanels: ['P01'], motion: { resolution: '720p', keepActor: false } });
+setJob({ cutout: 'auto', motionPanels: ['P01'], motionDecision: { by: 'creative-director', at: new Date().toISOString(), panels: ['P01'] }, motion: { resolution: '720p', keepActor: false } });
 ok(run('motion-transfer.js', ['3echo', jobId, 'brief']), 're-brief keepActor off');
 assert.strictEqual(readBrief().panels[0].motion.status, 'delivered', 'unchanged references keep the landed clip');
 r = py('composite.py', ['3echo', jobId]); ok(r, 'composite keepActor off');

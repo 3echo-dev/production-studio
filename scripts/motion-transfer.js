@@ -7,6 +7,7 @@
 // text drift, so by default the result is used as a moving, camera-tracked background only:
 // composite.py lays the plate's own cut-out actor back on top (hybrid.motion.keepActor, default true).
 //
+//   node motion-transfer.js <client> <job-id> include P03,P04|none --by <who> --at <iso>   the intake answer: which camera-move panels get a moving background
 //   node motion-transfer.js <client> <job-id> brief                       make the [Video 1] refs, write each panel's request
 //   node motion-transfer.js <client> <job-id> asset <panel> --video-id V --image-id I   the uploaded AgentC asset ids
 //   node motion-transfer.js <client> <job-id> quote <panel> --credits N   the estimate_video_job figure
@@ -31,9 +32,18 @@ const argv = process.argv.slice(2);
 const opt = n => { const i = argv.indexOf(n); return i >= 0 && argv[i + 1] ? argv[i + 1] : null; };
 const { client, jobId, dir, rest } = ws.resolveJobArgs(argv, argv);
 const cmd = rest[0];
-if (!client || !jobId || !['brief', 'asset', 'quote', 'approve', 'land', 'status'].includes(cmd)) { console.error('usage: motion-transfer.js <client> <job-id> brief|asset|quote|approve|land|status ...'); process.exit(2); }
+if (!client || !jobId || !['include', 'brief', 'asset', 'quote', 'approve', 'land', 'status'].includes(cmd)) { console.error('usage: motion-transfer.js <client> <job-id> include|brief|asset|quote|approve|land|status ...'); process.exit(2); }
 const job = JSON.parse(fs.readFileSync(path.join(dir, 'job.json'), 'utf8'));
 if (job.footageSource !== 'hybrid') { console.error('job.json footageSource is not "hybrid"; motion transfer works on actor plates.'); process.exit(3); }
+// The answer to intake's camera question is a person's: it only ever arrives with --by and --at.
+if (cmd === 'include') {
+  const list = rest[1]; if (!list || !opt('--by') || !opt('--at')) { console.error('usage: include P03,P04|none --by <who> --at <iso>'); process.exit(2); }
+  const ids = /^none$/i.test(list) ? [] : list.split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
+  job.hybrid = Object.assign({}, job.hybrid, { motionPanels: ids, motionDecision: { by: opt('--by'), at: opt('--at'), panels: ids } });
+  const jp = path.join(dir, 'job.json'); fs.writeFileSync(jp + '.tmp', JSON.stringify(job, null, 2) + '\n'); fs.renameSync(jp + '.tmp', jp);
+  console.log(ids.length ? 'Moving background for ' + ids.join(', ') + ' (decided by ' + opt('--by') + '). Next: hybrid.js brief, cut-outs, then motion-transfer.js brief.' : 'Locked backgrounds everywhere (decided by ' + opt('--by') + '); no motion transfer.');
+  process.exit(0);
+}
 const briefPath = path.join(dir, 'hybrid-brief.json');
 if (!fs.existsSync(briefPath)) { console.error('no hybrid-brief.json yet; run hybrid.js brief first'); process.exit(3); }
 const brief = JSON.parse(fs.readFileSync(briefPath, 'utf8'));
