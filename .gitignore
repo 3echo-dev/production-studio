@@ -17,3 +17,6 @@ GATES.md
 .claude/settings.local.json
 .social-pipeline/
 .creative-studio-pipeline/
+# Local tool folders (session logs, caches); the plugin's own manifest stays tracked
+/.*/
+!/.claude-plugin/
