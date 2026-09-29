@@ -15,8 +15,5 @@ scripts/test/.out/
 GATES.md
 .claude/settings.json
 .claude/settings.local.json
-# Local tool folders (session logs, caches); the plugin's own manifest stays tracked
-/.*/
-!/.claude-plugin/
 .social-pipeline/
 .creative-studio-pipeline/
