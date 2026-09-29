@@ -699,7 +699,7 @@ function reqHtml(r){
   const thumb = r.thumb ? `<img class="thumb" src="${r.thumb}" alt="${esc(r.text||'')}">` : '';
   return `<div class="req ${esc(r.type||'')} ${esc(r.status||'')}"><span class="ic">${ic(icon)}</span><div class="from">${esc(kind)}${r.item?` · ${esc(itemOf(r.item).name)}`:''} · ${esc(humanName(r.from))} · ${fmt(r.createdAt)}</div><div class="body">${esc(r.text)}</div>${tail}${thumb}${opts}</div>`;
 }
-function previewHtml(it){ const p=previews[it.id]; if(!p||(!p.thumb&&!p.video)) return ''; const media = p.video ? `<video controls playsinline preload="metadata" src="${esc(p.video)}"${p.thumb?` poster="${p.thumb}"`:''}></video>` : `<img src="${p.thumb}" alt="${esc(p.caption||it.name)}">`; return `<div class="preview">${media}<div class="cap"><span>${esc(p.caption||'')}</span><span>${p.video?''+ic('film')+' watch · ':''}${fmt(p.updatedAt)}</span></div></div>`; }
+function previewHtml(it){ const p=previews[it.id]; if(!p||(!p.thumb&&!p.video)) return ''; const shape = p.w>0&&p.h>0 ? ` style="aspect-ratio:${Number(p.w)}/${Number(p.h)}"` : ''; const media = p.video ? `<video controls playsinline preload="metadata" src="${esc(p.video)}"${p.poster?` poster="${p.poster}"`:''}${shape}></video>` : `<img src="${p.thumb}" alt="${esc(p.caption||it.name)}">`; return `<div class="preview">${media}<div class="cap"><span>${esc(p.caption||'')}</span><span>${p.video?''+ic('film')+' watch · ':''}${fmt(p.updatedAt)}</span></div></div>`; }
 function candidatesHtml(it){
   if(!bgm.length) return `<p class="empty">The BGM supervisor pushes three candidates here once the first cut exists. Pick one; the sync stage will not start without a choice signed here.</p>`;
   const chosen=bgm.find(c=>c.chosen);

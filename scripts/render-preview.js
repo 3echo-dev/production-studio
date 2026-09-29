@@ -49,7 +49,7 @@ cuts.forEach((c, i) => {
   if (!fs.existsSync(clip.path)) { console.error('take not on disk: ' + clip.path); process.exit(3); }
   inputs.push('-i', clip.path);
   const label = String(c.panelId).replace(/[^A-Za-z0-9_-]/g, '') + ' ' + (i + 1) + '/' + cuts.length;
-  parts.push('[' + i + ':v]trim=' + c.inSec + ':' + c.outSec + ',setpts=PTS-STARTPTS,scale=-2:' + height + ',fps=' + (edl.fps || 25) + ',format=yuv420p' + (font && !master ? ',drawtext=' + fontArg + 'text=\'' + label + '\':x=18:y=18:fontsize=' + Math.round(height / 24) + ':fontcolor=white:box=1:boxcolor=black@0.55:boxborderw=8' : '') + '[v' + i + ']');
+  parts.push('[' + i + ':v]trim=' + c.inSec + ':' + c.outSec + ',setpts=PTS-STARTPTS,scale=-2:' + height + ',setsar=1,fps=' + (edl.fps || 25) + ',format=yuv420p' + (font && !master ? ',drawtext=' + fontArg + 'text=\'' + label + '\':x=18:y=18:fontsize=' + Math.round(height / 24) + ':fontcolor=white:box=1:boxcolor=black@0.55:boxborderw=8' : '') + '[v' + i + ']');
   total += c.outSec - c.inSec;
 });
 parts.push(cuts.map((_, i) => '[v' + i + ']').join('') + 'concat=n=' + cuts.length + ':v=1:a=0[v]');
@@ -57,14 +57,21 @@ const args = [...inputs];
 if (sync) args.push('-i', wav);
 args.push('-filter_complex', parts.join(';'), '-map', '[v]');
 if (sync) args.push('-map', String(cuts.length) + ':a', '-c:a', 'aac', '-b:a', master ? '320k' : '192k', '-shortest'); else args.push('-an');
-args.push('-c:v', 'libx264', '-preset', master ? 'slow' : 'veryfast', '-crf', master ? '18' : '23', '-movflags', '+faststart', mp4);
+// A keyframe every 2 s: a browser that starts or seeks mid-file finds a clean frame at once.
+const gop = String(Math.round((edl.fps || 25) * 2));
+args.push('-c:v', 'libx264', '-preset', master ? 'slow' : 'veryfast', '-crf', master ? '18' : '23', '-g', gop, '-keyint_min', gop, '-pix_fmt', 'yuv420p', '-movflags', '+faststart', mp4);
 run(args, 'ffmpeg preview');
 // Filmstrip: eight frames across the whole preview, shrunk until it fits the board's 200 KB.
 for (const w of [1200, 960, 720, 560]) {
   run(['-i', mp4, '-vf', 'fps=8/' + Math.max(total, 0.1) + ',scale=' + Math.round(w / 8) + ':-2,tile=8x1', '-frames:v', '1', strip], 'ffmpeg filmstrip');
   if (fs.statSync(strip).size <= 200 * 1024) break;
 }
+// Poster: one frame at the video's own shape. The filmstrip is eight frames side by side; used as a
+// poster it set the player's box to a thin wide strip until enough video had loaded, which read as a
+// distorted first cut for the first seconds.
+const poster = strip.replace(/-strip\.png$/, '-poster.jpg');
+run(['-ss', String(Math.min(0.5, total / 2)), '-i', mp4, '-frames:v', '1', '-vf', 'scale=\'min(480,iw)\':-2', '-q:v', '5', poster], 'ffmpeg poster');
 const probe = spawnSync('ffprobe', ['-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', mp4], { encoding: 'utf8' });
-const meta = { schemaVersion: '1.0', jobId, stage, version: n, file: (master ? 'bundle/' : 'previews/') + base + '.mp4', sha256: board.sha256File(mp4), bytes: fs.statSync(mp4).size, durationSec: Number(String(probe.stdout).trim()) || total, edlSha256: board.sha256File(path.join(dir, 'rough-edl.json')), wavSha256: sync ? sync.output.wavSha256 : null, strip: path.relative(dir, strip).split(path.sep).join('/'), renderedAt: new Date().toISOString() };
+const meta = { schemaVersion: '1.0', jobId, stage, version: n, file: (master ? 'bundle/' : 'previews/') + base + '.mp4', sha256: board.sha256File(mp4), bytes: fs.statSync(mp4).size, durationSec: Number(String(probe.stdout).trim()) || total, edlSha256: board.sha256File(path.join(dir, 'rough-edl.json')), wavSha256: sync ? sync.output.wavSha256 : null, strip: path.relative(dir, strip).split(path.sep).join('/'), poster: path.relative(dir, poster).split(path.sep).join('/'), renderedAt: new Date().toISOString() };
 fs.writeFileSync(path.join(dir, 'previews', base + (master ? '-v' + n : '') + '.json'), JSON.stringify(meta, null, 2) + '\n');
 console.log(meta.file + ': ' + meta.durationSec.toFixed(2) + ' s, ' + cuts.length + ' cut(s), ' + (sync ? 'with the synced mix' : 'silent') + ' (' + Math.round(meta.bytes / 1024) + ' KB); filmstrip ' + Math.round(fs.statSync(strip).size / 1024) + ' KB.');

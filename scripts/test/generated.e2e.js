@@ -92,4 +92,21 @@ ok(run('validate-schema.js', [path.join(PLUGIN, 'schemas', 'edl.schema.json'), p
 assert.ok(fs.existsSync(path.join(jobDir, 'timeline.png')), 'timeline strip');
 ok(run('render-preview.js', ['acme', jobId, '--stage', 'cut', '--height', '360']), 'silent preview');
 assert.ok(fs.existsSync(path.join(jobDir, 'previews', 'cut-v1.mp4')) && fs.statSync(path.join(jobDir, 'previews', 'cut-v1-strip.png')).size < 200 * 1024, 'preview and strip');
+// The player shows a real frame at the video's own shape before it loads (never the eight-frame strip),
+// with square pixels and a keyframe every 2 s, so the first seconds of the cut are not distorted.
+{
+  const mp4 = path.join(jobDir, 'previews', 'cut-v1.mp4'), poster = path.join(jobDir, 'previews', 'cut-v1-poster.jpg');
+  assert.ok(fs.existsSync(poster) && fs.statSync(poster).size < 150 * 1024, 'poster frame written');
+  const dims = f => spawnSync('ffprobe', ['-v', 'error', '-select_streams', 'v', '-show_entries', 'stream=width,height,sample_aspect_ratio', '-of', 'csv=p=0', f], { encoding: 'utf8' }).stdout.trim().split(',');
+  const [vw, vh, sar] = dims(mp4), [pw, ph] = dims(poster);
+  assert.ok(sar === '1:1' || sar === 'N/A', 'square pixels: ' + sar);
+  assert.ok(Math.abs(vw / vh - pw / ph) < 0.02, 'poster has the video shape: ' + [vw, vh, pw, ph]);
+  const keys = spawnSync('ffprobe', ['-v', 'error', '-select_streams', 'v', '-show_entries', 'packet=pts_time,flags', '-of', 'csv=p=0', mp4], { encoding: 'utf8' }).stdout.split(/\r?\n/).filter(l => /K/.test(l)).map(l => Number(l.split(',')[0]));
+  for (let i = 1; i < keys.length; i++) assert.ok(keys[i] - keys[i - 1] <= 2.05, 'keyframe gap ' + (keys[i] - keys[i - 1]));
+  ok(run('set-preview.js', ['acme', jobId, '--item', 'sequence', '--video-url', '/_blob/abc', '--strip', 'previews/cut-v1-strip.png']), 'set-preview');
+  const q = fs.readFileSync(path.join(jobDir, '.board', 'outbox.jsonl'), 'utf8').split(/\r?\n/).filter(Boolean).map(l => JSON.parse(l)).filter(e => e.collection === 'previews').pop();
+  assert.ok(/^data:image\/jpeg/.test(q.data.poster) && q.data.w > 0 && q.data.h > 0 && Math.abs(q.data.w / q.data.h - vw / vh) < 0.02, 'poster and shape queued: ' + JSON.stringify({ w: q.data.w, h: q.data.h }));
+  const page = fs.readFileSync(path.join(PLUGIN, 'board', 'src', 'post-control.html'), 'utf8');
+  assert.ok(/poster="\$\{p\.poster\}"/.test(page) && !/poster="\$\{p\.thumb\}"/.test(page) && /aspect-ratio:\$\{Number\(p\.w\)\}/.test(page), 'board plays with the poster frame and the video shape, never the strip');
+}
 console.log('ok   generated route: routed without rushes, briefed 3 panels, guard held twice, 3 clips landed, cut by panel id, preview rendered');
