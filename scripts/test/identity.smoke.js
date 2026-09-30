@@ -19,11 +19,14 @@ assert.ok(!market.plugins.some(p => p.name === 'creative-studio-pipeline'), 'mar
 
 const SKIP_DIRS = new Set(['.git', 'node_modules', '.out', '__pycache__', 'docs']);
 const TEXT = /\.(js|mjs|py|md|json|yaml|yml|html|txt|csv)$/i;
-const BAD = [
-  /CREATIVE_STUDIO_ROOT\b/,
-  /\.creative-studio-pipeline\b/,
-  /"name":\s*"creative-studio-pipeline"/,
-];
+// A leftover root variable or pre-prod's plugin name would misdirect a run; forbidden everywhere.
+// The `.creative-studio-pipeline` config-dir string is different: the sibling guard
+// (ws.foreignOwner) names it on purpose, to step aside in a pre-prod folder rather than adopt one.
+// So that one pattern is allowed in the two files that hold the guard; our own config dir stays
+// pinned by CONFIG_DIR in lib-workspace.js.
+const BAD_ALL = [/CREATIVE_STUDIO_ROOT\b/, /"name":\s*"creative-studio-pipeline"/];
+const BAD_CONFIG = /\.creative-studio-pipeline\b/;
+const SIBLING_GUARD_FILES = new Set(['scripts/lib-workspace.js', 'scripts/test/sibling-yield.smoke.js']);
 const hits = [];
 function walk(dir) {
   for (const name of fs.readdirSync(dir)) {
@@ -35,7 +38,8 @@ function walk(dir) {
     const rel = path.relative(ROOT, abs).split(path.sep).join('/');
     if (rel === 'scripts/test/identity.smoke.js') continue;
     const text = fs.readFileSync(abs, 'utf8');
-    for (const re of BAD) if (re.test(text)) hits.push(rel + ': ' + re.source);
+    for (const re of BAD_ALL) if (re.test(text)) hits.push(rel + ': ' + re.source);
+    if (!SIBLING_GUARD_FILES.has(rel) && BAD_CONFIG.test(text)) hits.push(rel + ': ' + BAD_CONFIG.source);
   }
 }
 walk(ROOT);

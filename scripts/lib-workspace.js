@@ -158,8 +158,27 @@ function refuseShootRoot(argv) {
     'set-root.js <folder> from outside it, --root <folder>, or CREATIVE_STUDIO_POST_ROOT. Nothing was created.';
 }
 
+// A sibling studio/social plugin's ownership marker in the same folder tree. When one of these
+// config.json files is found on the way up from cwd before our own, this folder is theirs: our
+// hooks yield rather than writing .board or warning about an unpushed outbox in somebody else's
+// project. The mirror of social-pipeline's siblingStudioRoot guard: every studio plugin steps
+// aside in a folder another one owns. Our own config always wins.
+const SIBLING_MARKERS = ['.social-pipeline', '.creative-studio-pipeline'];
+function foreignOwner(start = process.cwd()) {
+  let dir = path.resolve(start);
+  for (;;) {
+    if (fs.existsSync(path.join(dir, CONFIG_DIR, CONFIG_FILE))) return null; // ours wins
+    for (const marker of SIBLING_MARKERS) {
+      try { if (fs.existsSync(path.join(dir, marker, CONFIG_FILE))) return marker; } catch { /* unreadable is not owned */ }
+    }
+    const up = path.dirname(dir);
+    if (up === dir) return null;
+    dir = up;
+  }
+}
+
 module.exports = {
-  shootMarks, refuseShootRoot,
+  shootMarks, refuseShootRoot, foreignOwner, SIBLING_MARKERS,
   root, rootWithSource, clientsDir, brandsDir: clientsDir, wsDir, jobsDir, jobDir, listClients, listBrands: listClients,
   listJobs, positionals, resolveJobArgs, workspaceConfig, now, fwd,
   CONFIG_DIR, CONFIG_FILE, findConfig,
