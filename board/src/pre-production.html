@@ -914,7 +914,7 @@ async function requestChange(id, note, files){
   const fs=files||[];
   await write(base+'/inbox/'+Date.now().toString(36),{type:'change',item:id,text:note.trim(),from:me,status:'open',createdAt:now(), ...(fs.length?{files:fs}:{})});
   await log(`Change requested on ${it.name}: ${note.trim()}${deps.length?` (${deps.length} dependent item${deps.length>1?'s':''} sent back for review)`:''}`, id, fs);
-  toast(`Change sent to ${seatLabel(it.seat)}`, 'ok'); signalPipeline(`Change requested on ${it.name}`, fs.length?'Land the board (board-sync.js land) and carry on; reply here in one line.'+filesOrder(fs):undefined);
+  toast(`Change sent to ${seatLabel(it.seat)}`, 'ok'); signalPipeline(`Change requested on ${it.name}`, fs.length?'Land the board (board-sync.js land) and carry on; reply here in one line, and put the same reply in the agent chat (board-say.js, then board-sync.js push).'+filesOrder(fs):undefined);
 }
 // Ask the scout to look harder. A wider search is a change note carrying the depth: the pipeline
 // lands it as a revision, re-runs the Scraper at that depth, and adds rows without dropping any the
@@ -969,7 +969,7 @@ async function signalPipeline(why, order){
       try{
         const el=document.querySelector('[data-signal-anchor]')||document.body.firstElementChild||document.body;
         const anchor=await cm.anchorFor(el);
-        await cm.sendToClaude({anchor, text:'Pre-production board: '+what+'. '+(order||slateOrder()||'Land the board (board-sync.js land) and carry on; reply here in one line.')});
+        await cm.sendToClaude({anchor, text:'Pre-production board: '+what+'. '+(order||slateOrder()||'Land the board (board-sync.js land) and carry on; reply here in one line, and put the same reply in the agent chat (board-say.js, then board-sync.js push).')});
         await bellLog(why,'sent'); toast(why+'. The run has been told.', 'ok'); return true;
       }catch(e){ await bellLog(why,'send_failed',(e&&(e.code+' '+e.message))||e); if(e&&e.code==='consent_required') toast(why+'. Allow this page to send comments to Claude, or the run has to be told in chat.'); }
     } else if(can==='no_session'){ await bellLog(why,'no_session'); toast(why+'. No run is watching the board right now; say it in chat when one is.'); }
@@ -1177,8 +1177,12 @@ function agentState(seat){
   const latest=its.slice().sort((a,b)=>String(b.updatedAt||'').localeCompare(String(a.updatedAt||'')))[0];
   const cur=its.find(i=>shownStatus(i)==='running')||its.find(i=>['needs_input','needs_review','draft'].includes(shownStatus(i)))||latest;
   const line=cur?(cur.status==='pending'?cur.produces:`${cur.name} v${cur.version||0}: ${cur.summary||cur.produces}`):'';
-  const at=st==='idle'?null:((r&&(r.finishedAt||r.startedAt))||(latest&&latest.updatedAt)||null);
-  return {st, word, line, at, item:cur?cur.id:null, q};
+  let at=st==='idle'?null:((r&&(r.finishedAt||r.startedAt))||(latest&&latest.updatedAt)||null);
+  // The newest thing it said in its chat (messages come newest first) is what the row shows.
+  const say=messages.find(m=>isAgentSeat(m.by)&&(m.by===seat||its.some(i=>i.id===m.item)));
+  let lineOut=line; const said=!!say&&(!at||String(say.at)>String(at));
+  if(said){ at=say.at; lineOut=say.text; }
+  return {st, word, line:lineOut, at, item:cur?cur.id:null, q, said};
 }
 function whoName(id){ const s=SEATS.find(x=>x.id===id); return s&&s.kind!=='human'?s.label:humanName(id); }
 function ago(iso){ if(!iso) return ''; const d=new Date(iso); if(isNaN(d)) return ''; const m=Math.round((Date.now()-d)/60000); if(m<1) return 'now'; if(m<60) return m+'m'; const h=Math.round(m/60); if(h<24) return h+'h'; const dd=Math.round(h/24); return dd<7?dd+'d':d.toLocaleDateString('en-SG',{day:'2-digit',month:'short'}); }
@@ -1248,7 +1252,7 @@ function seedDemo(d){
   d.seed(P+'/inbox/q1',{type:'question',item:null,text:'Is there a trailer cut as well as the main film? The timeline tracks them separately.',options:['Main film only','Main film and a trailer'],from:'orchestrator',status:'open',createdAt:T(12)});
   d.seed(P+'/inbox/q0',{type:'question',item:'script',text:'Screenplay or AV script?',options:['Screenplay','AV script'],from:'orchestrator',status:'answered',answer:'AV script',answeredBy:'creative-director',answeredAt:T(180),createdAt:T(186)});
   d.seed(P+'/inbox/g1',{type:'generate',item:'storyboard',scope:'batch',panels:['S02','S03','S04','S05','S06','S07','S08'],credits:7,text:'Generate the batch: 7 panels (7 credits)',from:'creative-director',status:'open',createdAt:T(30)});
-  [['pipeline','Project opened. The Drive folder has been read.',null,190],['creative-director','Scraper v2 approved.','scraper',131],['creative-director','Script v2 approved.','script',52],['creative-director','Sample panel S01 approved; the batch may be generated.','storyboard',34]].forEach((m,i)=>d.seed(P+'/messages/m'+i,{by:m[0],text:m[1],item:m[2],at:T(m[3])}));
+  [['pipeline','Project opened. The Drive folder has been read.',null,190],['creative-director','Note to Scriptwriter on Script v1: Can the cold open be one shot?','script',96],['script-director','Yes. I am cutting scenes 1 and 2 into a single wide and keeping the closing line. v2 follows.','script',94],['creative-director','Scraper v2 approved.','scraper',131],['creative-director','Script v2 approved.','script',52],['creative-director','Sample panel S01 approved; the batch may be generated.','storyboard',34]].forEach((m,i)=>d.seed(P+'/messages/m'+i,{by:m[0],text:m[1],item:m[2],at:T(m[3])}));
   d.seed(Q,{title:'Reference hunt',client:'Example client',driveFolder:'Example client / Projects / Reference hunt',scriptFormat:'',storyboardStyle:'',status:'stage1',steps:['intake','scraper'],createdAt:T(64),createdBy:'pipeline',example:true,cost:{runs:2,tokens:96000}});
   item(Q,'intake',{status:'approved',version:1,summary:'One-page brief: find references for a studio host character.',approvedBy:'creative-director',approvedAt:T(50),approvedVersion:1,updatedAt:T(55),artifactPath:'brief/brief.md'});
   item(Q,'scraper',{status:'draft',version:1,summary:'4 references from 2 sites. Tick the ones to keep.',updatedAt:T(9),artifactPath:'references/references-v1.md',sites:[{name:'Site one',status:'found',count:2,url:'https://example.com/one'},{name:'Site two',status:'found',count:2,url:'https://example.com/two'}]});
@@ -1487,7 +1491,7 @@ function pendingHtml(){
 
 /* ---------- the agent inbox, and the open agent's chat ---------- */
 function agentRow(s, a, seen){
-  const un=unseen(s.id, a.at, seen)&&a.st!=='idle';
+  const un=unseen(s.id, a.at, seen)&&(a.st!=='idle'||a.said);
   const badge=a.q?`<span class="n" title="Questions waiting on you">${a.q}</span>`:un?'<i class="dot" role="img" aria-label="New" title="New since you last looked"></i>':'';
   return `<button class="ag st-${a.st}" data-agent="${s.id}">
     <span class="ag-f">${blob(s.id, AGENT_MOOD[a.st], 36)}<i class="ag-d" aria-hidden="true"></i></span>
@@ -1498,10 +1502,10 @@ function agentRow(s, a, seen){
 function inboxHtml(){
   const seen=seenMap(); if(project&&!seen[project.id]){ seen[project.id]={_first:now()}; try{ localStorage.setItem('c122.seen', JSON.stringify(seen)); }catch(e){} }
   const all=agentsInScope().map(s=>({s, a:agentState(s.id)}));
-  const rank={working:0,ask:1,review:2,draft:3,done:4};
+  const rank={working:0,ask:1,review:2,draft:3,done:4,idle:5};
   const orch=all.filter(x=>x.s.id==='orchestrator');
-  const called=all.filter(x=>x.s.id!=='orchestrator'&&x.a.st!=='idle').sort((x,y)=>rank[x.a.st]-rank[y.a.st]||String(y.a.at||'').localeCompare(String(x.a.at||'')));
-  const quiet=all.filter(x=>x.s.id!=='orchestrator'&&x.a.st==='idle');
+  const called=all.filter(x=>x.s.id!=='orchestrator'&&(x.a.st!=='idle'||x.a.said)).sort((x,y)=>rank[x.a.st]-rank[y.a.st]||String(y.a.at||'').localeCompare(String(x.a.at||'')));
+  const quiet=all.filter(x=>x.s.id!=='orchestrator'&&x.a.st==='idle'&&!x.a.said);
   const working=all.filter(x=>x.a.st==='working').length, ask=all.filter(x=>x.a.st==='ask'||x.a.st==='draft').length;
   const sum=[working?working+' working':'', ask?ask+' waiting on you':''].filter(Boolean).join(' · ')||all.length+' on this pipeline';
   return `<section class="inbox" aria-label="Agent inbox"><div class="in-h"><h2>Inbox</h2><span class="meta num">${sum}</span></div>
@@ -1511,6 +1515,7 @@ function inboxHtml(){
 // The chat is assembled from what the board already holds: an agent's runs are its messages, a
 // question it asked is a message with the options as replies, and what a person answered, noted
 // or asked to change is their message back. Nothing is stored for the chat itself.
+function isAgentSeat(id){ const s=SEATS.find(x=>x.id===id); return !!s&&s.kind!=='human'; }
 function isHuman(id){ const k=LEGACY_IDS[id]||id; return HUMANS.some(h=>h.id===k); }
 function safeImg(u){ return /^(data:image\/[a-z0-9.+-]+;base64,[A-Za-z0-9+\/=]+|https:\/\/[^\s"'()<>\\]+)$/i.test(String(u||'')); }
 function questionMsgs(r, out){
@@ -1521,6 +1526,8 @@ function questionMsgs(r, out){
 }
 function logMsgs(m, out){
   const t=String(m.text||''); if(/^Answered: /.test(t)) return;
+  // What the run answered in this agent's name (board-say.js) is the agent's own message.
+  if(isAgentSeat(m.by)){ out.push({side:'a', at:m.at, who:seatLabel(m.by), html:`<div class="bub-out">${md(t)}</div>`}); return; }
   if(!isHuman(m.by)){ out.push({side:'sys', at:m.at, html:esc(t)}); return; }
   const note=t.match(/^Note to .+? on .+? v\d+: ([\s\S]*)$/), chg=t.match(/^Change requested on [^:]+: ([\s\S]*)$/);
   const fl=m.files&&m.files.length?fileChips(m.files):'';
@@ -1538,7 +1545,8 @@ function chatMsgs(seat){
   if(seat.id==='orchestrator'){
     inbox.filter(r=>r.type==='question'&&!r.item).forEach(r=>questionMsgs(r,out));
     messages.filter(m=>!m.item).forEach(m=>{ const t=String(m.text||''); if(/^Answered: /.test(t)) return;
-      if(!isHuman(m.by)) out.push({side:'a', at:m.at, html:`<p>${esc(t)}</p>`});
+      if(isAgentSeat(m.by)&&m.by!=='orchestrator') return;
+      if(!isHuman(m.by)) out.push({side:'a', at:m.at, html:`<div class="bub-out">${md(t)}</div>`});
       else if(/^Gate [A-C] (signed off: .*|.* locked)\.$/.test(t)) out.push({side:'sys', at:m.at, html:`${esc(humanName(m.by))} · ${esc(t)}`});
       else out.push({side:'me', at:m.at, who:humanName(m.by), html:`<p>${esc(t)}</p>${m.files&&m.files.length?fileChips(m.files):''}`}); });
   } else {
@@ -1552,6 +1560,7 @@ function chatMsgs(seat){
       });
       messages.filter(m=>m.item===it.id).forEach(m=>logMsgs(m,out));
     }
+    messages.filter(m=>!m.item&&m.by===seat.id).forEach(m=>logMsgs(m,out));
   }
   return out.sort((a,b)=>String(a.at||'').localeCompare(String(b.at||'')));
 }
@@ -1775,7 +1784,7 @@ function wire(){
     if(f.dataset.answerForm){ const r=inbox.find(x=>x.id===f.dataset.answerForm); const v=f.text.value.trim(); if(r&&v){ await answer(r, v); } return; }
     if(f.id==='notef'){ if(attachBusy){ toast('Still uploading; send in a moment'); return; } const v=f.text.value.trim()||(attach.length?'See the attached file'+(attach.length>1?'s':''):''); if(!v||!project) return; const fs=takeFiles(); f.reset(); const id=f.dataset.item; const it=itemOf(id);
       await write('projects/'+project.id+'/inbox/'+Date.now().toString(36),{type:'change',item:id,text:v,from:me,status:'open',createdAt:now(), ...(fs.length?{files:fs}:{})});
-      await log(`Note to ${seatLabel(it.seat)} on ${it.name} v${it.version||0}: ${v}`, id, fs); toast('Sent to '+seatLabel(it.seat), 'ok'); await signalPipeline('Note to '+seatLabel(it.seat)+' on '+it.name+': '+v.slice(0,80), fs.length?'Land the board (board-sync.js land) and carry on; reply here in one line.'+filesOrder(fs):undefined); return; }
+      await log(`Note to ${seatLabel(it.seat)} on ${it.name} v${it.version||0}: ${v}`, id, fs); toast('Sent to '+seatLabel(it.seat), 'ok'); await signalPipeline('Note to '+seatLabel(it.seat)+' on '+it.name+': '+v.slice(0,80), fs.length?'Land the board (board-sync.js land) and carry on; reply here in one line, and put the same reply in the agent chat (board-say.js, then board-sync.js push).'+filesOrder(fs):undefined); return; }
   };
   const sel=$('#me'); if(sel) sel.onchange=()=>{ me=sel.value; try{localStorage.setItem('c122.me',me);}catch(e){} render(); };
   // Enter sends a chat message; Shift+Enter starts a new line.

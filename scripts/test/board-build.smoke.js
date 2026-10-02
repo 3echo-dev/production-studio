@@ -52,4 +52,8 @@ for (const [fn, next] of [['approve(', 'async function markNA('], ['markNA(', 'a
 const createFn = src.slice(src.indexOf('async function createProject('), src.indexOf('function chatSummary('));
 assert.ok(createFn.includes("await signalPipeline('New project opened"), 'opening a project on the slate rings the bell, and waits for the consent prompt before leaving the slate');
 assert.ok(src.includes("projects.filter(p=>p.status!=='moved')"), 'a slate card the pipeline adopted is hidden');
+// A quote inside a quoted string once shipped a page whose whole script failed to parse: the
+// board drew nothing at all. The page's script has to compile.
+const pageScript = src.slice(src.lastIndexOf('<script>') + 8, src.lastIndexOf('</script>'));
+assert.doesNotThrow(() => new (require('vm').Script)(pageScript), 'the page script parses');
 console.log('ok   the shipped board is the build of its source, panels keep their ratio, every decision rings the bell, a slate project rings and is adopted, and waiting and working are visible');
