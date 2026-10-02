@@ -4,7 +4,7 @@ description: >
   Turns a pulled Drive folder into a validated job.json: script format, storyboard style,
   trailer, shoot days, the file lists under Brief, Concept and Client Assets, and the approvers.
   Asks only the blocking questions, once, on the board and in chat, then runs the deterministic
-  router and planner. Use at stage 0 of 1-22, and again when a route returns a missing field or
+  router and planner. Use at stage 0 of pre-production, and again when a route returns a missing field or
   a blocker.
 metadata:
   version: 0.1.0

@@ -1,7 +1,7 @@
 ---
 name: resume-project
 description: >
-  Resumes an existing 1-22 project. Reads status.md, reconciles it against what is on disk and
+  Resumes an existing pre-production project. Reads status.md, reconciles it against what is on disk and
   what the board has landed, reloads the context the next stage needs, and continues from the
   correct place. Never passes a gate. Use for "resume", "continue", "where were we", "pick up
   {job-id}", or after a decision on the board.
@@ -26,7 +26,7 @@ metadata:
    node "${CLAUDE_PLUGIN_ROOT}/scripts/board-sync.js" land {client} {job-id} "{file.json}"
    ```
 
-   It prints what changed since the last landing: a gate locked, a question answered, a change requested, rows entered. A turn that opened with `[Artifact comment sent to Claude]` is the board ringing for exactly this landing; reply in that thread in one line once you have acted.
+   It prints what changed since the last landing: a gate signed off, a question answered, a change requested, rows entered. A turn that opened with `[Artifact comment sent to Claude]` is the board ringing for exactly this landing; reply in that thread in one line once you have acted.
 
 3. **Read `status.md`**, its Notes block first: live constraints, an open revision, a deferred question, the credit tally for panels.
 
@@ -34,7 +34,7 @@ metadata:
 
    Never redo work that exists. Re-spawn only the director whose file is missing or sent back.
 
-5. **At a gate**, run `board-sync.js pull --gate {g}`. Exit 0 means the human locked it and the approval is on disk: carry on. Exit 1 names a file that changed after the lock: re-present that item. No decision yet: report what is waiting and stop.
+5. **At a gate**, run `board-sync.js pull --gate {g}`. Exit 0 means the human signed it off and the approval is on disk: carry on. Exit 1 names a file that changed after the sign-off: re-present that item. No decision yet: report what is waiting and stop.
 
 6. **Reload the context the next stage needs**, from disk, in full, never from a summary: the owning director's Contract `reads:` block.
 
@@ -66,7 +66,7 @@ Two lines: what is waiting, and what to do about it. Then end the turn.
 
 > **HTF, Night Shift** - Gate A is waiting on you. Budget sheet and timeline still have 11 unknowns.
 >
-> Lock the creative on the board, or say what to change.
+> Sign off the creative on the board, or say what to change.
 
 ## Failure modes
 

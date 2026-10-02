@@ -1,6 +1,6 @@
 // The board, from a script's point of view.
 //
-// The kernel talked to a gate app over HTTP through lib-gate.js. 1-22's board is the 1-22
+// The kernel talked to a gate app over HTTP through lib-gate.js. This plugin's board is the Pre-production
 // Control artifact, whose database only the orchestrator can reach (through the Artifact
 // tool's read_db and write_db). A script cannot call it. So every script that used to post
 // to the gate app now appends to an outbox on disk, and `board-sync.js push` turns the outbox

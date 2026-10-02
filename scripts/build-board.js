@@ -4,7 +4,7 @@
 //   node build-board.js            board/src/pre-production.html -> board/pre-production.html
 //   node build-board.js --check    exit 1 when the shipped page is not the build of the source
 //
-// The page carries its own source as base64 in a #__src tag, so a gate lock can republish
+// The page carries its own source as base64 in a #__src tag, so a gate sign-off can republish
 // itself from a pristine copy. That made the shipped file "built", and until this script the
 // source of truth lived outside the repository: nobody working from the repo could fix the
 // page. Edit board/src/pre-production.html, run this, commit both files. The test suite runs

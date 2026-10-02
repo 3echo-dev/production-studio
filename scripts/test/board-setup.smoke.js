@@ -15,7 +15,7 @@ const page = fs.readFileSync(path.join(ROOT, 'board', 'pre-production.html'), 'u
 // 1. The page.
 assert.ok(/<title>Pre-production<\/title>/.test(page), 'the board page, as published');
 assert.ok(page.includes("use('db')") && page.includes("use('artifact')") && page.includes("use('comments')"), 'uses the db, artifact and comments capabilities the setup skill declares');
-assert.ok(/<script type="text\/plain" id="__src">[A-Za-z0-9+/=]+<\/script>/.test(page), 'built page carries its base64 source for the gate-lock republish');
+assert.ok(/<script type="text\/plain" id="__src">[A-Za-z0-9+/=]+<\/script>/.test(page), 'built page carries its base64 source for the gate sign-off republish');
 assert.ok(page.length < 16 * 1024 * 1024, 'inside the artifact size limit');
 
 // 2. No baked-in address anywhere in the scripts.

@@ -2,7 +2,7 @@
 
 Read by the reviewer the orchestrator spawns before a gate (`skills/review-pass`). Every item is a yes or no question and names the file to look in. A no is a finding; the reviewer places it (line, cell, panel id, shot id) and proposes the fix. Sources of each item: the manifest's review focus lines, the definition's acceptance tests T1 to T5 and A16 to A20, and the rules the check scripts enforce.
 
-## Gate A, creative lock
+## Gate A, creative sign-off
 
 Covers: scraper, script, storyboard, shot list, budget sheet, timeline. Run `shot-list-check.js` first and hand its output to the reviewer.
 
@@ -52,7 +52,7 @@ Covers: scraper, script, storyboard, shot list, budget sheet, timeline. Run `sho
 - A27. Is no date copied from the template's sample project? (S04)
 - A28. Are shoot days left as placeholders until call sheets are released?
 
-## Gate B, logistics lock
+## Gate B, logistics sign-off
 
 Covers: audio, talents, props, locations. Run `gate-b-check.js` first and hand its output to the reviewer.
 
@@ -84,7 +84,7 @@ Covers: audio, talents, props, locations. Run `gate-b-check.js` first and hand i
 - B15. Is availability filled by a person or marked unknown by decision, never inferred? (R06)
 - B16. Do the fields match the call sheet's location block: name, address, availability, contact?
 
-## Gate C, documents released
+## Gate C, release to shoot
 
 Covers: concept breakdown, call sheets. Run `breakdown-check.js` and `call-sheet-check.js` first and hand their output to the reviewer.
 

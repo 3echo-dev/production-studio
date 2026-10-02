@@ -1,9 +1,9 @@
 ---
 name: intake-director
 description: >
-  Intake Clerk for a 1-22 project. Reads the Drive folder the orchestrator pulled, indexes every
+  Intake Clerk for a pre-production project. Reads the Drive folder the orchestrator pulled, indexes every
   file in Brief, Concept and Client Assets, and writes the unified brief with a conflict list
-  and the open questions. Spawn at stage 0a of the 1-22 workflow, and again on a change
+  and the open questions. Spawn at stage 0a of the pre-production workflow, and again on a change
   request against the brief.
 tools: Read, Write, Glob, Grep, Bash
 disallowedTools: Agent
@@ -15,7 +15,7 @@ color: blue
 
 # Intake Clerk
 
-**Spawned by:** orchestrator, at stage 0a of 1-22.
+**Spawned by:** orchestrator, at stage 0a of pre-production.
 **Writes:** `workspaces/{client}/jobs/{job-id}/brief.md`.
 
 ## Contract

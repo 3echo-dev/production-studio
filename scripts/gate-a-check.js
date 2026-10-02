@@ -1,9 +1,9 @@
 #!/usr/bin/env node
-// May Gate A be asked for? The creative director locks on pictures, not on a panel table, so
+// May Gate A be asked for? The creative director signs off on pictures, not on a panel table, so
 // every image panel in the latest storyboard's generation manifest must have its file on disk.
 // A board without images passes only when a person recorded that decision in the manifest:
 //   "imagesDeferred": { "by": "creative-director", "at": "...", "reason": "..." }
-// A panel table alone is not a storyboard; a run that locked on one is what this check stops.
+// A panel table alone is not a storyboard; a run that was signed off on one is what this check stops.
 //
 //   node gate-a-check.js <client> <job-id> [--json]
 //
@@ -49,23 +49,23 @@ if (missing.length) {
     problems.push('imagesDeferred is set but does not say who decided it and why');
   } else {
     const shown = missing.slice(0, 6).join(', ') + (missing.length > 6 ? ' and ' + (missing.length - 6) + ' more' : '');
-    problems.push(missing.length + ' of ' + items.length + ' panels have no image on disk (' + shown + '). Generate them through make-image, or a person records the decision to lock without images in the manifest as imagesDeferred');
+    problems.push(missing.length + ' of ' + items.length + ' panels have no image on disk (' + shown + '). Generate them through make-image, or a person records the decision to sign off without images in the manifest as imagesDeferred');
   }
 }
 const sample = items.find(it => it.sample === true);
 if (sample && !missing.includes(sample.panel) && landed.length && !deferred && sample.status !== 'validated' && sample.status !== 'approved') {
-  notes.push('sample ' + sample.panel + ' is on disk; its approval is read from the board at the lock');
+  notes.push('sample ' + sample.panel + ' is on disk; its approval is read from the board at the sign-off');
 }
 
 const result = { valid: !problems.length, boardVersion: latest, panels: items.length, landed: landed.length, missing, deferred: !!(deferred && deferred.by), problems, notes };
 try {
   fs.mkdirSync(path.join(dir, 'validation'), { recursive: true });
-  fs.writeFileSync(path.join(dir, 'validation', 'gate-a-check.md'), '# Gate A check\n\n' + notes.map(n => '- ' + n).join('\n') + '\n' + (problems.length ? '\n## Problems\n\n' + problems.map(p => '- ' + p).join('\n') + '\n' : '\nok: every panel has its image, or the decision to lock without images is recorded.\n'));
+  fs.writeFileSync(path.join(dir, 'validation', 'gate-a-check.md'), '# Gate A check\n\n' + notes.map(n => '- ' + n).join('\n') + '\n' + (problems.length ? '\n## Problems\n\n' + problems.map(p => '- ' + p).join('\n') + '\n' : '\nok: every panel has its image, or the decision to sign off without images is recorded.\n'));
 } catch { /* the summary file is a courtesy */ }
 if (json) console.log(JSON.stringify(result, null, 2));
 else {
   for (const n of notes) console.log('note: ' + n);
   for (const p of problems) console.error('PROBLEM: ' + p);
-  console.log(problems.length ? 'Gate A cannot be asked for yet.' : 'ok: every storyboard panel has its image on disk, or the decision to lock without images is recorded. Gate A can be asked for.');
+  console.log(problems.length ? 'Gate A cannot be asked for yet.' : 'ok: every storyboard panel has its image on disk, or the decision to sign off without images is recorded. Gate A can be asked for.');
 }
 process.exit(problems.length ? 1 : 0);

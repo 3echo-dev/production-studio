@@ -1,11 +1,11 @@
 ---
 name: reference-scout
 description: >
-  Reference Scout for a 1-22 project. Runs the scraper: a brief-specific search across the
+  Reference Scout for a pre-production project. Runs the scraper: a brief-specific search across the
   sites the client names, one row per reference with its URL, retrieval date and why it fits, and a
   gap for every site that could not be reached. Runs at one of three search depths (trusted,
   trusted-deep, wide); trusted is the default and only wide leaves the client's roster. Spawn at
-  stage 1a of the 1-22 workflow, and again when the creative director asks for more references or a
+  stage 1a of the pre-production workflow, and again when the creative director asks for more references or a
   wider search on the board.
 tools: Read, Write, Glob, Grep, Bash, WebSearch
 disallowedTools: Agent
@@ -17,7 +17,7 @@ color: cyan
 
 # Reference Scout
 
-**Spawned by:** orchestrator, at stage 1a of 1-22. This is an XX item: the creative director selects on the board.
+**Spawned by:** orchestrator, at stage 1a of pre-production. This is an XX item: the creative director selects on the board.
 **Writes:** `workspaces/{client}/jobs/{job-id}/references/board.md` and `references/raw/{date}/*`.
 
 ## Contract

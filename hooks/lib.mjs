@@ -10,7 +10,7 @@
 // The spend guard's vocabulary. Only the suffix of an MCP tool name is stable: the server is
 // `plugin_cs-pre-production_3echo` under this plugin and a bare id under a Desktop connector.
 // ---------------------------------------------------------------------------------------
-/** The one tool 1-22 may spend credits through: a storyboard panel is an image job. */
+/** The one tool pre-production may spend credits through: a storyboard panel is an image job. */
 export const SPENDER = /__create_image_job$/;
 /** Video is never generated in pre-production. A clip is a post-production decision. */
 export const VIDEO = /__(create_video_job|estimate_video_job|generate_studio_take|generate_studio_take_batch|generate_studio_rough_cut|create_studio_fine_cut|generate_studio_reference_bible_versions)$/;
@@ -20,6 +20,7 @@ export const STUDIO = /__(start_studio_flow|advance_studio_flow|create_studio_re
 /** `record-approval.js` SYNONYMS: the words people use, mapped onto one vocabulary. */
 export const SYNONYMS = {
   approve: 'approve', approved: 'approve', ok: 'approve', yes: 'approve', go: 'approve', ship: 'approve', lock: 'approve', release: 'approve',
+  'sign-off': 'approve', signoff: 'approve', 'sign-it-off': 'approve', 'signed-off': 'approve',
   edit: 'edit',
   change: 'change', changes: 'change', update: 'change', revise: 'change', fix: 'change',
   'start-over': 'start over', startover: 'start over', reject: 'start over', no: 'start over', redo: 'start over',
@@ -33,8 +34,8 @@ export const WAITING_STATES = ['BLOCKED', 'ESCALATED'];
 export const STAGE_IDS = ['opening', 'stage-1-creative', 'gate-a', 'stage-2-logistics', 'gate-b', 'stage-3-documents', 'gate-c', 'released'];
 
 export const DENY = {
-  studio: 'The studio tools spend credits without a quote, a storyboard or a gate. 1-22 never calls them; storyboard panels go through make-image and create_image_job.',
-  video: 'Video is never generated in pre-production. 1-22 delivers documents; a clip is a post-production decision made after Gate C.',
+  studio: 'The studio tools spend credits without a quote, a storyboard or a gate. Pre-production never calls them; storyboard panels go through make-image and create_image_job.',
+  video: 'Video is never generated in pre-production. This pipeline delivers documents; a clip is a post-production decision made after Gate C.',
   noProject: 'No project is open in this folder, so there is nothing an image could belong to. Open or resume a project first.',
   noKey: 'Give an idempotencyKey spelled as the job id, then the storyboard version, then the panel id, joined by slashes: job-.../v2/P03.',
   wrongJob: 'That idempotencyKey names a different project from the one that is open.',

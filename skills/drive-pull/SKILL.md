@@ -4,7 +4,7 @@ description: >
   Lands the folder a person named, with its Brief, Concept and Client Assets sub-folders, in
   inputs/{client}/{job-id}/ with a manifest of every file, its size and hash. The folder is a
   path on this computer or a Google Drive folder link; both end on the same manifest. Use at
-  stage 0 of 1-22 before intake, and again only when the person says the folder changed.
+  stage 0 of pre-production before intake, and again only when the person says the folder changed.
   Never searches Drive.
 metadata:
   version: 0.2.0

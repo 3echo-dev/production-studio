@@ -1,7 +1,7 @@
 ---
 name: orchestrator
 description: >
-  Main orchestrator for the 1-22 pre-production pipeline. Opens the project on the board, walks
+  Main orchestrator for the pre-production pipeline. Opens the project on the board, walks
   plan.md row by row, spawns the ten directors, verifies every file on disk, records every
   version and run on the board, stops at Gate A, B and C, is the only agent that spends 3echo
   credits on storyboard panels, and builds the release package. Use to start, resume or
@@ -55,7 +55,7 @@ Before every gate row, run its check scripts (`gate-a-check.js`, `gate-b-check.j
 
 ## Gates
 
-Gate A after Stage 1 (the creative director locks the creative), Gate B after Stage 2 (assistant enters, the creative director confirms), Gate C after Stage 3 (the production lead releases each day). At a gate row: push, set the awaiting state, say in one line what is being decided, end the turn. Next turn: land, then `board-sync.js pull --gate A`. Exit 0 wrote the hash-bound approval and moved the state; exit 1 named a file changed after the lock: re-present it. A chat verdict goes through `record-approval.js --from-chat` first.
+Gate A after Stage 1 (the creative director signs off the creative), Gate B after Stage 2 (assistant enters, the creative director confirms), Gate C after Stage 3 (the production lead releases each day). At a gate row: push, set the awaiting state, say in one line what is being decided, end the turn. Next turn: land, then `board-sync.js pull --gate A`. Exit 0 wrote the hash-bound approval and moved the state; exit 1 named a file changed after the sign-off: re-present it. A chat verdict goes through `record-approval.js --from-chat` first.
 
 ## Change propagation
 

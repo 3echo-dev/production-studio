@@ -49,13 +49,13 @@ node "${CLAUDE_PLUGIN_ROOT}/scripts/board-sync.js" land {client} {job-id} ".boar
 
 It writes `.board/inbox.json`, `registers/*.json` and `references/selected.json`, prints what changed; no board record exits 1.
 
-## Pull, once a gate is locked
+## Pull, once a gate is signed off
 
 ```bash
 node "${CLAUDE_PLUGIN_ROOT}/scripts/board-sync.js" pull {client} {job-id} --gate A
 ```
 
-Exit 0: every item version in the gate record matched disk; `approvals/A-{n}.json` is written, hash-bound, and the state moved. Exit 1 names the item whose file changed after the lock: re-present it. Exit 3: nothing landed; say what waits, end the turn. `--gate sample` binds the sample approval.
+Exit 0: every item version in the gate record matched disk; `approvals/A-{n}.json` is written, hash-bound, and the state moved. Exit 1 names the item whose file changed after the sign-off: re-present it. Exit 3: nothing landed; say what waits, end the turn. `--gate sample` binds the sample approval.
 
 ## Ask
 
@@ -95,6 +95,6 @@ Does not decide a gate, write a version or spawn a director.
 | A chat verdict while the board is open | `record-approval.js --from-chat`, then push |
 | Acknowledging a batch the tool rejected | Only after success |
 | Hand-editing `inbox.json` | Only `board-sync.js land` writes it |
-| Pulling an unlocked gate | Exit 3; say what waits |
+| Pulling an unsigned gate | Exit 3; say what waits |
 | `land` refused | `record-approval.js --channel board` or `sites-check.js --add`; a register row waits |
 | Ending a turn waiting on the board | Restate the open questions; say when you look again |

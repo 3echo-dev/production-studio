@@ -46,15 +46,15 @@ table, spawning ten directors that wrap the client's skills. Every gate is decid
 +--------+----------+----------+----------+----------+
                  ^           ^           ^
               GATE A      GATE B      GATE C
-           creative     logistics    documents
-             lock         lock       released
+           creative     logistics    release
+           sign-off     sign-off     to shoot
 
    XX items a person fills: scraper selection, budget sheet, timeline, talents, props, locations.
    Only storyboard panels cost credits, and only after the sample panel is approved.
 ```
 
-**The gates are the point.** Claude cannot pass one. A gate is locked by a person on the board,
-and the lock is bound to the sha256 of the exact files they saw. Editing a file after the lock
+**The gates are the point.** Claude cannot pass one. A gate is signed off by a person on the board,
+and the sign-off is bound to the sha256 of the exact files they saw. Editing a file after the sign-off
 invalidates it, and `build-release.js` refuses to package it.
 
 **XX means a person.** Six items are prepared by a director and filled by the assistant or
@@ -139,7 +139,7 @@ between two files as a row, every missing decision as a question on the board.
 serves. A site that could not be reached is a gap, never a reference.
 
 **A script you edit directly.** One file per version. The version you select on the board is the
-one the lock binds.
+one the sign-off binds.
 
 **A storyboard in one style.** Panel ids that never move, story order and shoot order kept
 apart, one sample panel before any batch.
@@ -241,13 +241,13 @@ project, resume one, or onboard a client.
 Four questions in one batch: script format, storyboard style, trailer, shoot days. Then it
 pulls, routes, plans, opens the project on the board and runs Stage 1.
 
-### Gate A: creative lock
+### Gate A: creative sign-off
 
 On the board: select the script version, approve the storyboard after its sample, approve the
-shot list, accept the budget and timeline templates, tick the references. Then press Lock Gate A.
+shot list, accept the budget and timeline templates, tick the references. Then press Sign off Gate A.
 
 ```
-Lock it.
+Sign it off.
 Scene 4: the porter speaks first.
 Redo P07 in the same style, wider.
 ```
@@ -255,12 +255,12 @@ Redo P07 in the same style, wider.
 A change to the script sends the board and the shot list back for review and reopens Gate A
 only. Nothing downstream regenerates until you approve again.
 
-### Gate B: logistics lock
+### Gate B: logistics sign-off
 
 Enter talents, props and locations on the board, or mark a register not applicable. Answer
 the audio questions. Unknown blocks the gate; not applicable does not.
 
-### Gate C: documents released
+### Gate C: release to shoot
 
 Assign breakdown rows to shoot days on the board. The production lead approves each day's
 sheet. The release package is built only from approved sheets.
@@ -272,7 +272,7 @@ sheet. The release package is built only from approved sheets.
 ```
 
 Lands what the board decided, reconciles `status.md` against disk, and continues. It will not
-walk through a gate you did not lock.
+walk through a gate you did not sign off.
 
 ---
 
@@ -312,7 +312,7 @@ parsing, frontmatter safety, file size and provenance. No network and no API cal
 ## Provenance
 
 The kernel is [social-media-pipeline](https://github.com/3echo-dev/social-media-pipeline) by
-3echo, MIT. The 1-22 skin is new. [`docs/THIRD_PARTY_SOURCES.md`](docs/THIRD_PARTY_SOURCES.md)
+3echo, MIT. The pre-production skin is new. [`docs/THIRD_PARTY_SOURCES.md`](docs/THIRD_PARTY_SOURCES.md)
 lists every borrowed file with its licence.
 
 ---

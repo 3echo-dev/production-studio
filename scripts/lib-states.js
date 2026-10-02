@@ -16,22 +16,22 @@ const STATES = [
   { id: 'STORYBOARD_DRAFTED',  label: 'Storyboard drafted, listing the shots',               next: ['SHOT_LIST_DRAFTED', 'STORYBOARD_DRAFTED', 'CHANGES_REQUESTED', 'BLOCKED', 'ESCALATED', 'CANCELLED'] },
   { id: 'SHOT_LIST_DRAFTED',   label: 'Shot list drafted, preparing budget and timeline',    next: ['PLANNING_DRAFTED', 'CHANGES_REQUESTED', 'BLOCKED', 'ESCALATED', 'CANCELLED'] },
   { id: 'PLANNING_DRAFTED',    label: 'Budget and timeline templates ready for you',         next: ['AWAITING_GATE_A', 'CHANGES_REQUESTED', 'BLOCKED', 'ESCALATED', 'CANCELLED'] },
-  { id: 'AWAITING_GATE_A',     label: 'Gate A: creative lock is yours to give', gate: 'A', rollback: 'BRIEF_READY',
+  { id: 'AWAITING_GATE_A',     label: 'Gate A: creative sign-off is yours to give', gate: 'A', rollback: 'BRIEF_READY',
     next: ['GATE_A_PASSED', 'BRIEF_READY', 'SCRIPT_DRAFTED', 'STORYBOARD_DRAFTED', 'SHOT_LIST_DRAFTED', 'PLANNING_DRAFTED', 'CHANGES_REQUESTED', 'BLOCKED', 'ESCALATED', 'CANCELLED'] },
-  { id: 'GATE_A_PASSED',       label: 'Creative locked, opening logistics',                  next: ['LOGISTICS_OPEN', 'BLOCKED', 'ESCALATED', 'CANCELLED'] },
+  { id: 'GATE_A_PASSED',       label: 'Creative signed off, opening logistics', next: ['LOGISTICS_OPEN', 'BLOCKED', 'ESCALATED', 'CANCELLED'] },
 
   // Stage 2: logistics
   { id: 'LOGISTICS_OPEN',      label: 'Audio drafted; talents, props and locations waiting on you', next: ['AWAITING_GATE_B', 'LOGISTICS_OPEN', 'CHANGES_REQUESTED', 'BLOCKED', 'ESCALATED', 'CANCELLED'] },
-  { id: 'AWAITING_GATE_B',     label: 'Gate B: logistics lock is yours to give', gate: 'B', rollback: 'LOGISTICS_OPEN',
+  { id: 'AWAITING_GATE_B',     label: 'Gate B: logistics sign-off is yours to give', gate: 'B', rollback: 'LOGISTICS_OPEN',
     next: ['GATE_B_PASSED', 'LOGISTICS_OPEN', 'CHANGES_REQUESTED', 'BLOCKED', 'ESCALATED', 'CANCELLED'] },
-  { id: 'GATE_B_PASSED',       label: 'Logistics locked, compiling the breakdown',           next: ['BREAKDOWN_DRAFTED', 'BLOCKED', 'ESCALATED', 'CANCELLED'] },
+  { id: 'GATE_B_PASSED',       label: 'Logistics signed off, compiling the breakdown', next: ['BREAKDOWN_DRAFTED', 'BLOCKED', 'ESCALATED', 'CANCELLED'] },
 
   // Stage 3: documents
   { id: 'BREAKDOWN_DRAFTED',   label: 'Breakdown compiled, building call sheets',            next: ['CALL_SHEETS_DRAFTED', 'BREAKDOWN_DRAFTED', 'CHANGES_REQUESTED', 'BLOCKED', 'ESCALATED', 'CANCELLED'] },
   { id: 'CALL_SHEETS_DRAFTED', label: 'Call sheets ready for release',                       next: ['AWAITING_GATE_C', 'CHANGES_REQUESTED', 'BLOCKED', 'ESCALATED', 'CANCELLED'] },
   { id: 'AWAITING_GATE_C',     label: "Gate C: release is the production lead's call", gate: 'C', rollback: 'BREAKDOWN_DRAFTED',
     next: ['RELEASED', 'BREAKDOWN_DRAFTED', 'CALL_SHEETS_DRAFTED', 'CHANGES_REQUESTED', 'BLOCKED', 'ESCALATED', 'CANCELLED'] },
-  { id: 'RELEASED',            label: 'Documents released',                                  next: ['CHANGES_REQUESTED', 'COMPLETE', 'CANCELLED'] },
+  { id: 'RELEASED',            label: 'Released to shoot', next: ['CHANGES_REQUESTED', 'COMPLETE', 'CANCELLED'] },
 
   // Anywhere
   { id: 'CHANGES_REQUESTED',   label: 'Making the change you asked for',
@@ -67,7 +67,7 @@ function canMove(from, to) {
   return (BY_ID[from].next || []).includes(to);
 }
 
-// Where "start over" at a gate sends a job. Every 1-22 gate has exactly one answer; the
+// Where "start over" at a gate sends a job. Every pre-production gate has exactly one answer; the
 // route-aware form is kept so callers written against the kernel keep working.
 function rollbackFor(id, routeGates) {
   const raw = BY_ID[id] ? BY_ID[id].rollback : null;

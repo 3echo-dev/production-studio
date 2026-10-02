@@ -33,7 +33,7 @@ for (let i = 0; i < argv.length; i++) {
     else opts[k] = argv[++i];
   } else pos.push(a);
 }
-// A, B and C are the 1-22 gates. `sample` is the one storyboard panel approved before the batch is
+// A, B and C are the pre-production gates. `sample` is the one storyboard panel approved before the batch is
 // generated; it moves no state, it only unlocks make-image.
 const GATES = ['A', 'B', 'C', 'sample'];
 // One vocabulary, with the words people actually use mapped onto it.

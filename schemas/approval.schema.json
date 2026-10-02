@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "ApprovalDecision v1 (1-22)",
+  "title": "ApprovalDecision v1 (pre-production)",
   "type": "object",
   "required": ["schemaVersion", "approvalId", "jobId", "brand", "gate", "round", "decision", "artifacts", "decidedBy", "decidedAt", "channel"],
   "properties": {

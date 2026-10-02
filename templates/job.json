@@ -28,6 +28,6 @@
     "aspectRatio": ["16:9", "9:16", "1:1", "4:3", "3:4", "21:9", "2:3", "3:2"],
     "shootDays": "an integer once the person answers, null until then",
     "inputs": "relative paths under inputs/{client}/{job-id}/, from drive-pull's manifest; brief needs at least one file or the router blocks",
-    "approvers": "workspace.json values; creative locks Gate A, logistics enters registers and the creative director confirms Gate B, release approves each day sheet at Gate C"
+    "approvers": "workspace.json values; creative signs off Gate A, logistics enters registers and the creative director confirms Gate B, release approves each day sheet at Gate C"
   }
 }

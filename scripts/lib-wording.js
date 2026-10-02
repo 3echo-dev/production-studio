@@ -15,12 +15,12 @@ const SENTENCES = {
   STORYBOARD_DRAFTED: 'The storyboard is drafted and the shot list is being written.',
   SHOT_LIST_DRAFTED: 'The shot list is done and the budget sheet and timeline are being prepared.',
   PLANNING_DRAFTED: 'Budget sheet and timeline are ready for you to fill and accept.',
-  AWAITING_GATE_A: 'Gate A: lock the creative on the board, or say what to change. Nothing downstream starts until you do.',
-  GATE_A_PASSED: 'Creative is locked and logistics is opening.',
+  AWAITING_GATE_A: 'Gate A: sign off the creative on the board, or say what to change. Nothing downstream starts until you do.',
+  GATE_A_PASSED: 'Creative is signed off and logistics is opening.',
 
   LOGISTICS_OPEN: 'Audio is drafted. Talents, props and locations are waiting for you on the board.',
-  AWAITING_GATE_B: 'Gate B: lock the logistics on the board once every register is entered or marked not applicable.',
-  GATE_B_PASSED: 'Logistics is locked and the concept breakdown is being compiled.',
+  AWAITING_GATE_B: 'Gate B: sign off the logistics on the board once every register is entered or marked not applicable.',
+  GATE_B_PASSED: 'Logistics is signed off and the concept breakdown is being compiled.',
 
   BREAKDOWN_DRAFTED: 'The breakdown is compiled and the call sheets are being built.',
   CALL_SHEETS_DRAFTED: 'Call sheets are ready for the production lead to release.',

@@ -24,9 +24,9 @@ for (const id of states.ids()) {
   assert.ok(!carriesJargon(s), id + ' reads as jargon: ' + s);
 }
 const turn = require(path.join(scripts, 'hooks', 'turn.js'));
-const said = turn.whyItIsTheirTurn('**Blocked on:** You, to lock the creative on the board (see script/v3.md)\n');
+const said = turn.whyItIsTheirTurn('**Blocked on:** You, to sign off the creative on the board (see script/v3.md)\n');
 assert.ok(!/\.md\b/.test(said), 'no file name reaches the person: ' + said);
 assert.ok(!/[A-Z]{3,}_[A-Z]/.test(said), 'no state id reaches the person: ' + said);
-assert.ok(/lock the creative/.test(said), 'the reason itself survives: ' + said);
+assert.ok(/sign off the creative/.test(said), 'the reason itself survives: ' + said);
 
 console.log('ok   what the board shows carries no file names and no internal ids');

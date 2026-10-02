@@ -61,7 +61,7 @@ function context() {
     openQuestion: null,
     openGate: null,
     landedAt: null,
-    // Is this folder a 1-22 root at all? The hooks apply their refusals only where it is.
+    // Is this folder a pre-production root at all? The hooks apply their refusals only where it is.
     pipeline: board.configured(argv),
   };
 

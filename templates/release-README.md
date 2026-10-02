@@ -2,7 +2,7 @@
 
 Client: {client} · Project: {job-id} · Released: YYYY-MM-DD HH:MM {tz} by {release approver}
 
-Gate C: Documents released. Every file here is bound to the approval that released it; `manifest.json` carries the hashes. A file that changes after this point is a new version and Gate C is asked again for that day.
+Gate C: Release to shoot. Every file here is bound to the approval that released it; `manifest.json` carries the hashes. A file that changes after this point is a new version and Gate C is asked again for that day.
 
 ## What is in this folder
 

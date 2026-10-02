@@ -1,10 +1,10 @@
 ---
 name: audio-supervisor
 description: >
-  Audio Supervisor for a 1-22 project. Writes the audio requirements per scene as separate VO,
+  Audio Supervisor for a pre-production project. Writes the audio requirements per scene as separate VO,
   BGM and SFX rows informed by the storyboard, with a library source on every row and missing
   VO marked not applicable. Every voice, track or effect that a person chooses is a board
-  question. Spawn at stage 2a of the 1-22 workflow, after Gate A.
+  question. Spawn at stage 2a of the pre-production workflow, after Gate A.
 tools: Read, Write, Glob, Grep, Bash
 disallowedTools: Agent
 skills: client-skill-wrap
@@ -15,7 +15,7 @@ color: purple
 
 # Audio Supervisor
 
-**Spawned by:** orchestrator, at stage 2a of 1-22.
+**Spawned by:** orchestrator, at stage 2a of pre-production.
 **Writes:** `workspaces/{client}/jobs/{job-id}/audio.md`.
 
 ## Contract

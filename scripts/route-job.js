@@ -176,7 +176,7 @@ fs.writeFileSync(outPath, JSON.stringify(R, null, 2) + '\n');
 
 const fwd = s => s.split(path.sep).join('/');
 if (args.includes('--human')) {
-  if (R.status === 'ROUTED') console.log('I can run this. Three gates along the way are yours: creative lock, logistics lock, release.');
+  if (R.status === 'ROUTED') console.log('I can run this. Three gates along the way are yours: creative sign-off, logistics sign-off, release to shoot.');
   else if (R.status === 'BLOCKED') console.log('I need ' + R.blockers.join(', and ') + ' before I can start.');
   else if (R.status === 'NEEDS_CLARIFICATION') console.log('I need a bit more before I start: ' + R.missingFields.join(', ') + '.');
   else console.log('I cannot run this: ' + R.unsupported.join('; ') + '.');
@@ -188,7 +188,7 @@ if (R.unsupported.length) console.log('unsupported: ' + R.unsupported.join('; ')
 console.log('wrote ' + fwd(outPath));
 
 // The router is the only thing that knows the job is routed, so it records it. A blocked or
-// unclear job stays where it was: the 1-22 table has no state for "asked and waiting", the
+// unclear job stays where it was: the pre-production table has no state for "asked and waiting", the
 // board carries the question instead.
 const { advance } = require('./lib-advance.js');
 if (R.status === 'ROUTED') {

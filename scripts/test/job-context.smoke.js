@@ -73,7 +73,7 @@ console.log('ok   an open job reports its state, its sentence and its stage');
 
 // 3. A gate. This is the fact every guard in the plan turns on, so it is asserted by name.
 writeStatus('AWAITING_GATE_A', {
-  blocked: 'You, to lock the creative on the board or say what to change',
+  blocked: 'You, to sign off the creative on the board or say what to change',
   credits: '4 of 30',
 });
 c = JSON.parse(run(['--json']).stdout);
@@ -82,7 +82,7 @@ assert.strictEqual(c.gate, 'A', 'the gate is read from lib-states.js');
 assert.strictEqual(c.openGate, 'A', 'and it is still open');
 assert.strictEqual(c.creditsSpent, 4);
 assert.strictEqual(c.creditsCeiling, 30);
-assert.ok(c.openQuestion && /lock the creative/i.test(c.openQuestion),
+assert.ok(c.openQuestion && /sign off the creative/i.test(c.openQuestion),
   'the question comes back in the job\'s own words: ' + c.openQuestion);
 console.log('ok   a gate reports the gate, the question and the credit tally');
 

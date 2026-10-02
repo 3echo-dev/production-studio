@@ -3,14 +3,14 @@ name: 1-22
 description: >
   Entry point for CS Pre-production pre-production. Reads what is already in progress, opens the
   board, then asks whether to start a new project, resume one, or onboard a client, and routes
-  accordingly. Use when the user types /1-22 or says any of "start 1-22", "run pre-production",
+  accordingly. Use when the user types /1-22 or says any of "start 1-22", "start pre-production", "run pre-production",
   "new project", "call sheets for", "where is the HTF job", or asks what this plugin does.
 argument-hint: "[client]"
 metadata:
   version: 0.1.0
 ---
 
-# 1-22
+# Pre-production
 
 **Purpose:** the one thing a user has to remember. Everything else is reachable from here.
 
@@ -29,7 +29,7 @@ One row per project, in plain words. Never ask a question this answers.
 First time on this account: `set-board.js --show` exits 3 when no board is set; run the `board-setup` skill once (it publishes the board page that ships with the plugin and records the address), then continue.
 
 ```bash
-node "${CLAUDE_PLUGIN_ROOT}/scripts/pane.js" "home" "1-22"
+node "${CLAUDE_PLUGIN_ROOT}/scripts/pane.js" "home" "Pre-production"
 ```
 
 Then `ToolSearch` for `select:mcp__Claude_Browser__preview_start`. If it exists, call it with `previewUrl` and say one line that the board is open beside the chat. If not, print `fallbackFile` on its own line under "Open the board". The web address is never printed. `${CLAUDE_PLUGIN_ROOT}/docs/SHARED-RULES.md` has the whole rule.

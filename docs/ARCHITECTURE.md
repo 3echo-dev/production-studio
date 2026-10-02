@@ -13,8 +13,8 @@ A Drive folder becomes a typed project on disk. A deterministic script routes it
 workflow, an owner and three gates. A markdown stage table becomes the plan. An orchestrator
 walks the plan, spawning directors that wrap the client's skills, verifying every file on disk before
 advancing, recording every version and run on the board, and stopping at every gate. Only the
-orchestrator reaches the board or spends money. Gates are locked by a person on the board and
-bound to content hashes, so an edit after the lock invalidates it mechanically.
+orchestrator reaches the board or spends money. Gates are signed off by a person on the board and
+bound to content hashes, so an edit after the sign-off invalidates it mechanically.
 
 ---
 
@@ -130,11 +130,11 @@ the id.
 A gate is five things: push the board, set the awaiting state, end the turn, land the record,
 bind it.
 
-The person locks the gate on the board. The record names every item it covers with the version
+The person signs off the gate on the board. The record names every item it covers with the version
 the person saw. `board-sync.js pull` compares each version to the latest line in `versions.jsonl`;
 on a match it runs `record-approval.js`, which hashes the files (`hash-artifact.js` normalises
 markdown and drops any `# Decision` section) and writes `approvals/{g}-{n}.json`. A mismatch is
-exit 1 naming the item: a file changed after the lock, so the lock does not hold.
+exit 1 naming the item: a file changed after the sign-off, so the sign-off does not hold.
 
 `check-approval.js` exits 0 on match, 1 on mismatch, 3 when no record exists. `build-release.js`
 refuses on anything but 0. Gate C is one record per day sheet.
@@ -249,7 +249,7 @@ Exit codes mean the same thing everywhere: `0` did it, `1` the answer is no, `2`
 
 | Not built | Instead | Why |
 |---|---|---|
-| Video generation | Nothing | 1-22 is pre-production; the shoot makes the film |
+| Video generation | Nothing | This is pre-production; the shoot makes the film |
 | A state server | `status.md` per project | Nothing to run, nothing to migrate |
 | Drive search | `drive-pull` of a folder a person named | A search that picks the wrong folder is worse than a question |
 | Template authoring | the client's files, copied and filled | A layout the crew has not seen is not a deliverable |

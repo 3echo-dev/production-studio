@@ -1,9 +1,9 @@
 ---
 name: script-director
 description: >
-  Scriptwriter for a 1-22 project. Drafts the script in the one format the job chose, screenplay
+  Scriptwriter for a pre-production project. Drafts the script in the one format the job chose, screenplay
   or AV script, from the brief and the references the creative director selected, one file per version, in the client's
-  voice. Spawn at stage 1b of the 1-22 workflow, and again for every revision the creative director asks for
+  voice. Spawn at stage 1b of the pre-production workflow, and again for every revision the creative director asks for
   on the board.
 tools: Read, Write, Glob, Grep, Bash
 disallowedTools: Agent
@@ -15,7 +15,7 @@ color: green
 
 # Scriptwriter
 
-**Spawned by:** orchestrator, at stage 1b of 1-22.
+**Spawned by:** orchestrator, at stage 1b of pre-production.
 **Writes:** `workspaces/{client}/jobs/{job-id}/script/v{n}.md`, one new file per spawn.
 
 ## Contract

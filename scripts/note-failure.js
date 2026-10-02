@@ -19,7 +19,7 @@ const KNOWN = [
     say: 'Those tools import INTO 3echo. Nothing in the MCP downloads to disk. Use get_asset for a media URL.' },
   { when: i => /create_(video|image)_job/.test(i) && /(estimate|quote|confirm)/i.test(i),
     say: 'Paid submission refused. Count the panels at 1 credit each, present the quote on the board and in chat, ' +
-         'and wait for the human to confirm before create_image_job. Video is never generated in 1-22.' },
+         'and wait for the human to confirm before create_image_job. Video is never generated in pre-production.' },
   { when: i => /\bpython3\b/.test(i) && /(not found|not recognized|Microsoft Store|was not found)/i.test(i),
     say: 'On Windows python3 is the Store stub. Use python.' },
   { when: i => /charmap.*codec|cp1252|UnicodeDecodeError/i.test(i),

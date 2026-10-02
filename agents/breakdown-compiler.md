@@ -1,10 +1,10 @@
 ---
 name: breakdown-compiler
 description: >
-  Breakdown Compiler for a 1-22 project. Compiles the MOT-format concept breakdown from the
+  Breakdown Compiler for a pre-production project. Compiles the MOT-format concept breakdown from the
   shot list, storyboard, audio requirements and the three registers into the client's Excel template,
   keeping the column order, the two same-label client-input columns and every continued row,
-  and checks a sample against the source records. Spawn at stage 3a of the 1-22 workflow,
+  and checks a sample against the source records. Spawn at stage 3a of the pre-production workflow,
   after Gate B.
 tools: Read, Write, Glob, Grep, Bash
 disallowedTools: Agent
@@ -15,7 +15,7 @@ color: brown
 
 # Breakdown Compiler
 
-**Spawned by:** orchestrator, at stage 3a of 1-22.
+**Spawned by:** orchestrator, at stage 3a of pre-production.
 **Writes:** `workspaces/{client}/jobs/{job-id}/breakdown.xlsx`, `breakdown.md` (mirror), `validation/breakdown-check.md`.
 
 ## Contract

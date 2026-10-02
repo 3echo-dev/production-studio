@@ -46,9 +46,9 @@ how the pieces fit. This is the sequence.
    |                         |                          +-> production-planner    |
    |<= XX: budget, timeline on the board ===============+   budget.xlsx, timeline |
    |                         |                          |                         |
-   |<== GATE A == lock the creative on the board ===================================+
+   |<== GATE A == sign off the creative on the board ===============================+
    |   select script version, approve board, shot list, templates, references     |
-   +- Lock Gate A ---------->|  land, pull --gate A     |                         |
+   +- Sign off Gate A ------>|  land, pull --gate A     |                         |
    |                         |  record-approval.js      |                         |
    |                         |                          +-> audio-supervisor      |
    |<- question: which VO voice? ----------------------+   audio.md              |
@@ -56,8 +56,8 @@ how the pieces fit. This is the sequence.
    |<= XX: talents, props, locations on the board ======+   skeletons             |
    +- rows entered --------->|  land -> registers/*.json|                         |
    |                         |  gate-b-check.js         |                         |
-   |<== GATE B == lock the logistics on the board ==================================+
-   +- Lock Gate B ---------->|  land, pull --gate B     |                         |
+   |<== GATE B == sign off the logistics on the board ==============================+
+   +- Sign off Gate B ------>|  land, pull --gate B     |                         |
    |                         |                          +-> breakdown-compiler    |
    |                         |  breakdown-check.js      |   breakdown.xlsx        |
    |<- question: rows to days? -------------------------+                         |
@@ -109,12 +109,12 @@ per day and the day-assignment question.
 
 | Gate | After | Passes when | Who | Not applicable |
 |---|---|---|---|---|
-| A, creative lock | Stage 1 | script version selected; storyboard approved in its one style after the sample; shot list approved; budget and timeline templates accepted; references selected | the creative director; the assistant accepts the templates | never |
-| B, logistics lock | Stage 2 | talents, props and locations entered or explicitly not applicable; audio approved | assistant enters, the creative director confirms | allowed on the three registers |
-| C, documents released | Stage 3 | breakdown checked against a sample; every shoot day's sheet approved | production lead, per day | never |
+| A, creative sign-off | Stage 1 | script version selected; storyboard approved in its one style after the sample; shot list approved; budget and timeline templates accepted; references selected | the creative director; the assistant accepts the templates | never |
+| B, logistics sign-off | Stage 2 | talents, props and locations entered or explicitly not applicable; audio approved | assistant enters, the creative director confirms | allowed on the three registers |
+| C, release to shoot | Stage 3 | breakdown checked against a sample; every shoot day's sheet approved | production lead, per day | never |
 
-A gate is locked on the board. `board-sync.js pull` binds the record to the file hashes; a file
-that changed after the lock makes the lock fail, and the item is re-presented.
+A gate is signed off on the board. `board-sync.js pull` binds the record to the file hashes; a file
+that changed after the sign-off makes the sign-off fail, and the item is re-presented.
 
 Before each gate row (1h, 2f, 3c) a review pass runs: the check scripts first, then a reviewer
 spawned with no memory of the work, reading against the gate's section of
@@ -190,7 +190,7 @@ approved again.
         +- continue from the first row whose file is missing
 ```
 
-It will not walk through a gate you did not lock. A project left at Gate B a week ago is still
+It will not walk through a gate you did not sign off. A project left at Gate B a week ago is still
 waiting there, with the registers it was waiting on.
 
 ---

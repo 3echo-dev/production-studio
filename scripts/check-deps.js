@@ -113,7 +113,7 @@ const LEARNED = learned.length
 
 const board = require('./lib-board.js');
 const boardLine = board.boardUrl() ? '' : 'No board is set here yet: /cs-pre-production:board-setup publishes this account\'s copy of the board page, once.\n';
-let out = '1-22. ' + rootLine + '\n' + boardLine;
+let out = 'Pre-production. ' + rootLine + '\n' + boardLine;
 if (missing.length) {
   out += '\n' + missing.length + ' thing(s) not installed:\n\n';
   for (const [name, , cmd, why, req] of missing) {

@@ -1,10 +1,10 @@
 ---
 name: call-sheet-builder
 description: >
-  Call Sheet Builder for a 1-22 project. Builds one call sheet per shoot day in the HTF layout
+  Call Sheet Builder for a pre-production project. Builds one call sheet per shoot day in the HTF layout
   from the breakdown rows a person assigned to that day, keeping the selected shooting order,
   computing overnight blocks, allowing parallel units and flagging shared-resource conflicts.
-  Every day sheet is released by the production lead at Gate C. Spawn at stage 3b of the 1-22
+  Every day sheet is released by the production lead at Gate C. Spawn at stage 3b of the pre-production
   workflow and again when a day's rows or a talent's availability change.
 tools: Read, Write, Glob, Grep, Bash
 disallowedTools: Agent
@@ -15,7 +15,7 @@ color: pink
 
 # Call Sheet Builder
 
-**Spawned by:** orchestrator, at stage 3b of 1-22.
+**Spawned by:** orchestrator, at stage 3b of pre-production.
 **Writes:** `workspaces/{client}/jobs/{job-id}/call-sheets/day-{d}.xlsx` and `call-sheets/day-{d}.md` (mirror).
 
 ## Contract

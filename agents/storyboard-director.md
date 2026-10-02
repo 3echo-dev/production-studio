@@ -1,10 +1,10 @@
 ---
 name: storyboard-director
 description: >
-  Storyboard Artist for a 1-22 project. Draws the panel table for the selected script in the one
+  Storyboard Artist for a pre-production project. Draws the panel table for the selected script in the one
   style the job chose, sketches, live pictures or cartoon animation, with panel ids that survive
   reordering and story order and shoot order kept as separate fields. Writes the prompts for the
-  sample panel and the batch; the orchestrator generates. Spawn at stage 1c of the 1-22 workflow
+  sample panel and the batch; the orchestrator generates. Spawn at stage 1c of the pre-production workflow
   and on any panel change the creative director asks for on the board.
 tools: Read, Write, Glob, Grep, Bash
 disallowedTools: Agent
@@ -16,7 +16,7 @@ color: magenta
 
 # Storyboard Artist
 
-**Spawned by:** orchestrator, at stage 1c of 1-22.
+**Spawned by:** orchestrator, at stage 1c of pre-production.
 **Writes:** `workspaces/{client}/jobs/{job-id}/storyboard/v{n}/panels.md` and `storyboard/v{n}/generation-manifest.json`.
 
 ## Contract

@@ -5,7 +5,7 @@ Adapted fragments are listed in `THIRD_PARTY_SOURCES.md`; only the kernel, vendo
 
 ## 3echo-dev/social-media-pipeline (MIT)
 
-The kernel of this plugin, scripts, hooks, tests, templates and the documentation structure, is carried over from social-media-pipeline v0.12.9 by 3echo and re-skinned for 1-22.
+The kernel of this plugin, scripts, hooks, tests, templates and the documentation structure, is carried over from social-media-pipeline v0.12.9 by 3echo and re-skinned for pre-production.
 
 ```
 MIT License

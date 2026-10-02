@@ -12,8 +12,8 @@ user-invocable: false
 
 # Skill: Review pass
 
-**Purpose:** catch what a director cannot see in its own work before a person is asked to lock it.
-**Used by:** the orchestrator, at rows 1h, 2f and 3c of 1-22, as the instructions of a spawned reviewer.
+**Purpose:** catch what a director cannot see in its own work before a person is asked to sign it off.
+**Used by:** the orchestrator, at rows 1h, 2f and 3c of pre-production, as the instructions of a spawned reviewer.
 
 ## Inputs
 

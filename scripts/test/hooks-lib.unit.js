@@ -73,6 +73,8 @@ const stages = require('../lib-stages.js');
 
   // Verdict words and the heredoc rule.
   assert.strictEqual(lib.classifyVerdict('Lock it.'), 'approve');
+  assert.strictEqual(lib.classifyVerdict('Sign off.'), 'approve');
+  assert.strictEqual(lib.classifyVerdict('sign it off'), 'approve');
   assert.strictEqual(lib.classifyVerdict('change the porter line'), 'change');
   assert.strictEqual(lib.classifyVerdict('start over'), 'start over');
   assert.strictEqual(lib.classifyVerdict('hmm'), null);
@@ -80,7 +82,7 @@ const stages = require('../lib-stages.js');
   assert.ok(!lib.HEREDOC.test('node scripts/set-state.js htf job-1 PLANNED --by me'), 'a plain command is not a heredoc');
 
   // Context block never leaks a state id.
-  const block = lib.contextBlock({ jobId: 'job-1', client: 'htf', sentence: 'Gate A: lock the creative on the board.', isTheirTurn: true, openGate: 'A', creditsSpent: 3, creditsCeiling: 12 });
+  const block = lib.contextBlock({ jobId: 'job-1', client: 'htf', sentence: 'Gate A: sign off the creative on the board.', isTheirTurn: true, openGate: 'A', creditsSpent: 3, creditsCeiling: 12 });
   assert.ok(block && /Gate A/.test(block) && !/AWAITING_GATE_A/.test(block), 'context block speaks in sentences');
   assert.ok(/last landed never/.test(block) && /land them/.test(block), 'the block says when the board was last landed and makes landing the first step');
   assert.ok(/last landed 2026-09-18T08:14:00Z/.test(lib.contextBlock({ jobId: 'job-1', client: 'htf', isTheirTurn: true, landedAt: '2026-09-18T08:14:00Z' })));

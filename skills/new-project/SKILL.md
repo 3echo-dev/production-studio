@@ -1,7 +1,7 @@
 ---
 name: new-project
 description: >
-  Starts a new 1-22 project for a client. Scaffolds the job folder, pulls the named Drive
+  Starts a new pre-production project for a client. Scaffolds the job folder, pulls the named Drive
   folder, runs intake, routes and plans, opens the project on the board, and runs Stage 1 to
   Gate A, then stops. Use for "new project", "start the HTF job", "pre-production for", or any
   fresh brief that arrives as a Drive folder.
@@ -49,7 +49,7 @@ metadata:
 
 7. **Run the plan.** Follow `plan.md` row by row as the `orchestrator`, which owns narration, versions, runs and pushes.
 
-8. **Stop at Gate A.** Push, set the awaiting state, say what the creative director is locking and which XX items are open, and end the turn.
+8. **Stop at Gate A.** Push, set the awaiting state, say what the creative director is signing off and which XX items are open, and end the turn.
 
 ## Rules
 

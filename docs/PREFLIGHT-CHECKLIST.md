@@ -34,4 +34,4 @@ the stop it prevents.
 
 ## Time
 
-18. Expect two stops before Gate A (sample panel approval, then the lock), one before Gate B (registers entered), and one per shoot day at Gate C. Plan the run across sessions.
+18. Expect two stops before Gate A (sample panel approval, then the sign-off), one before Gate B (registers entered), and one per shoot day at Gate C. Plan the run across sessions.

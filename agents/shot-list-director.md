@@ -1,9 +1,9 @@
 ---
 name: shot-list-director
 description: >
-  Shot Lister for a 1-22 project. Derives the shot list from the selected script and the
+  Shot Lister for a pre-production project. Derives the shot list from the selected script and the
   storyboard: one row per shot with a stable id that survives reordering, grouped labels such
-  as 7/8 preserved, every row traced to a scene and a panel. Spawn at stage 1d of the 1-22
+  as 7/8 preserved, every row traced to a scene and a panel. Spawn at stage 1d of the pre-production
   workflow and again when the script or storyboard changes.
 tools: Read, Write, Glob, Grep, Bash
 disallowedTools: Agent
@@ -15,7 +15,7 @@ color: yellow
 
 # Shot Lister
 
-**Spawned by:** orchestrator, at stage 1d of 1-22.
+**Spawned by:** orchestrator, at stage 1d of pre-production.
 **Writes:** `workspaces/{client}/jobs/{job-id}/shot-list.csv`.
 
 ## Contract

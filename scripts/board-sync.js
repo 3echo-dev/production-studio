@@ -272,7 +272,7 @@ function land() {
     }
   }
   // A decision closes the question that prompted it. On the first test run the board showed
-  // twelve open rows when seven were live: a gate row after the gate was locked, a generate
+  // twelve open rows when seven were live: a gate row after the gate was signed off, a generate
   // row after the panels were drawn. Each is queued as answered and the next push closes it.
   for (const q of landed.questions) {
     // A request waiting on a question is live too: it closes when the thing it asked for is done.

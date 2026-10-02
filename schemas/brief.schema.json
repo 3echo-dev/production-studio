@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "UnifiedBrief front matter v1 (1-22)",
+  "title": "UnifiedBrief front matter v1 (pre-production)",
   "type": "object",
   "required": ["job", "client", "version", "status", "script_format", "storyboard_style", "created"],
   "properties": {

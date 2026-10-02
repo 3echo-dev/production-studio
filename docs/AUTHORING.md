@@ -63,7 +63,7 @@ No director lists an MCP tool. Only `orchestrator` omits `tools:` and keeps ever
 ```
 # {Name}
 
-**Spawned by:** orchestrator, at stage {row} of 1-22.
+**Spawned by:** orchestrator, at stage {row} of pre-production.
 **Writes:** {exact paths}.
 
 ## Contract

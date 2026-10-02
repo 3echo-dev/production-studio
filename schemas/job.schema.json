@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "ProjectSpec v1 (1-22)",
+  "title": "ProjectSpec v1 (pre-production)",
   "type": "object",
   "required": [
     "schemaVersion",

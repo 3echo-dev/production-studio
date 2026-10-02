@@ -11,7 +11,7 @@ These are yours. Everything below them is machinery.
 |---|---|---|
 | `max_parallel_agents` | How many directors work at once. Lower is slower and cheaper. | 3 |
 | `credit_ceiling_per_job` | The most 3echo credits one project may spend on storyboard panels. | 60 |
-| `require_gate_*_human_approval` | Which gates stop and wait for a person on the board. Turning one off means that stage passes without anyone locking it. | all on |
+| `require_gate_*_human_approval` | Which gates stop and wait for a person on the board. Turning one off means that stage passes without anyone signing it off. | all on |
 | `timezone` | The zone every timestamp in a workspace carries, unless `workspace.json` says otherwise. | Asia/Singapore |
 | Where the work is kept | Not in this file. Run `set-root.js <folder>`, or pass `--root`, or set `CREATIVE_STUDIO_ROOT`. | the current folder |
 | The board | Not in this file. `CREATIVE_STUDIO_BOARD_URL`, or `boardUrl` in `.creative-studio-pipeline/config.json`, written by `scripts/set-board.js` after the `board-setup` skill publishes this account's copy of `board/pre-production.html`. No default: a board is private to the account that published it. | this account's Pre-production artifact |
@@ -24,9 +24,9 @@ max_parallel_agents: 3
 credit_ceiling_per_job: 60
 timezone: Asia/Singapore
 
-require_gate_a_human_approval: true        # Creative lock: the creative director, on the board
-require_gate_b_human_approval: true        # Logistics lock: assistant enters, the creative director confirms
-require_gate_c_human_approval: true        # Documents released: production lead, per day sheet
+require_gate_a_human_approval: true        # Creative sign-off: the creative director, on the board
+require_gate_b_human_approval: true        # Logistics sign-off: assistant enters, the creative director confirms
+require_gate_c_human_approval: true        # Release to shoot: production lead, per day sheet
 require_sample_panel_human_approval: true  # one panel before any batch is generated
 ```
 
@@ -66,7 +66,7 @@ verbose: false
 | `max_agent_depth: 1` | Only `orchestrator` spawns. | **Structural.** Every director sets `disallowedTools: Agent`. |
 | `collect_artifacts_after_each_batch` | `collect-artifacts.js` must exit 0 before a stage advances. | Instruction, with the script's exit code. |
 | `max_machine_revisions_per_stage` | The same reason code for the same stage twice; the third time the project goes to the person. | Instruction, counted in `revisions/`. |
-| `require_gate_*_human_approval` | Each gate: push the board, set the awaiting state, end the turn; the person locks it on the board; `board-sync.js pull` binds the record to the file hashes. | Instruction, plus `check-approval.js` refusing the release without a matching approval, plus `board-sync.js pull` refusing a record whose versions no longer match disk. |
+| `require_gate_*_human_approval` | Each gate: push the board, set the awaiting state, end the turn; the person signs it off on the board; `board-sync.js pull` binds the record to the file hashes. | Instruction, plus `check-approval.js` refusing the release without a matching approval, plus `board-sync.js pull` refusing a record whose versions no longer match disk. |
 | `require_sample_panel_human_approval` | One panel is generated and approved on the board before the batch. | **Mechanical (function hook).** The first allowed image call per board locks the rest until the sample is approved on a landing. |
 | `preflight_media_download` | `preflight-media.js` runs before the first generation. Exit 3 means the host is unreachable: stop before spend. | Instruction; the pre-spend gate `preflight-generation.js` is **Mechanical (function hook)**. |
 | `registers_from_board_only` | Register files are written by `board-sync.js land` and nothing else. | **Mechanical (function hook)** on `registers/*.json`; Instruction elsewhere. |

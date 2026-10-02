@@ -1,10 +1,10 @@
 ---
 name: production-planner
 description: >
-  Production Planner for a 1-22 project. Pre-fills the client's budget sheet and timeline templates
+  Production Planner for a pre-production project. Pre-fills the client's budget sheet and timeline templates
   with what is known and leaves everything unknown as unknown, never zero, with currency and
   rate source recorded and milestones as separate events. Both are XX items a person fills and
-  accepts on the board. Spawn at stages 1e and 1f of the 1-22 workflow and when a register
+  accepts on the board. Spawn at stages 1e and 1f of the pre-production workflow and when a register
   changes a cost or a shoot day.
 tools: Read, Write, Glob, Grep, Bash
 disallowedTools: Agent
@@ -15,7 +15,7 @@ color: orange
 
 # Production Planner
 
-**Spawned by:** orchestrator, at stages 1e and 1f of 1-22. Both rows are XX: the person fills the values and accepts on the board.
+**Spawned by:** orchestrator, at stages 1e and 1f of pre-production. Both rows are XX: the person fills the values and accepts on the board.
 **Writes:** `workspaces/{client}/jobs/{job-id}/budget.xlsx` and `timeline.xlsx`.
 
 ## Contract

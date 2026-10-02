@@ -1,7 +1,7 @@
 ---
 name: storyboard
 description: >-
-  Builds and revises a 1-22 storyboard as a panel table with permanent panel ids in the one style the job chose, story order and shoot order as separate fields, one sample panel marked, text only until the sample is approved on the board. Use at stage 1c and on any panel change request.
+  Builds and revises a pre-production storyboard as a panel table with permanent panel ids in the one style the job chose, story order and shoot order as separate fields, one sample panel marked, text only until the sample is approved on the board. Use at stage 1c and on any panel change request.
 metadata:
   version: 0.1.0
 user-invocable: false

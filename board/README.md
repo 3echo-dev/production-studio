@@ -11,7 +11,7 @@ database, so a fresh copy opens on the slate with no projects until the first `b
 push`.
 
 The file is a built page: the source, `src/pre-production.html`, plus a base64 copy of that
-source in a `<script type="text/plain" id="__src">` tag, so a gate lock can republish the page
+source in a `<script type="text/plain" id="__src">` tag, so a gate sign-off can republish the page
 from a pristine copy. Edit `src/pre-production.html`, run `node scripts/build-board.js`, and commit
 both files; `build-board.js --check` runs in the test suite, so a hand-edit of the built page
 fails the build.

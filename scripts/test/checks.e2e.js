@@ -75,7 +75,7 @@ try {
   assert.ok(fs.existsSync(path.join(dir, 'validation', 'gate-a-check.md')));
   manifest({ imagesDeferred: { by: 'creative-director', at: '2026-09-15', reason: 'animatic comes from the agency' } });
   r = run('gate-a-check.js', ['htf', jobId], tmp);
-  assert.strictEqual(r.status, 0, 'a recorded decision to lock without images passes: ' + r.stderr);
+  assert.strictEqual(r.status, 0, 'a recorded decision to sign off without images passes: ' + r.stderr);
   assert.match(r.stdout, /images deferred by creative-director/);
   manifest({ imagesDeferred: { reason: 'nobody said who' } });
   r = run('gate-a-check.js', ['htf', jobId], tmp);

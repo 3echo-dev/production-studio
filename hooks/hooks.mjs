@@ -46,11 +46,11 @@ export const register = (on) => {
     const tool = String(e.tool || '');
     const args = /** @type {Record<string, any>} */ (/** @type {unknown} */ (e));
 
-    // This plugin's refusals apply only where this plugin has work: a folder that is a 1-22
+    // This plugin's refusals apply only where this plugin has work: a folder that is a pre-production
     // root. The switch that loads function hooks is the folder's, not the plugin's, so
     // onboarding one plugin arms every plugin installed there; on the first test run another
     // plugin's guard refused every panel and every write over a folder it had no job in. So
-    // anywhere that is not a 1-22 root, every call passes through here untouched. The one rule
+    // anywhere that is not a pre-production root, every call passes through here untouched. The one rule
     // that holds everywhere is that the plugin's own folder is read-only.
     let ours = false;
     try { const c = await context($); ours = Boolean(c && c.pipeline); } catch { ours = false; }

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// The 1-22 stage table names a state after every row. This plans one plan.md from a realistic
+// The pre-production stage table names a state after every row. This plans one plan.md from a realistic
 // route, reads the "State after" column in row order, and asserts every consecutive pair is a
 // legal walk through lib-states.js. It also checks the board journey: every state the job
 // reaches maps to a stage the route shows, and every working stage names who is working.
