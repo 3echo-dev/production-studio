@@ -79,7 +79,7 @@ if (cmd === 'open') {
     audioLed: !!job.audioLed, driveFolder: job.driveFolder || '', preRelease: job.prePipelineReleaseFolder || '',
     approvers: job.approvers || {},
   };
-  lib.appendOutbox(CWD, client, jobId, { collection: 'projects', docId: jobId, data: project });
+  lib.appendOutbox(CWD, client, jobId, { collection: 'projects', docId: jobId, data: { kind: 'post', ...project } }); // kind: the studio board holds both pipelines
   for (const it of ITEMS) lib.appendOutbox(CWD, client, jobId, { collection: 'items', docId: it, data: { status: 'pending', version: 0, summary: '', updatedAt: now(), updatedBy: 'pipeline' } });
   lib.appendOutbox(CWD, client, jobId, { collection: 'messages', docId: 'm-' + Date.now().toString(36), data: { by: 'pipeline', text: 'Project opened from job.json. Ingest starts once the footage counts are confirmed.', at: now() } });
   if (MODE === 'file') {
