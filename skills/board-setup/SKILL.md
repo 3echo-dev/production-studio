@@ -25,7 +25,7 @@ user-invocable: true
 
    Exit 0 prints the board in use and where the setting came from: say so in one line and stop, unless the user asked for a new one (`--new`). Exit 3: continue.
 
-2. **Publish the page** with the Artifact tool, `file_path` set to `${CLAUDE_PLUGIN_ROOT}/board/pre-production.html`, `title` "Pre-production", `favicon` "🎬", `capabilities` `{"db": {}, "artifact": {}, "comments": {}, "downloads": true}`, and a one-line description ("Pre-production board: gates, registers, storyboard, inbox"). Publish it as it is: never edit the page, never strip the base64 copy at its end, never pass `contract`. The artifact starts private; `comments` keeps it inside the organization, which a board is anyway. The publish result says whether this session now watches the board: note the answer for step 5.
+2. **Publish the page** with the Artifact tool, `file_path` set to `${CLAUDE_PLUGIN_ROOT}/board/pre-production.html`, `title` "Pre-production", `favicon` "🎬", `capabilities` `{"db": {}, "artifact": {}, "comments": {}, "downloads": true, "assets": {}}`, and a one-line description ("Pre-production board: gates, registers, storyboard, inbox"). Publish it as it is: never edit the page, never strip the base64 copy at its end, never pass `contract`. The artifact starts private; `comments` keeps it inside the organization, which a board is anyway. The publish result says whether this session now watches the board: note the answer for step 5.
 
 3. **Record the address** the publish result returned:
 
@@ -39,7 +39,7 @@ user-invocable: true
 
 5. **Say who is watching.** A decision reaches the run as a comment sent to Claude, only in a session watching the artifact with replies armed; publishing from this session arms it. `ArtifactComments` `action: "watch"` with no `url` lists the watches: if the board's row is connected and armed, the session running jobs must be this one, or must watch it as "Watching the board" in SHARED-RULES says. Otherwise say plainly that every decision on the board must also be said in chat.
 
-6. **Open it** with `pane.js "home" "1-22"`, then ask the person to press **Signal pipeline** on the board once and approve the prompt that lets the page message this session. A turn headed as a comment sent to Claude arrives: reply in its thread in one line. That press is the proof; until it is approved every decision on the board falls back to a silent republish. Never repeat the address.
+6. **Open it** with `pane.js "home" "Pre-production"`, then ask the person to press **Signal pipeline** on the board once and approve the prompt that lets the page message this session. A turn headed as a comment sent to Claude arrives: reply in its thread in one line. That press is the proof; until it is approved every decision on the board falls back to a silent republish. Never repeat the address.
 
 ## Rules
 
@@ -52,7 +52,7 @@ The shared rules in `${CLAUDE_PLUGIN_ROOT}/docs/SHARED-RULES.md` apply.
 
 ## Output contract
 
-A private artifact of the board page with capabilities db, artifact, comments and downloads; `boardUrl` and `boardSetAt` in `<root>/.creative-studio-pipeline/config.json`; the `meta/board` document on the artifact's database.
+A private artifact of the board page with capabilities db, artifact, comments, downloads and assets; `boardUrl` and `boardSetAt` in `<root>/.creative-studio-pipeline/config.json`; the `meta/board` document on the artifact's database.
 
 ## Boundary
 
@@ -62,6 +62,6 @@ Does not push projects (`board-sync`), share the artifact, or edit the page.
 
 | Failure | Fix |
 |---|---|
-| Publish refused for the capabilities | Say which; the page needs `db`, `artifact`, `comments` and `downloads` (the Download buttons) |
+| Publish refused for the capabilities | Say which; the page needs `db`, `artifact`, `comments`, `downloads` and `assets` |
 | A decision on the board wakes nobody | The page was never allowed to message a session: press Signal pipeline and approve |
 | The consent for the first write is declined | Stop; the board stays published but unused until a session with consent writes it |

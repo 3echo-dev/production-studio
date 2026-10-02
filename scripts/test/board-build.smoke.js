@@ -24,7 +24,7 @@ assert.ok(src.includes('background-size:contain') && !src.includes('background-s
 assert.ok(src.includes("claude.use('comments')") && src.includes('cm.sendToClaude(') && src.includes('canSendToClaude()'), 'a decision is sent to Claude as a comment');
 assert.ok(src.includes("art.publish(buildDocument(src))"), 'the republish stays as the fallback');
 
-// Run 2, R4: the bell was wired to locking a gate, requesting a generation and requesting an
+// Run 2, R4: the bell was wired to signing off a gate, requesting a generation and requesting an
 // export, and left off answering a question - the one thing a person does constantly. Four
 // answers landed on the board and the run never woke. Assert the common paths ring it.
 const answerFn = src.slice(src.indexOf('async function answer('), src.indexOf('async function addRow('));
@@ -35,7 +35,8 @@ assert.ok(addRowFn.includes('signalPipeline('), 'starting a register rings the b
 // press again; a card with an open question of its own reads Your input; and the slate says
 // what the run is doing, not only which stage it is at.
 assert.ok(src.includes("r.status==='waiting'") && src.includes('function waitingGenerate()'), 'a landed request that waits on a question is shown as waiting');
-assert.ok(src.includes('function shownStatus(') && src.includes('pill ${shownStatus(it)}'), 'a card with an open question of its own reads Your input');
+const stepRowFn = src.slice(src.indexOf('function stepRow('), src.indexOf('function gateBand('));
+assert.ok(src.includes('function shownStatus(') && stepRowFn.includes('shownStatus(it)') && stepRowFn.includes('pill ${sh}'), 'a step with an open question of its own reads Your input');
 assert.ok(src.includes('p.activity'), 'the slate card carries what the run is doing');
 // Run 3 and the external trial, R2: approving the sample, approving an item, marking one not
 // applicable, asking for a change or a redo wrote the database and rang nothing, so the person
