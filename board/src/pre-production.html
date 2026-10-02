@@ -1,4 +1,4 @@
-<title>Pre-production</title>
+<title>Production Studio</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap">
 <style>
 :root{
@@ -611,6 +611,45 @@ details.model .work{margin-top:16px}
 @keyframes av-hop{0%,70%,100%{transform:none}82%{transform:translateY(-1.800px)}}
 .ag.st-working .ag-f::after{border-radius:50%}
 @media (prefers-reduced-motion:reduce){.av.face .eye,.av.face .pu,.av.face svg{animation:none}}
+/* ---------- the studio page: one door per pipeline ---------- */
+.home{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:12px}
+.hcard{position:relative;isolation:isolate;overflow:hidden;display:flex;align-items:center;gap:14px;text-align:left;padding:20px 18px;min-height:96px;border:0;border-radius:16px;font-weight:500;
+  box-shadow:inset 0 0 0 1px rgb(255 255 255/.14),inset 0 1px 0 rgb(255 255 255/.18),0 14px 34px -20px var(--hg,rgb(255 140 30/.8));transition:filter 180ms ease,transform 160ms var(--ease-out)}
+.hcard.k-pre{--hg:rgb(255 140 30/.8);background:radial-gradient(34% 190% at 60% 40%,#FF8A1A,rgb(255 138 26/0) 100%),radial-gradient(30% 200% at 86% 55%,#FFB52E,rgb(255 181 46/0) 100%),radial-gradient(36% 170% at 34% 90%,#D94E0A,rgb(217 78 10/0) 100%),linear-gradient(90deg,#2B1505,#4A2207 26%,#7A3A0A 70%,#5C2B08)}
+.hcard.k-post{--hg:rgb(255 60 110/.75);background:radial-gradient(34% 190% at 60% 40%,#FF2D6F,rgb(255 45 111/0) 100%),radial-gradient(30% 200% at 86% 55%,#FF7A3D,rgb(255 122 61/0) 100%),radial-gradient(36% 170% at 34% 90%,#B5104E,rgb(181 16 78/0) 100%),linear-gradient(90deg,#2B0715,#4F0C26 26%,#7E1238 70%,#5A0E2A)}
+.hcard::after{content:"";position:absolute;inset:0;z-index:-1;background:radial-gradient(rgb(255 255 255/.22) .8px,rgb(255 255 255/0) 1.3px) 0 0/7px 7px;-webkit-mask-image:linear-gradient(to top,#000,transparent 70%);mask-image:linear-gradient(to top,#000,transparent 70%)}
+.hcard:hover,.hcard:active{background-color:transparent}
+.hcard.k-post .mb-ic{background:#FFD0DC}
+.hcard.k-post .mb-t em{color:#FFD9E2}
+.hcard .mb-t{font-size:16px}
+.hcard .mb-btn svg{width:15px;height:15px;stroke-width:2.4}
+.pc-kind{font-size:10.500px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:rgb(255 255 255/.85)}
+.np-choices.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media (hover:hover) and (pointer:fine){.hcard:hover{filter:brightness(1.08) saturate(1.08)}}
+@media (max-width:960px){.np-choices.three{grid-template-columns:1fr}}
+@media (max-width:640px){.hcard{flex-wrap:wrap}.hcard .mb-btn{min-height:44px;width:100%;justify-content:center}}
+/* ---------- post-production: music candidates, shot requests, previews ---------- */
+.cands{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.cand{display:flex;flex-direction:column;gap:6px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--ink);font-size:var(--t2)}
+.cand.chosen{border-color:var(--go)}
+.cand h4{margin:0;font-size:var(--t3);font-weight:700}
+.cand .num{font-size:var(--t1);color:var(--faint)}
+.cand p{color:var(--dim);line-height:1.45}
+.cand audio{width:100%;height:34px}
+.cand-f{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:auto;padding-top:4px}
+.cand-f .mono{color:var(--faint);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.reqform{display:flex;flex-direction:column;gap:8px;padding:12px 14px;margin-bottom:12px;border:1px solid var(--line2);border-radius:12px;background:var(--ink)}
+.reqform .two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.reqform label{display:flex;flex-direction:column;gap:4px;font-size:var(--t1);color:var(--dim)}
+.reqform .row{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.brs{display:flex;flex-direction:column;gap:8px}
+.br{display:flex;flex-direction:column;gap:6px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--ink);font-size:var(--t2)}
+.br-h{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.br img{max-height:180px;border-radius:8px;border:1px solid var(--line2);align-self:flex-start}
+.br .mono{color:var(--faint);word-break:break-all}
+.preview{margin-bottom:12px;border:1px solid var(--line2);border-radius:12px;overflow:hidden;background:var(--ink)}
+.preview img,.preview video{display:block;width:100%;max-height:56vh;object-fit:contain;background:#000}
+.preview .cap{display:flex;justify-content:space-between;gap:10px;padding:7px 10px;font-size:var(--t1);color:var(--dim)}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -639,6 +678,17 @@ details.model .work{margin-top:16px}
   <symbol id="ic-s-locations" viewBox="0 0 24 24"><path d="M12 21s7-6.200 7-11a7 7 0 0 0-14 0c0 4.800 7 11 7 11z"/><circle cx="12" cy="10" r="2.500"/></symbol>
   <symbol id="ic-s-concept_breakdown" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M3 15h18M9 4v16"/></symbol>
   <symbol id="ic-s-call_sheet" viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1"/><path d="m9 13 2 2 4-4"/></symbol>
+  <symbol id="ic-music" viewBox="0 0 24 24"><path d="M9 18V6l10-2v12"/><circle cx="6.500" cy="18" r="2.500"/><circle cx="16.500" cy="16" r="2.500"/></symbol>
+  <symbol id="ic-film" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M8 5v14M16 5v14M3 10h5M3 14h5M16 10h5M16 14h5"/></symbol>
+  <symbol id="ic-s-ingest" viewBox="0 0 24 24"><path d="M12 4v10"/><path d="m8 10 4 4 4-4"/><path d="M5 17v2h14v-2"/></symbol>
+  <symbol id="ic-s-sequence" viewBox="0 0 24 24"><rect x="3" y="7" width="5" height="10" rx="1"/><rect x="9.500" y="7" width="5" height="10" rx="1"/><rect x="16" y="7" width="5" height="10" rx="1"/></symbol>
+  <symbol id="ic-s-bgm" viewBox="0 0 24 24"><path d="M9 18V6l10-2v12"/><circle cx="6.500" cy="18" r="2.500"/><circle cx="16.500" cy="16" r="2.500"/></symbol>
+  <symbol id="ic-s-vo_drop" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M6 11a6 6 0 0 0 12 0"/><path d="M12 17v4"/></symbol>
+  <symbol id="ic-s-sync" viewBox="0 0 24 24"><path d="M4 10v4M8 7v10M12 4v16M16 8v8M20 11v2"/></symbol>
+  <symbol id="ic-s-review" viewBox="0 0 24 24"><path d="M2.500 12S6 5.500 12 5.500 21.500 12 21.500 12 18 18.500 12 18.500 2.500 12 2.500 12z"/><circle cx="12" cy="12" r="2.800"/></symbol>
+  <symbol id="ic-s-broll" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m10 9.500 5 2.500-5 2.500z"/></symbol>
+  <symbol id="ic-s-mograph" viewBox="0 0 24 24"><path d="M12 3l2.300 5.700L20 11l-5.700 2.300L12 19l-2.300-5.700L4 11l5.700-2.300z"/></symbol>
+  <symbol id="ic-s-package" viewBox="0 0 24 24"><path d="M12 3 4 7v10l8 4 8-4V7z"/><path d="m4 7 8 4 8-4"/><path d="M12 11v10"/></symbol>
   <symbol id="ic-clip" viewBox="0 0 24 24"><path d="m20 11-8.500 8.500a5 5 0 0 1-7-7L13 4a3.300 3.300 0 0 1 4.700 4.700l-8.400 8.400a1.700 1.700 0 0 1-2.400-2.400L14.500 7"/></symbol>
   <symbol id="ic-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
   <symbol id="ic-arrow" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></symbol>
@@ -650,7 +700,7 @@ details.model .work{margin-top:16px}
 
 <script>
 /* ---------- The pre-production model: what the board knows without a database ---------- */
-const ITEMS = [
+let ITEMS = [
   {id:'intake',            stage:0, name:'Intake',            xx:false, seat:'intake-director',    produces:'Unified brief with the folder index, conflict list and open questions', deps:[]},
   {id:'scraper',           stage:1, name:'Scraper',           xx:true,  seat:'reference-scout',    produces:'Reference board: URL, retrieval date and why it fits, per reference', deps:['intake']},
   {id:'script',            stage:1, name:'Script',            xx:false, seat:'script-director',    produces:'Screenplay or AV script, versioned, one selected', deps:['intake','scraper']},
@@ -665,19 +715,19 @@ const ITEMS = [
   {id:'concept_breakdown', stage:3, name:'Concept breakdown', xx:false, seat:'breakdown-compiler', produces:'MOT-format table compiled from every upstream record', deps:['shot_list','storyboard','audio','talents','props','locations']},
   {id:'call_sheet',        stage:3, name:'Call sheet',        xx:false, seat:'call-sheet-builder', produces:'One sheet per shoot day in the HTF layout', deps:['concept_breakdown','talents','locations','timeline']},
 ];
-const STAGES = [
+let STAGES = [
   {n:1, name:'Stage 1', sub:'Creative', gate:'A'},
   {n:2, name:'Stage 2', sub:'Logistics', gate:'B'},
   {n:3, name:'Stage 3', sub:'Documents', gate:'C'},
 ];
-const GATES = {
+let GATES = {
   A:{name:'Creative sign-off', after:1, items:['script','storyboard','shot_list','budget_sheet','timeline','scraper'], approver:'The creative director for creative; the assistant accepts the templates', cond:'Script version selected. Storyboard approved in its one style. Shot list approved. Budget and timeline templates accepted. Scraper targets confirmed and references selected.'},
   B:{name:'Logistics sign-off', after:2, items:['audio','talents','props','locations'], approver:'Assistant enters, the creative director confirms', cond:'Talents, props and locations entered or explicitly not applicable. Audio choices recorded. Unknown is not the same as not applicable.'},
   C:{name:'Release to shoot', after:3, items:['concept_breakdown','call_sheet'], approver:'Production lead', cond:'Breakdown checked against a sample. Every shoot day\'s call sheet approved by the named releaser.'},
 };
-const GATE_RELEASES = {A:'Stage 2: audio drafting and the three logistics registers open.', B:'Stage 3: the concept breakdown compiles and call sheets are built.', C:'The release package: breakdown plus every approved day sheet, bound to their hashes. Shoot days are written back to the timeline.'};
-const GATE_ROLLBACK = {A:'A change on any Stage 1 item reopens Gate A only; approved versions are kept.', B:'A change on a register or audio reopens Gate B only; the breakdown and call sheets go back to review.', C:'A released sheet is never edited; a change makes a new version and Gate C is asked again for that day.'};
-const SEATS = [
+let GATE_RELEASES = {A:'Stage 2: audio drafting and the three logistics registers open.', B:'Stage 3: the concept breakdown compiles and call sheets are built.', C:'The release package: breakdown plus every approved day sheet, bound to their hashes. Shoot days are written back to the timeline.'};
+let GATE_ROLLBACK = {A:'A change on any Stage 1 item reopens Gate A only; approved versions are kept.', B:'A change on a register or audio reopens Gate B only; the breakdown and call sheets go back to review.', C:'A released sheet is never edited; a change makes a new version and Gate C is asked again for that day.'};
+let SEATS = [
   {id:'orchestrator',        n:'00', label:'Orchestrator',        kind:'agent', note:'Walks the plan, verifies every file on disk, stops at every gate'},
   {id:'intake-director',     n:'01', label:'Intake Clerk',        kind:'new',   note:'Reads the Drive folder, builds the unified brief, lists conflicts'},
   {id:'reference-scout',     n:'02', label:'Reference Scout',     kind:'new',   note:'Runs the scraper against the client\'s sites; URL, date, reason kept'},
@@ -700,8 +750,74 @@ const REG_FIELDS = {
   props:['name','scene','source','have'],
   locations:['name','address','availability','contact'],
 };
-const HUMANS = [{id:'creative-director',label:'Creative director'},{id:'assistant',label:'Production assistant'},{id:'lead',label:'Production lead'},{id:'finance',label:'Finance approver'}];
+const HUMANS = [{id:'creative-director',label:'Creative director'},{id:'assistant',label:'Production assistant'},{id:'lead',label:'Production lead'},{id:'finance',label:'Finance approver'},{id:'editor',label:'Editor'}];
 const LEGACY_IDS = {sham:'creative-director', eugene:'finance'};
+
+/* ---------- two pipelines, one board ---------- */
+// Pre-production and post-production share this page: the same slate, pipeline, inbox and chat,
+// drawn from whichever model the project belongs to. The model above is pre-production's; this
+// is post-production's. usePipe() swaps the names the rest of the page reads.
+const PRE = {kind:'pre', label:'Pre-production', tag:'Drive folder in, call sheets out.', ITEMS, STAGES, GATES, GATE_RELEASES, GATE_ROLLBACK, SEATS,
+  STAGE_GATE:{2:'A', 3:'B'}, gateNext:{A:'stage2', B:'stage3', C:'released'},
+  order:{intake:0, stage1:1, gate_a:1, stage2:2, gate_b:2, stage3:3, gate_c:3, released:4},
+  na:it=>it.stage===2&&it.xx,
+  naNote:g=>g==='B'?'Allowed on talents, props and locations. A decision, recorded with who made it.':'Never accepted at this gate.',
+  rules:['<b>XX</b> means a person enters or approves it. The pipeline never fills an XX for you.','<b>Unknown is not N/A.</b> A blank stays a question; not applicable is a decision.','<b>One style per storyboard.</b> Sketches, live pictures or cartoon, never mixed.','<b>The client\'s templates, never invented.</b>','<b>Every approval is a record on the board.</b> The pipeline reads it, never assumes it.']};
+const POST = {kind:'post', label:'Post-production', tag:'Footage and the release in, a Premiere bundle out.',
+  ITEMS:[
+    {id:'intake',   stage:0, name:'Intake',             xx:true,  seat:'post-intake-director', produces:'job.json: the pre-production release verified, aspect ratio, deliverable duration and the audio-led flag declared', deps:[]},
+    {id:'ingest',   stage:1, name:'Ingest',             xx:true,  seat:'ingest-director',      produces:'manifest.json: every clip and audio file with size, hash and probe data; the counts confirmed by a person', deps:['intake']},
+    {id:'sequence', stage:1, name:'First cut',          xx:false, seat:'sequence-director',    produces:'rough-edl.json and timeline.png: storyboard panels matched to the best takes, in story order', deps:['ingest']},
+    {id:'bgm',      stage:2, name:'BGM',                xx:true,  seat:'bgm-supervisor',       produces:'Three candidates with source and duration; one chosen here before the sync runs', deps:['sequence']},
+    {id:'vo_drop',  stage:2, name:'Voice-over',         xx:true,  seat:'audio-engineer',       produces:'vo-track.json: the takes placed against the script markers; final or scratch confirmed by a person', deps:['sequence']},
+    {id:'sync',     stage:2, name:'Audio sync',         xx:false, seat:'audio-engineer',       produces:'synced-track.wav and waveform.png: VO, BGM and SFX mixed, music ducked under voice', deps:['bgm','vo_drop']},
+    {id:'review',   stage:2, name:'Cut + audio review', xx:false, seat:'review-director',      produces:'The rubric verdict on picture and audio together, before Gate A', deps:['sequence','sync']},
+    {id:'broll',    stage:3, name:'B-roll',             xx:true,  seat:'broll-director',       produces:'bundle/broll/*.mp4: one generated shot per request, each quoted and approved here', deps:['review']},
+    {id:'mograph',  stage:3, name:'Motion graphics',    xx:true,  seat:'mograph-director',     produces:'bundle/mograph/*.mov: alpha overlays from the chosen template; one sample before the batch', deps:['review']},
+    {id:'package',  stage:3, name:'Premiere bundle',    xx:false, seat:'premiere-packager',    produces:'bundle/project.fcpxml and README: the editor imports one file and the timeline is loaded', deps:['broll','mograph']},
+  ],
+  STAGES:[
+    {n:1, name:'Picture', sub:'Ingest and cut', gate:null},
+    {n:2, name:'Audio',   sub:'Music, voice, sync', gate:'A'},
+    {n:3, name:'Finish',  sub:'Generated and packaged', gate:'B'},
+  ],
+  GATES:{
+    A:{name:'Picture + audio sign-off', after:2, items:['ingest','sequence','bgm','vo_drop','sync','review'], approver:'The creative director signs off picture and audio together', cond:'Counts confirmed. First cut approved. One BGM chosen. VO takes confirmed or not applicable. Synced track approved. Review verdict on disk.'},
+    B:{name:'Delivery released', after:3, items:['broll','mograph','package'], approver:'The production lead releases the bundle; the editor acknowledges the handoff', cond:'Every requested B-roll shot delivered or not applicable. Motion graphics approved or not applicable. FCPXML bundle built and checked.'},
+  },
+  GATE_RELEASES:{A:'Finish: B-roll requests open, the motion-graphics template is proposed, the bundle can be built.', B:'The editor picks up bundle/project.fcpxml; the job is done.'},
+  GATE_ROLLBACK:{A:'A change on any picture or audio item reopens Gate A only; approved versions are kept and the next number is written.', B:'A released bundle is never edited; a change makes a new bundle and Gate B is asked again.'},
+  SEATS:[
+    {id:'orchestrator',         n:'00', label:'Orchestrator',      kind:'agent', note:'Walks the plan, verifies every file on disk, stops at both gates, the only seat that spends credits'},
+    {id:'post-intake-director', n:'01', label:'Post Intake',       kind:'agent', note:'Verifies the pre-production release and the shoot folder; asks the XX declarations'},
+    {id:'ingest-director',      n:'02', label:'Ingest',            kind:'agent', note:'Probes every clip and audio file; writes the manifest with hashes'},
+    {id:'sequence-director',    n:'03', label:'Sequence',          kind:'agent', note:'Matches storyboard panels to takes; writes the rough EDL'},
+    {id:'bgm-supervisor',       n:'04', label:'BGM Supervisor',    kind:'agent', note:'Proposes three music candidates; never picks'},
+    {id:'audio-engineer',       n:'05', label:'Audio Engineer',    kind:'agent', note:'Places the VO, syncs and ducks the mix, draws the waveform'},
+    {id:'review-director',      n:'06', label:'Reviewer',          kind:'agent', note:'Runs the Gate A rubric; returns a verdict, never a decision'},
+    {id:'broll-director',       n:'07', label:'B-roll',            kind:'agent', note:'Turns one approved request into one generated shot'},
+    {id:'mograph-director',     n:'08', label:'Motion Graphics',   kind:'agent', note:'One sample alpha from the template, then the batch'},
+    {id:'premiere-packager',    n:'09', label:'Premiere Packager', kind:'agent', note:'Writes the FCPXML and the bundle README'},
+    {id:'creative-director',    n:'H1', label:'Creative director', kind:'human', note:'Approves the cut, picks the music, signs off Gate A'},
+    {id:'lead',                 n:'H2', label:'Production lead',   kind:'human', note:'Releases the bundle at Gate B'},
+    {id:'editor',               n:'H3', label:'Editor',            kind:'human', note:'Opens the bundle in Premiere; acknowledges the handoff'},
+  ],
+  STAGE_GATE:{3:'A'}, gateNext:{A:'finish', B:'released'},
+  order:{intake:0, picture:1, audio:1, gate_a:1, finish:2, gate_b:2, released:3},
+  na:it=>['vo_drop','broll','mograph'].includes(it.id),
+  naNote:g=>g==='A'?'Allowed on the voice-over. A decision, recorded with who made it.':'Allowed on B-roll and motion graphics. A decision, recorded with who made it.',
+  rules:['<b>XX</b> means a person declares or approves it. The pipeline never fills an XX for you.','<b>Picture and audio are signed off together</b> at Gate A; they go to the client in one review.','<b>Nothing is generated unquoted.</b> Every B-roll shot and every alpha shows its credits before a yes.','<b>A sign-off binds to the files.</b> A file changed after it is refused, not re-approved by silence.']};
+const PIPES = {pre:PRE, post:POST};
+let KIND = 'pre', PIPE = PRE;
+function usePipe(k){ PIPE=PIPES[k]||PRE; KIND=PIPE.kind; ({ITEMS, STAGES, GATES, GATE_RELEASES, GATE_ROLLBACK, SEATS, STAGE_GATE}=PIPE); }
+// Which pipeline a project belongs to. Each plugin tags the projects it opens; one opened before
+// the tag existed is told apart by what only a post-production project carries.
+function kindOf(p){ if(!p) return 'pre'; if(p.kind==='pre'||p.kind==='post') return p.kind; return (p.preRelease!=null||p.footageSource!=null||p.deliverableDurationSec!=null||p.audioLed!=null||['picture','audio','finish'].includes(p.status))?'post':'pre'; }
+function projectKind(){ if(!project||project.missing) return KIND; if(project.kind) return kindOf(project); return (items.ingest||items.sequence||items.package)?'post':kindOf(project); }
+function projSub(p){ return kindOf(p)==='post' ? [p.client, p.aspectRatio, p.deliverableDurationSec?p.deliverableDurationSec+' s':'', p.audioLed?'audio-led':''] : [p.client, p.scriptFormat, p.storyboardStyle]; }
+const ASPECTS = ['16:9','9:16','1:1','4:5','2.39:1'];
+const tc = s => { const n=Number(s); if(!isFinite(n)||!n) return ''; const m=Math.floor(n/60), r=Math.round(n%60); return `${String(m).padStart(2,'0')}:${String(r).padStart(2,'0')}`; };
+function strip(o){ const c={...o}; delete c.id; return c; }
 const ic = n => `<svg class="i" aria-hidden="true"><use href="#ic-${n}"/></svg>`;
 
 /* ---------- state ---------- */
@@ -724,6 +840,7 @@ function arm(key){ armed={key, until:Date.now()+8000}; render(); setTimeout(()=>
 let changeFor = null; // item id whose change form is open
 let answerFor = null; // inbox id whose typed-answer form is open
 let panels = []; // storyboard panels the pipeline pushed, with thumbnails
+let bgm = [], mograph = [], previews = {}; // post-production: music candidates, alpha overlays, and a preview per step
 let refs = [], refsel = {}; // the scout's reference rows, and which ones the person ticked
 // Every agent is a small character drawn here, with no outside library: a body in a colour and a
 // shape of its own, and a face that says how it is doing. It dozes until it is called, reads
@@ -769,7 +886,7 @@ let toastEl=null;
 function toast(t, kind){ if(toastEl) toastEl.remove(); const el=document.createElement('div'); el.className='toast'; el.setAttribute('role','status'); el.innerHTML=(kind==='ok'?ic('check'):'')+esc(t); document.body.appendChild(el); toastEl=el; setTimeout(()=>{ el.classList.add('out'); setTimeout(()=>{ if(el===toastEl) toastEl=null; el.remove(); },240); },1900); }
 
 /* ---------- routing ---------- */
-function route(){ const h=location.hash||'#/'; const m=h.match(/^#\/p\/([^/]+)/); return m?{page:'project',id:decodeURIComponent(m[1])}:{page:'slate'}; }
+function route(){ const h=location.hash||'#/'; const m=h.match(/^#\/p\/([^/]+)/); const s=h.match(/^#\/(pre|post)(?![\w-])/); return m?{page:'project',id:decodeURIComponent(m[1])}: s?{page:'slate',kind:s[1]}:{page:'home'}; }
 window.addEventListener('hashchange', ()=>{ closePanel(); refocus=null; gateOpen=null; bindProject(); render(); });
 // Escape backs out of the nearest thing that is open and never leaves the project.
 window.addEventListener('keydown', e=>{ if(e.key!=='Escape') return; if(lightbox){ lightbox=null; render(); } else if(redoFor){ redoFor=null; render(); } else if(sheetOpen){ sheetOpen=false; render(); } else if(changeFor){ changeFor=null; render(); } else if(agentOpen){ closePanel(); render(); } });
@@ -790,10 +907,14 @@ async function boot(){
 }
 function bindProject(){
   unsubs.forEach(u=>{try{u()}catch(e){}}); unsubs=[];
-  items={}; gates={}; inbox=[]; messages=[]; regs={talents:[],props:[],locations:[]}; versions={}; runs={}; project=null; panels=[]; lightbox=null; redoFor=null; sheets={}; exportsDl={}; refs=[]; refsel={};
+  items={}; gates={}; inbox=[]; messages=[]; regs={talents:[],props:[],locations:[]}; versions={}; runs={}; project=null; panels=[]; bgm=[]; mograph=[]; previews={}; lightbox=null; redoFor=null; sheets={}; exportsDl={}; refs=[]; refsel={};
   const r=route(); if(r.page!=='project'||!db) return;
   const base='projects/'+r.id;
-  unsubs.push(db.doc(base).onSnapshot(s=>{ project=s.exists?{id:s.id,...s.data()}:{id:r.id,missing:true}; queue(); }));
+  // A slate card the run adopted points at the job; carry the person to the job's own page.
+  unsubs.push(db.doc(base).onSnapshot(s=>{ project=s.exists?{id:s.id,...s.data()}:{id:r.id,missing:true}; if(project.status==='moved'&&project.movedTo&&project.movedTo!==r.id){ location.hash='#/p/'+encodeURIComponent(project.movedTo); return; } queue(); }));
+  unsubs.push(db.collection(base+'/bgm').onSnapshot(q=>{ bgm=q.docs.map(d=>({id:d.id,...d.data()})); queue(); }));
+  unsubs.push(db.collection(base+'/mograph').onSnapshot(q=>{ mograph=q.docs.map(d=>({id:d.id,...d.data()})); queue(); }));
+  unsubs.push(db.collection(base+'/previews').onSnapshot(q=>{ previews={}; q.docs.forEach(d=>previews[d.id]=d.data()); queue(); }));
   unsubs.push(db.collection(base+'/items').onSnapshot(q=>{ items={}; q.docs.forEach(d=>items[d.id]=d.data()); queue(); }));
   unsubs.push(db.collection(base+'/gates').onSnapshot(q=>{ gates={}; q.docs.forEach(d=>gates[d.id]=d.data()); queue(); }));
   unsubs.push(db.collection(base+'/inbox').orderBy('createdAt','desc').limit(40).onSnapshot(q=>{ inbox=q.docs.map(d=>({id:d.id,...d.data()})); queue(); }));
@@ -814,12 +935,17 @@ function itemOf(id){ const def=ITEMS.find(i=>i.id===id); return Object.assign({s
 // it does not know that the pipeline has a question open about it, the inbox does. So a card
 // that is not started or working, with an open question of its own, reads Your input here,
 // without the pipeline having to write a status it would then have to unwrite.
-function shownStatus(it){ if(['pending','running'].includes(it.status) && inbox.some(r=>r.type==='question'&&r.status==='open'&&r.item===it.id)) return 'needs_input'; return it.status; }
+function shownStatus(it){ if(['pending','running'].includes(it.status) && inbox.some(r=>r.type==='question'&&r.status==='open'&&r.item===it.id)) return 'needs_input'; if(KIND==='post'&&it.id==='broll'&&['pending','running','draft'].includes(it.status)&&inbox.some(r=>r.type==='generate'&&r.item==='broll'&&r.status==='quoted')) return 'needs_input'; return it.status; }
+function canApproveItem(it){
+  if(['approved','na'].includes(it.status)) return false;
+  if(KIND==='post') return !(it.id==='intake'&&it.status==='pending')&&!(it.id==='package'&&it.status!=='draft');
+  return it.status!=='running'&&(it.status!=='pending'||(!!REG_FIELDS[it.id]&&regs[it.id].length>0));
+}
 function gateReady(g){ const ids=gateItems(g); return ids.length>0 && ids.every(id=>['approved','na'].includes(itemOf(id).status)); }
 // A step that has not started and cannot yet: its stage sits behind a gate that has not passed,
 // or a step it reads from is not approved. The board shows it as one quiet line instead of a
 // full card with buttons that do nothing.
-const STAGE_GATE = {2:'A', 3:'B'};
+let STAGE_GATE = {2:'A', 3:'B'};
 function stageOpen(n){ const g=STAGE_GATE[n]; return !g || !gateItems(g).length || (gates[g]&&gates[g].status==='passed'); }
 function blockedBy(it){
   if(it.status!=='pending' || shownStatus(it)!=='pending') return null;
@@ -899,7 +1025,8 @@ async function setItem(id, patch, note){
 }
 async function approve(id){
   const it=itemOf(id); if(['approved','na'].includes(it.status)) return;
-  if(id==='scraper' && refs.length && !chosenCount()){ openItem('scraper','references'); render(); toast('Tick at least one reference first; the script is written from those only'); return; }
+  if(KIND==='post' && id==='bgm' && !bgm.some(c=>c.chosen)){ openItem('bgm','candidates'); sheetOpen=true; sheetEnter=true; render(); toast('Choose one of the candidates first'); return; }
+  if(KIND==='pre' && id==='scraper' && refs.length && !chosenCount()){ openItem('scraper','references'); sheetOpen=true; sheetEnter=true; render(); toast('Tick at least one reference first; the script is written from those only'); return; }
   await setItem(id,{status:'approved', approvedBy:me, approvedAt:now(), approvedVersion:it.version||0}, `${it.name} v${it.version||0} approved.`);
   toast(`${it.name} v${it.version||0} approved`, 'ok'); signalPipeline(`${it.name} v${it.version||0} approved`);
 }
@@ -932,9 +1059,10 @@ async function searchWider(mode){
 }
 async function lockGate(g){
   if(!gateReady(g)) return; const base='projects/'+project.id;
-  const stamp={status:'passed', decidedBy:me, decidedAt:now(), items:Object.fromEntries(gateItems(g).map(id=>[id,{status:itemOf(id).status,version:itemOf(id).version||0}]))};
+  // A post-production sign-off also carries each file and its hash as the pipeline last pushed them, so the run can bind the approval to the files on disk.
+  const stamp={status:'passed', decidedBy:me, decidedAt:now(), ...(KIND==='post'?{round:((gates[g]&&gates[g].round)||0)+1}:{}), items:Object.fromEntries(gateItems(g).map(id=>{ const it=itemOf(id); return [id, KIND==='post'?{status:it.status,version:it.version||0,file:it.file||null,sha256:it.sha256||null,bytes:it.bytes||null}:{status:it.status,version:it.version||0}]; }))};
   await write(base+'/gates/'+g, stamp);
-  const nextStatus = g==='A'?'stage2': g==='B'?'stage3':'released';
+  const nextStatus = PIPE.gateNext[g]||'released';
   await write(base, {...project, status: nextStatus, updatedAt: now()});
   await write(base+'/inbox/'+Date.now().toString(36),{type:'gate',gate:g,text:`Gate ${g} ${GATES[g].name} passed by ${humanName(me)}`,from:me,status:'open',createdAt:now()});
   await log(`Gate ${g} signed off: ${GATES[g].name}.`);
@@ -954,7 +1082,9 @@ function buildDocument(src){ const cut=src.indexOf('<svg width="0"'); const head
 async function bellLog(why, outcome, detail){ if(!db) return; const rec={at:now(), why, outcome, detail:detail==null?null:String(detail).slice(0,600), by:me, project:project&&project.id||null}; try{ await db.doc('bells/'+Date.now().toString(36)+Math.random().toString(36).slice(2,5)).set(rec); }catch(e){} try{ await db.doc('meta/bell').set(rec); }catch(e){} }
 // The slate form's project has a board id and no folder: the bell carries the order to start it,
 // so the woken turn runs new-project with the fields as answers instead of asking.
-function slateOrderFor(d, id){ return 'This is a slate project with no job folder yet'+(id?', slate id '+id:'')+'. Run the new-project skill for it now, in this turn, with these answers already given: client '+(d.client||'not given')+', folder '+(d.driveFolder||'not given, ask for it')+', title '+(d.title||'')+', script format '+(d.scriptFormat||'')+', storyboard style '+(d.storyboardStyle||'')+'. Ask nothing these answer. When the job id exists run board-sync.js adopt with --from the slate id, push, and carry on to Gate A. Do not reply asking whether to start.'; }
+function slateOrderFor(d, id){ return kindOf(d)==='post'?slateOrderPost(d, id):slateOrderPre(d, id); }
+function slateOrderPost(d, id){ return 'This is a slate project with no job folder yet'+(id?', slate id '+id:'')+'. Run the new-post-project skill for it now, in this turn, with these answers already given: client '+(d.client||'not given, ask for it')+', title '+(d.title||'')+', footage folder '+(d.driveFolder||'not given, ask for it')+', pre-prod release folder '+(d.preRelease||'not given, ask for it')+', aspect ratio '+(d.aspectRatio||'not given')+', duration '+(d.deliverableDurationSec?d.deliverableDurationSec+' s':'not given, ask for it')+', '+(d.audioLed?'voice-over leads the cut (audioLed true)':'picture leads the cut (audioLed false)')+', references folder '+(d.referencesFolder||'the references/ folder inside the footage folder, if there is one')+', footage '+(d.footageSource==='hybrid'?'hybrid: real actors kept as shot, backgrounds replaced (footageSource hybrid; actor plates under the footage/plates folder, one per panel)':d.footageSource==='generated'?'generated per storyboard panel (footageSource generated; the footage folder is where the clips land)':'shot rushes (footageSource shoot)')+'. Ask nothing these answer. Scaffold the client if it does not exist, scaffold the job, write these into job.json, route, plan, run scan-references.js and put its summary on the Intake item (ask only about what must be drawn from text), board-sync.js open and push; when the job id exists run board-sync.js adopt with --from the slate id, push, and carry on to Gate A. Do not reply asking whether to start.'; }
+function slateOrderPre(d, id){ return 'This is a slate project with no job folder yet'+(id?', slate id '+id:'')+'. Run the new-project skill for it now, in this turn, with these answers already given: client '+(d.client||'not given')+', folder '+(d.driveFolder||'not given, ask for it')+', title '+(d.title||'')+', script format '+(d.scriptFormat||'')+', storyboard style '+(d.storyboardStyle||'')+'. Ask nothing these answer. When the job id exists run board-sync.js adopt with --from the slate id, push, and carry on to Gate A. Do not reply asking whether to start.'; }
 function slateOrder(){ return project&&project.createdBy&&project.createdBy!=='pipeline'&&project.status!=='moved'&&project.driveFolder!=null ? slateOrderFor(project, project.id) : null; }
 // Consent is per board and per viewer; asking for it here, on the person's own press, holds the
 // dialog open instead of letting the first send fail with consent_required and fall back.
@@ -969,7 +1099,7 @@ async function signalPipeline(why, order){
       try{
         const el=document.querySelector('[data-signal-anchor]')||document.body.firstElementChild||document.body;
         const anchor=await cm.anchorFor(el);
-        await cm.sendToClaude({anchor, text:'Pre-production board: '+what+'. '+(order||slateOrder()||'Land the board (board-sync.js land) and carry on; reply here in one line, and put the same reply in the agent chat (board-say.js, then board-sync.js push).')});
+        await cm.sendToClaude({anchor, text:PIPE.label+' board: '+what+'. '+(order||slateOrder()||'Land the board (board-sync.js land) and carry on; reply here in one line, and put the same reply in the agent chat (board-say.js, then board-sync.js push).')});
         await bellLog(why,'sent'); toast(why+'. The run has been told.', 'ok'); return true;
       }catch(e){ await bellLog(why,'send_failed',(e&&(e.code+' '+e.message))||e); if(e&&e.code==='consent_required') toast(why+'. Allow this page to send comments to Claude, or the run has to be told in chat.'); }
     } else if(can==='no_session'){ await bellLog(why,'no_session'); toast(why+'. No run is watching the board right now; say it in chat when one is.'); }
@@ -1115,19 +1245,19 @@ async function addRow(kind, form){
 async function createProject(form){
   const title=form.querySelector('[name=title]').value.trim(); if(!title){ toast('Give the project a title'); form.querySelector('[name=title]').focus(); return; }
   const id=slug(title)+'-'+Date.now().toString(36).slice(-4); const base='projects/'+id;
-  const doc={title, client:form.querySelector('[name=client]').value.trim(), driveFolder:form.querySelector('[name=drive]').value.trim(), scriptFormat:form.elements.format.value, storyboardStyle:form.elements.style.value, status:'intake', createdAt:now(), createdBy:me};
+  const doc={kind:'pre', title, client:form.querySelector('[name=client]').value.trim(), driveFolder:form.querySelector('[name=drive]').value.trim(), scriptFormat:form.elements.format.value, storyboardStyle:form.elements.style.value, status:'intake', createdAt:now(), createdBy:me};
   // The bell rings first, on the press itself: a send to Claude is allowed only from a recent
   // viewer gesture, and the fourteen writes below take seconds, which is why every Open project
   // press used to fall back while Signal pipeline, sent at once, went through.
   await signalPipeline('New project opened: '+title+(doc.client?' for '+doc.client:'')+(doc.driveFolder?', folder '+doc.driveFolder:'')+', '+doc.scriptFormat+', '+doc.storyboardStyle+' ('+id+')', slateOrderFor(doc, id));
   if(!await write(base, doc)) return;
-  for(const it of ITEMS) await write(base+'/items/'+it.id, {status:'pending', version:0, summary:'', updatedAt:now(), updatedBy:me});
+  for(const it of PRE.ITEMS) await write(base+'/items/'+it.id, {status:'pending', version:0, summary:'', updatedAt:now(), updatedBy:me});
   await write(base+'/messages/'+Date.now().toString(36), {by:me, text:'Project opened. Waiting for the Drive folder to be read.', at:now()});
   location.hash='#/p/'+encodeURIComponent(id);
 }
 function chatSummary(){
   const open=inbox.filter(r=>r.status==='open'||r.status==='waiting');
-  const lines=[`Pre-production · ${project.title}${project.client?' · '+project.client:''}`, `Status: ${statusWord(project.status)}`, ...(alaCarte()?[`Pipeline: a la carte, ${scopeItems().map(i=>i.name).join(', ')}`]:[]), ''];
+  const lines=[`${PIPE.label} · ${project.title}${project.client?' · '+project.client:''}`, `Status: ${statusWord(project.status)}`, ...(alaCarte()?[`Pipeline: a la carte, ${scopeItems().map(i=>i.name).join(', ')}`]:[]), ''];
   for(const g of scopeGates()){ const v=gateView(g); lines.push(`Gate ${g} ${GATES[g].name}: ${v.st==='passed'?'signed off by '+humanName(v.decidedBy)+' '+fmt(v.decidedAt):v.st==='ready'?'ready for sign-off':v.st==='reopened'?'reopened ('+(v.reason||'')+')':'not yet'}`); }
   lines.push('', 'Items:');
   for(const d of scopeItems()){ const it=itemOf(d.id); lines.push(`- ${it.name}${it.xx?' [XX]':''}: ${STATUS_LABEL[shownStatus(it)]} v${it.version||0}${it.approvedBy?' (approved by '+humanName(it.approvedBy)+')':''}${it.changeNote?' — change: '+it.changeNote:''}`); }
@@ -1191,7 +1321,7 @@ function seenMap(){ try{ return JSON.parse(localStorage.getItem('c122.seen')||'{
 function markSeen(seat){ if(!project||!seat) return; try{ const m=seenMap(); (m[project.id]=m[project.id]||{})[seat]=now(); localStorage.setItem('c122.seen', JSON.stringify(m)); }catch(e){} }
 // The first time a project is opened in this browser, everything already there counts as seen.
 function unseen(seat, at, seen){ if(!at||!project) return false; const m=seen[project.id]||{}; const s=m[seat]||m._first; return !!s && new Date(at)>new Date(s); }
-function defaultTab(id){ return id==='storyboard'?'panels':id==='scraper'?'references':REG_FIELDS[id]?'register':(SHEET_ITEMS.includes(id)&&sheets[id]?'sheet':'output'); }
+function defaultTab(id){ if(KIND==='post') return id==='bgm'?'candidates':id==='broll'?'requests':id==='mograph'?'alphas':'output'; return id==='storyboard'?'panels':id==='scraper'?'references':REG_FIELDS[id]?'register':(SHEET_ITEMS.includes(id)&&sheets[id]?'sheet':'output'); }
 function openItem(id, tab){ chatJump=true; panelEnter=!agentOpen; panelFocus=true; drawer=id; agentOpen=itemOf(id).seat; drawerTab=tab||defaultTab(id); runSel=null; markSeen(agentOpen); }
 function openAgent(seat){
   chatJump=true; sheetOpen=false; panelEnter=!agentOpen; panelFocus=true; agentOpen=seat; runSel=null; changeFor=null;
@@ -1260,6 +1390,23 @@ function seedDemo(d){
   run(Q,'r2',{item:'scraper',seat:'reference-scout',version:1,startedAt:T(24),finishedAt:T(9),turns:20,tokens:75000,artifactPath:'references/references-v1.md',output:'# References v1\n\n4 references from 2 sites, one row each with its link, the date it was read and why it fits.'});
   [['Host at a desk, soft key light','Site one','Wardrobe and framing.'],['Walk-and-talk in a studio corridor','Site one','Movement reference.'],['Close-up, direct to camera','Site two','How the host addresses the viewer.'],['Opening titles with the host','Site two','How the character is introduced.']].forEach((r,i)=>d.seed(Q+'/references/ref'+(i+1),{n:i+1,title:r[0],site:r[1],why:r[2],url:'https://example.com/host/'+(i+1),retrieved:T(10).slice(0,10)}));
   d.seed(Q+'/messages/m0',{by:'pipeline',text:'Asked for the references only. The pipeline is cut down to intake and the scraper.',item:null,at:T(63)});
+  // A post-production job, so the example shows both pipelines.
+  const R='projects/late-again-example';
+  d.seed(R,{kind:'post',title:'Late Again',client:'Example client',driveFolder:'Shoot / Day 01',preRelease:'Example client / Late Again / release',aspectRatio:'16:9',deliverableDurationSec:30,audioLed:false,footageSource:'shoot',status:'audio',createdAt:T(320),createdBy:'pipeline',example:true,activity:'Audio Engineer is mixing the voice-over under the chosen track',heartbeatAt:T(2),cost:{runs:4,tokens:188000,creditsSpent:0,creditsCeiling:20}});
+  POST.ITEMS.forEach(i=>item(R,i.id,{}));
+  item(R,'intake',{status:'approved',version:1,summary:'Release verified: script, storyboard, breakdown and 2 call sheets. 16:9, 30 s, picture leads.',approvedBy:'creative-director',approvedAt:T(300),approvedVersion:1,updatedAt:T(305),file:'job.json'});
+  item(R,'ingest',{status:'approved',version:1,summary:'42 clips and 6 audio files probed. Counts confirmed.',approvedBy:'creative-director',approvedAt:T(250),approvedVersion:1,updatedAt:T(262),file:'manifest.json'});
+  item(R,'sequence',{status:'approved',version:2,summary:'8 panels matched to takes. v2 swaps the take on panel 5.',approvedBy:'creative-director',approvedAt:T(150),approvedVersion:2,updatedAt:T(160),file:'cut/rough-edl-v2.json'});
+  item(R,'bgm',{status:'approved',version:1,summary:'Three candidates; Low Tide chosen.',approvedBy:'creative-director',approvedAt:T(95),approvedVersion:1,updatedAt:T(110),choice:'c2',choiceTitle:'Low Tide'});
+  item(R,'vo_drop',{status:'draft',version:1,summary:'4 takes placed against the script markers. Final or scratch?',updatedAt:T(40),file:'audio/vo-track.json'});
+  item(R,'sync',{status:'running',version:1,summary:'Mixing voice, music and effects; music ducks under the voice.',updatedAt:T(3)});
+  run(R,'p1',{item:'sequence',seat:'sequence-director',version:2,startedAt:T(175),finishedAt:T(160),turns:11,tokens:64000,output:'# First cut v2\n\n8 panels, 8 takes, 29.6 s.\n\n- Panel 5 now uses take 3: the door is in frame.\n- Panels 1 to 4 and 6 to 8 are unchanged from v1.'});
+  run(R,'p2',{item:'bgm',seat:'bgm-supervisor',version:1,startedAt:T(125),finishedAt:T(110),turns:7,tokens:31000,output:'Three candidates from the library, each long enough for 30 s. None picked: that choice is yours.'});
+  run(R,'p3',{item:'vo_drop',seat:'audio-engineer',version:1,startedAt:T(52),finishedAt:T(40),turns:6,tokens:28000,output:'4 voice-over takes placed against the script markers. Take 2 of line 3 runs 0.4 s long.'});
+  run(R,'p4',{item:'sync',seat:'audio-engineer',version:1,status:'running',startedAt:T(12),turns:5,tokens:22000,output:'Levels set. Ducking the music under lines 1 to 4.'});
+  [['c1','Paper Lanterns',34,92,'Library A','Warm, a little wistful.'],['c2','Low Tide',41,84,'Library A','Sparse and steady; leaves room for the voice.'],['c3','Night Bus',36,104,'Library B','More drive than the cut has.']].forEach(c=>d.seed(R+'/bgm/'+c[0],{title:c[1],durationSec:c[2],bpm:c[3],source:c[4],mood:c[5],...(c[0]==='c2'?{chosen:true,chosenBy:'creative-director',chosenAt:T(95)}:{})}));
+  d.seed(R+'/inbox/q1',{type:'question',item:'vo_drop',text:'Are these the final voice-over takes, or scratch to be replaced?',options:['Final','Scratch'],from:'audio-engineer',status:'open',createdAt:T(38)});
+  [['pipeline','Project opened from the release package.',null,318],['creative-director','First cut v2 approved.','sequence',150]].forEach((m,i)=>d.seed(R+'/messages/m'+i,{by:m[0],text:m[1],item:m[2],at:T(m[3])}));
 }
 function startDemo(){ db=demoDb(); seedDemo(db); dbState='demo'; db.collection('projects').orderBy('createdAt','desc').onSnapshot(q=>{ projects=q.docs.map(d=>({id:d.id,...d.data()})); queue(); }); bindProject(); render(); }
 
@@ -1291,9 +1438,10 @@ let rq=0;
 function queue(){ if(rq) return; rq=requestAnimationFrame(()=>{ rq=0; render(); }); }
 function render(){
   const r=route(); const app=$('#app');
+  usePipe(r.page==='slate'?r.kind: r.page==='project'?projectKind():KIND);
   try{
     const kept=keep(app); const c0=app.querySelector('.chat-l'); const stick=!!c0&&c0.scrollHeight-c0.scrollTop-c0.clientHeight<32;
-    app.innerHTML = topbar() + (r.page==='project' ? projectPage(r.id)+workSheetHtml() : slatePage()) + footer() + lightboxHtml();
+    app.innerHTML = topbar() + (r.page==='project' ? projectPage(r.id)+workSheetHtml() : r.page==='slate' ? slatePage() : homePage()) + footer() + lightboxHtml();
     wire(); restore(app, kept);
     const c1=app.querySelector('.chat-l'); if(c1&&(chatJump||stick)) c1.scrollTop=c1.scrollHeight;
     if(sheetEnter){ const b=app.querySelector('.ws-h button'); if(b) b.focus({preventScroll:true}); }
@@ -1307,10 +1455,10 @@ function render(){
 // The wordmark is the brand kit's reversed file (white type for navy), embedded so the page needs no external image.
 const LOGO='data:image/png;base64,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';
 function topbar(){
-  const back=route().page==='project'?`<button class="ghost" data-home title="Back to every project on the slate">${ic('back')} All projects</button>`:'';
+  const rt=route(); const back=rt.page==='project'?`<button class="ghost" data-nav="#/${KIND}" title="Back to every ${esc(PIPE.label.toLowerCase())} project">${ic('back')} ${esc(PIPE.label)}</button>`: rt.page==='slate'?`<button class="ghost" data-nav="#/" title="Back to the studio">${ic('back')} Studio</button>`:'';
   const conn=dbState==='on'?'Board connected':dbState==='connecting'?'Connecting to the board…':dbState==='demo'?'Example board, nothing is saved or sent':'Not connected';
   return `<header class="top">
-    <div class="brand">${back}<a href="#/" data-home><img src="${LOGO}" alt="3echo"><span class="sep" aria-hidden="true"></span><h1>Pre-production</h1></a></div>
+    <div class="brand">${back}<a href="#/" data-home><img src="${LOGO}" alt="3echo"><span class="sep" aria-hidden="true"></span><h1>${rt.page==='home'?'Production Studio':esc(PIPE.label)}</h1></a></div>
     <div class="who">
       <span class="conn ${dbState==='on'?'on':dbState==='demo'?'demo':''}"><i></i>${conn}</span>
       <label>Acting as <select id="me" aria-label="Acting as">${HUMANS.map(h=>`<option value="${h.id}" ${h.id===me?'selected':''}>${h.label}</option>`).join('')}</select></label>
@@ -1344,26 +1492,37 @@ function costBox(){
     ${rows.length?`<div class="seats">${rows.map(r=>`<button class="seat-row" data-open-item="${r.id}" data-open-tab="output" title="${esc(r.models.join(', '))} · ${r.u} turns"><span><b>${esc(r.name)}</b>${r.n>1?` · ${r.n} runs`:''}</span><span class="num">${tok(r.t)}${total?` · ${Math.round(r.t*100/total)}%`:''}</span></button>`).join('')}</div>`:''}
   </div>`;
 }
-function statusWord(s){ return {intake:'Intake',stage1:'Stage 1',gate_a:'At Gate A',stage2:'Stage 2',gate_b:'At Gate B',stage3:'Stage 3',gate_c:'At Gate C',released:'Released',killed:'Killed'}[s]||s||''; }
+function statusWord(s){ return {picture:'Picture',audio:'Audio',finish:'Finish',intake:'Intake',stage1:'Stage 1',gate_a:'At Gate A',stage2:'Stage 2',gate_b:'At Gate B',stage3:'Stage 3',gate_c:'At Gate C',released:'Released',killed:'Killed'}[s]||s||''; }
 function demoOffer(){ return `<p class="empty" style="margin-top:20px">The board database is not reachable from this view.</p><div class="actions" style="margin-top:10px"><button data-demo>Open the example board</button>${route().page==='project'?`<button class="ghost" data-home>${ic('back')} All projects</button>`:''}</div>`; }
-function slatePage(){
-  const live=projects.filter(p=>p.status!=='moved'); const cards = live.length ? live.map(p=>{
-    const n=Array.isArray(p.steps)&&p.steps.length?p.steps.length:0;
-    const sub=[p.client,p.scriptFormat,p.storyboardStyle].filter(Boolean).map(esc).join(' · ');
-    const working=p.activity&&!['released','killed'].includes(p.status);
-    return `<button class="pcard" data-open="${esc(p.id)}" style="--h:${hueOf(p.id)}">
-      <span class="pc-top"><span class="pc-glass"><h3>${esc(p.title)}</h3>${sub?`<span class="pc-sub">${sub}</span>`:''}</span></span>
+// One project on a slate. On the studio's home page the card also says which pipeline it is in.
+function projectCard(p, tagged){
+  const k=kindOf(p); const n=Array.isArray(p.steps)&&p.steps.length?p.steps.length:0;
+  const sub=projSub(p).filter(Boolean).map(esc).join(' · ');
+  const working=p.activity&&!['released','killed'].includes(p.status);
+  return `<button class="pcard" data-open="${esc(p.id)}" style="--h:${hueOf(p.id)}">
+      <span class="pc-top"><span class="pc-glass">${tagged?`<span class="pc-kind">${esc(PIPES[k].label)}</span>`:''}<h3>${esc(p.title)}</h3>${sub?`<span class="pc-sub">${sub}</span>`:''}</span></span>
       <span class="pc-body">
-        <span class="pc-kv"><span>Opened</span><b>${fmt(p.createdAt)}</b><span>By</span><b>${esc(humanName(p.createdBy))}${p.example?' · example data':''}</b>${costLine(p.cost)?`<span>Cost</span><b class="num">${esc(costLine(p.cost))}</b>`:''}<span>${n?'Scope':'Gates'}</span><b>${n?`A la carte · ${n} step${n===1?'':'s'}`:`<span class="gchips" aria-label="Gates passed">${['A','B','C'].map(x=>`<span class="gchip ${gateChipState(p,x)}">${x}</span>`).join('')}</span>`}</b></span>
+        <span class="pc-kv"><span>Opened</span><b>${fmt(p.createdAt)}</b><span>By</span><b>${esc(humanName(p.createdBy))}${p.example?' · example data':''}</b>${costLine(p.cost)?`<span>Cost</span><b class="num">${esc(costLine(p.cost))}</b>`:''}<span>${n?'Scope':'Gates'}</span><b>${n?`A la carte · ${n} step${n===1?'':'s'}`:`<span class="gchips" aria-label="Gates passed">${Object.keys(PIPES[k].GATES).map(x=>`<span class="gchip ${gateChipState(p,x)}">${x}</span>`).join('')}</span>`}</b></span>
         <span class="pill ${p.status==='released'?'approved':working?'running':'plain'}">${esc(statusWord(p.status))}</span>
       </span>
       ${working?`<span class="pc-act">${esc(p.activity)}${p.heartbeatAt?' · '+fmt(p.heartbeatAt):''}</span>`:''}
       <span class="pc-dots" aria-hidden="true"></span>
-    </button>`; }).join('')
-    : dbState==='off' ? demoOffer() : `<p class="empty">${dbState==='connecting'?'Connecting to the board…':'No projects on the board yet. Open one below, or let the pipeline open it when a Drive folder lands.'}</p>`;
-  return `<div class="sect"><h2>Slate</h2><span class="meta">${live.length} project${live.length===1?'':'s'}</span></div>
-  <div class="slate">${cards}</div>
-  <form class="newp" id="newp">
+    </button>`;
+}
+// The studio's front page: the two pipelines as two doors, and everything in flight under them.
+function homePage(){
+  const live=projects.filter(p=>p.status!=='moved');
+  const door=k=>{ const P=PIPES[k]; const mine=live.filter(p=>kindOf(p)===k); const busy=mine.filter(p=>p.activity&&!['released','killed'].includes(p.status)).length;
+    return `<button class="hcard k-${k}" data-nav="#/${k}"><span class="mb-ic" aria-hidden="true">${ic(k==='pre'?'flow':'film')}</span><span class="mb-b"><span class="mb-t"><em>${esc(P.label)}.</em> ${esc(P.tag)}</span><span class="mb-s">${P.ITEMS.length} steps, ${Object.keys(P.GATES).length} gates · ${mine.length} project${mine.length===1?'':'s'}${busy?`, ${busy} working`:''}</span></span><span class="mb-btn">Open ${ic('arrow')}</span></button>`; };
+  const cards = live.length ? live.map(p=>projectCard(p, true)).join('')
+    : dbState==='off' ? demoOffer() : `<p class="empty">${dbState==='connecting'?'Connecting to the board…':'No projects on the board yet. Open one from Pre-production or Post-production.'}</p>`;
+  return `<div class="sect"><h2>Production Studio</h2><span class="meta">Two pipelines, one board</span></div>
+  <div class="home">${door('pre')}${door('post')}</div>
+  <div class="sect"><h2>In flight</h2><span class="meta">${live.length} project${live.length===1?'':'s'}</span></div>
+  <div class="slate">${cards}</div>`;
+}
+function preForm(){
+  return `<form class="newp" id="newp">
     <div class="np-head"><span class="np-ic" aria-hidden="true">${ic('plus')}</span><div><h3>Open a project</h3><p>Name it, point at the folder, and choose the two things every agent needs to know. The run pulls the folder, routes it and plans the steps from here.</p></div></div>
     <div class="np-fields">
       <label>Project title<input name="title" id="np-title" placeholder="Night Shift" required autocomplete="off"></label>
@@ -1375,14 +1534,119 @@ function slatePage(){
       <fieldset id="np-style"><legend>Storyboard style</legend><div class="seg"><label class="chip"><input type="radio" name="style" value="Sketches" checked><span>Sketches</span></label><label class="chip"><input type="radio" name="style" value="Live pictures"><span>Live pictures</span></label><label class="chip"><input type="radio" name="style" value="Cartoon / animation"><span>Cartoon / animation</span></label></div></fieldset>
     </div>
     <div class="np-foot"><span class="np-note">One style per storyboard. Shoot days, trailer and aspect ratio are asked once the folder is read.</span><button class="primary" type="submit">Open project ${ic('arrow')}</button></div>
-  </form>
+  </form>`;
+}
+function postForm(){
+  const seg=(name,opts)=>`<div class="seg">${opts.map((o,i)=>`<label class="chip"><input type="radio" name="${name}" value="${o[0]}" ${i===0?'checked':''}><span>${o[1]}</span></label>`).join('')}</div>`;
+  return `<form class="newp" id="newpost">
+    <div class="np-head"><span class="np-ic" aria-hidden="true">${ic('plus')}</span><div><h3>Open a project</h3><p>Name it, point at the footage and at the pre-production release it was shot from. The run verifies the release, reads the footage and plans the cut from here.</p></div></div>
+    <div class="np-fields">
+      <label>Project title<input name="title" id="npp-title" placeholder="Late Again" required autocomplete="off"></label>
+      <label>Client<input name="client" id="npp-client" placeholder="Client short name"></label>
+      <label>Footage folder<input name="drive" id="npp-drive" placeholder="Shoot / Day 01 …"></label>
+    </div>
+    <div class="np-fields">
+      <label>Pre-production release<input name="pre" id="npp-pre" placeholder="Release package folder"></label>
+      <label>Duration (seconds)<input name="duration" id="npp-duration" type="number" min="5" max="900" placeholder="30" inputmode="numeric"></label>
+      <label>References, optional<input name="refs" id="npp-refs" placeholder="characters, locations, wardrobe…"></label>
+    </div>
+    <div class="np-choices three">
+      <fieldset id="npp-aspect"><legend>Aspect ratio</legend>${seg('aspect', ASPECTS.map(a=>[a,a]))}</fieldset>
+      <fieldset id="npp-led"><legend>Leads the cut</legend>${seg('led', [['picture','Picture'],['audio','Voice-over']])}</fieldset>
+      <fieldset id="npp-source"><legend>Footage</legend>${seg('source', [['shoot','Shot rushes'],['generated','Generated per panel'],['hybrid','Hybrid: real actors, AI backgrounds']])}</fieldset>
+    </div>
+    <div class="np-foot"><span class="np-note">Picture and audio are signed off together at Gate A. Nothing is generated before its credits are quoted.</span><button class="primary" type="submit">Open project ${ic('arrow')}</button></div>
+  </form>`;
+}
+function slatePage(){
+  const live=projects.filter(p=>p.status!=='moved').filter(p=>kindOf(p)===KIND); const cards = live.length ? live.map(p=>projectCard(p, false)).join('')
+    : dbState==='off' ? demoOffer() : `<p class="empty">${dbState==='connecting'?'Connecting to the board…':'No '+PIPE.label.toLowerCase()+' projects on the board yet. Open one below, or let the pipeline open it.'}</p>`;
+  return `<div class="sect"><h2>${esc(PIPE.label)}</h2><span class="meta">${live.length} project${live.length===1?'':'s'}</span></div>
+  <div class="slate">${cards}</div>
+  ${KIND==='post'?postForm():preForm()}
   ${modelPreview(false)}`;
+}
+async function createPostProject(form){
+  const val=n=>((form.querySelector('[name='+n+']')||{}).value||'').trim();
+  const title=val('title'); if(!title){ toast('Give the project a title'); form.querySelector('[name=title]').focus(); return; }
+  const id=slug(title)+'-'+Date.now().toString(36).slice(-4); const base='projects/'+id;
+  const doc={kind:'post', title, client:val('client'), driveFolder:val('drive'), preRelease:val('pre'), referencesFolder:val('refs')||null, aspectRatio:form.elements.aspect.value, deliverableDurationSec:Number(val('duration'))||null, audioLed:form.elements.led.value==='audio', footageSource:form.elements.source.value, status:'intake', createdAt:now(), createdBy:me};
+  // The bell rings first, on the press itself, as it does for a pre-production project.
+  await signalPipeline('New post project opened: '+title+(doc.client?' for '+doc.client:'')+' ('+id+')', slateOrderFor(doc, id));
+  if(!await write(base, doc)) return;
+  for(const it of POST.ITEMS) await write(base+'/items/'+it.id, {status:'pending', version:0, summary:'', updatedAt:now(), updatedBy:me});
+  await write(base+'/messages/'+Date.now().toString(36), {by:me, text:'Project opened from the slate. The run scaffolds the job from these answers and adopts this card.', at:now()});
+  location.hash='#/p/'+encodeURIComponent(id);
+}
+
+/* ---------- post-production: music, generated shots, motion graphics ---------- */
+async function chooseBgm(id){
+  const c=bgm.find(x=>x.id===id); if(!c) return; const base='projects/'+project.id;
+  for(const x of bgm){ const want=x.id===id; if(!!x.chosen!==want) await write(base+'/bgm/'+x.id, {...strip(x), chosen:want, chosenBy:want?me:null, chosenAt:want?now():null}); }
+  await setItem('bgm',{status:'approved', approvedBy:me, approvedAt:now(), approvedVersion:itemOf('bgm').version||0, choice:id, choiceTitle:c.title||id}, `BGM chosen: ${c.title||id}${c.source?' ('+c.source+')':''}.`);
+  await write(base+'/inbox/'+Date.now().toString(36),{type:'bgm-choice',item:'bgm',candidate:id,text:`BGM chosen: ${c.title||id}`,from:me,status:'answered',answer:id,answeredBy:me,answeredAt:now(),createdAt:now()});
+  toast('BGM chosen: '+(c.title||id), 'ok'); await signalPipeline('BGM chosen: '+(c.title||id));
+}
+async function requestBroll(form){
+  const shot=(form.querySelector('[name=shot]').value||'').trim(); if(!shot){ toast('Describe the shot'); form.querySelector('[name=shot]').focus(); return; }
+  const durationSec=Number(form.querySelector('[name=duration]').value)||5; const aspect=form.querySelector('[name=aspect]').value||(project.aspectRatio||'16:9');
+  const id='b-'+Date.now().toString(36);
+  await write('projects/'+project.id+'/inbox/'+id,{type:'generate',item:'broll',shot,durationSec,aspect,text:`B-roll: ${shot} · ${durationSec}s · ${aspect}`,from:me,status:'requested',createdAt:now()});
+  const it=itemOf('broll'); if(['pending','needs_input'].includes(it.status)) await setItem('broll',{status:'draft'});
+  await log(`B-roll requested: ${shot} (${durationSec}s, ${aspect}). Waiting for the quote.`, 'broll');
+  form.reset(); toast('Request sent; the pipeline quotes it before anything is spent', 'ok'); await signalPipeline('B-roll requested: '+shot.slice(0,60));
+}
+async function approveBroll(r){
+  await write('projects/'+project.id+'/inbox/'+r.id,{...strip(r), status:'open', approvedBy:me, approvedAt:now()});
+  await log(`B-roll approved for ${r.credits||'?'} credit${r.credits===1?'':'s'}: ${r.shot||r.text}`, 'broll');
+  toast('Approved; the shot will be generated', 'ok'); await signalPipeline('B-roll approved ('+(r.credits||'?')+' credits): '+String(r.shot||'').slice(0,50));
+}
+async function declineBroll(r){
+  await write('projects/'+project.id+'/inbox/'+r.id,{...strip(r), status:'declined', declinedBy:me, declinedAt:now()});
+  await log(`B-roll declined: ${r.shot||r.text}`, 'broll');
+  toast('Declined', 'ok'); await signalPipeline('B-roll declined: '+String(r.shot||'').slice(0,50));
+}
+async function approveMograph(id){
+  const m=mograph.find(x=>x.id===id); if(!m||!m.thumb) return;
+  await write('projects/'+project.id+'/mograph/'+id,{...strip(m), approvedBy:me, approvedAt:now()});
+  const rest=mograph.filter(x=>x.id!==id&&!x.thumb).length;
+  if(m.sample && rest) await write('projects/'+project.id+'/inbox/'+('g-'+Date.now().toString(36)),{type:'generate',item:'mograph',scope:'batch',text:`Render the motion-graphics batch: ${rest} alpha${rest===1?'':'s'} from the approved sample`,from:me,status:'open',approvedBy:me,approvedAt:now(),createdAt:now()});
+  await log(m.sample?`Sample alpha ${id} approved; the batch may render.`:`Alpha ${id} approved.`, 'mograph');
+  toast((m.sample?'Sample ':'')+id+' approved', 'ok'); await signalPipeline((m.sample?'Sample alpha ':'Alpha ')+id+' approved');
+}
+function brollReqs(){ return inbox.filter(r=>r.type==='generate'&&r.item==='broll'); }
+// A quote is the one thing here that spends credits, so it confirms on a second press.
+function quoteBtns(r){ return (isArmed('q'+r.id)?`<button class="primary sm" data-approve-req="${esc(r.id)}">${ic('check')} Confirm: spend ${esc(r.credits||'?')} credit${r.credits===1?'':'s'}</button>`:`<button class="tape sm" data-approve-req="${esc(r.id)}">${ic('check')} Approve ${esc(r.credits||'?')} credit${r.credits===1?'':'s'}</button>`)+`<button class="ghost sm" data-decline-req="${esc(r.id)}">Decline</button>`; }
+function previewHtml(it){
+  const p=previews[it.id]; if(!p||(!p.thumb&&!p.video)) return '';
+  const shape = p.w>0&&p.h>0 ? ` style="aspect-ratio:${Number(p.w)}/${Number(p.h)}"` : '';
+  const media = p.video ? `<video controls playsinline preload="metadata" src="${esc(p.video)}"${p.poster?` poster="${esc(p.poster)}"`:''}${shape}></video>` : `<img src="${esc(p.thumb)}" alt="${esc(p.caption||it.name)}">`;
+  return `<div class="preview">${media}<div class="cap"><span>${esc(p.caption||'')}</span><span>${fmt(p.updatedAt)}</span></div></div>`;
+}
+function candidatesHtml(it){
+  if(!bgm.length) return `<p class="empty">The BGM supervisor pushes three candidates here once the first cut exists. Pick one; the sync stage will not start without a choice made here.</p>`;
+  const chosen=bgm.find(c=>c.chosen);
+  return `<div class="runmeta"><span>${bgm.length} candidate${bgm.length===1?'':'s'}${chosen?' · chosen: '+esc(chosen.title||chosen.id)+' by '+esc(humanName(chosen.chosenBy)):' · none chosen yet'}</span></div>
+  <div class="cands">${bgm.map(c=>`<div class="cand ${c.chosen?'chosen':''}"><h4>${esc(c.title||c.id)}</h4><span class="num">${[tc(c.durationSec), c.bpm?esc(c.bpm)+' bpm':'', esc(c.source||'')].filter(Boolean).join(' · ')}</span>${c.audio?`<audio controls preload="none" src="${esc(c.audio)}"></audio>`:''}${c.mood?`<p>${esc(c.mood)}</p>`:''}${c.note?`<p>${esc(c.note)}</p>`:''}<div class="cand-f">${c.file?`<span class="mono" title="${esc(c.file)}">${esc(String(c.file).split(/[\\/]/).pop())}</span>`:'<span></span>'}${c.chosen?`<span class="pill approved">Chosen</span>`:(isArmed('bgm'+c.id)?`<button class="primary sm" data-choose-bgm="${esc(c.id)}">${ic('check')} Confirm ${esc(c.title||c.id)}</button>`:`<button class="sm" data-choose-bgm="${esc(c.id)}">${ic('music')} Choose</button>`)}</div></div>`).join('')}</div>`;
+}
+function requestsHtml(it){
+  const rs=brollReqs(); const gateA=gateView('A').st==='passed';
+  const form = gateA ? `<form class="reqform" id="brollf"><label class="subh" for="br-shot">The shot</label><textarea name="shot" id="br-shot" placeholder="Slow push-in on a rain-streaked window at night, neon reflections, no people"></textarea><div class="two"><label>Duration (s)<input name="duration" id="br-duration" type="number" min="2" max="15" value="5"></label><label>Aspect<select name="aspect" id="br-aspect">${ASPECTS.map(a=>`<option ${a===(project.aspectRatio||'16:9')?'selected':''}>${a}</option>`).join('')}</select></label></div><div class="row"><span class="meta">One shot per request. The pipeline quotes it here before anything is spent.</span><button class="primary" type="submit">${ic('send')} Request shot</button></div></form>` : `<p class="empty">B-roll requests open once Gate A is signed off.</p>`;
+  const word={requested:'Awaiting quote', open:'Generating', waiting:'Waiting on a question', delivered:'Delivered', declined:'Declined'};
+  const list = rs.length ? `<div class="brs">${rs.map(r=>`<div class="br"><div class="br-h"><b>${esc(r.shot||r.text)}</b><span class="pill ${r.status==='delivered'?'approved':r.status==='quoted'?'needs_input':r.status==='open'?'running':'plain'}">${esc(r.status==='quoted'?(r.credits||'?')+' credits quoted':(word[r.status]||r.status))}</span></div><div class="meta num">${esc(r.durationSec||'')}s · ${esc(r.aspect||'')} · ${esc(humanName(r.from))} · ${fmt(r.createdAt)}${r.quoteText?' · '+esc(r.quoteText):''}</div>${r.path?`<div class="mono">${esc(r.path)}</div>`:''}${r.thumb&&safeImg(r.thumb)?`<img src="${esc(r.thumb)}" alt="${esc(r.shot||'')}">`:''}${r.status==='quoted'?`<div class="bub-act">${quoteBtns(r)}</div>`:''}</div>`).join('')}</div>` : `<p class="empty">No B-roll requested yet.</p>`;
+  return form+list;
+}
+function alphasHtml(it){
+  if(!mograph.length) return `<p class="empty">Once Gate A is signed off the motion-graphics director proposes a template; the sample alpha appears here for approval before the batch renders.</p>`;
+  const sample=mograph.find(m=>m.sample); const drawn=mograph.filter(m=>m.thumb).length;
+  return `<div class="runmeta"><span>${drawn}/${mograph.length} rendered${it.template?' · '+esc(it.template):''}${sample?' · sample '+esc(sample.id)+(sample.approvedBy?' approved':''):''}</span></div>
+  <div class="sb-grid">${mograph.map(m=>`<div class="sb-card ${m.sample?'sample':''}">${m.thumb&&safeImg(m.thumb)?`<div class="sb-ph" style="padding:0;border:0"><img src="${esc(m.thumb)}" alt="${esc(m.id)}" style="width:100%;height:100%;object-fit:contain"></div>`:`<div class="sb-ph"><span>${esc(m.id)}</span><span>not rendered</span></div>`}<div class="sb-cap"><span><b>${esc(m.id)}</b>${m.sample?' <span class="sb-tag">sample</span>':''}${m.approvedBy?' <span class="sb-tag ok">approved</span>':''}</span><span>${esc(m.variant||'')}${m.durationSec?' · '+tc(m.durationSec):''}</span>${m.thumb&&!m.approvedBy?`<span class="row"><button class="primary" data-approve-alpha="${esc(m.id)}">${ic('check')} Approve${m.sample?' sample':''}</button></span>`:''}</div></div>`).join('')}</div>`;
 }
 // Each project keeps one colour of its own, worked out from its id, so a slate of many reads at a glance.
 function hueOf(s){ let h=7; for(const ch of String(s||'')) h=(h*31+ch.charCodeAt(0))%360; return h; }
-function gateChipState(p, g){ const order={intake:0,stage1:1,gate_a:1,stage2:2,gate_b:2,stage3:3,gate_c:3,released:4}; const n=order[p.status]??0; const after={A:1,B:2,C:3}[g]; return n>after?'passed':n===after&&p.status.startsWith('gate')?'ready':''; }
+function gateChipState(p, g){ const order=PIPES[kindOf(p)].order; const n=order[p.status]??0; const after={A:1,B:2,C:3}[g]; return n>after?'passed':n===after&&p.status.startsWith('gate')?'ready':''; }
 function modelPreview(open){
-  return `<details class="model" data-k="model" ${open?'open':''}><summary><span class="mb-ic" aria-hidden="true">${ic('flow')}</span><span class="mb-b"><span class="mb-t"><em>Pre-Production Pipeline.</em> Drive folder in, call sheets out.</span><span class="mb-s">${ITEMS.length} steps, 3 gates, ${ITEMS.filter(i=>i.xx).length} XX items a person enters. See every step and who does the work.</span></span><span class="mb-btn"><span class="when-shut">View pipeline</span><span class="when-open">Hide pipeline</span><span class="chev">${ic('chev')}</span></span></summary>
+  return `<details class="model" data-k="model" ${open?'open':''}><summary><span class="mb-ic" aria-hidden="true">${ic('flow')}</span><span class="mb-b"><span class="mb-t"><em>${esc(PIPE.label)} Pipeline.</em> ${esc(PIPE.tag)}</span><span class="mb-s">${ITEMS.length} steps, ${Object.keys(GATES).length} gates, ${ITEMS.filter(i=>i.xx).length} XX items a person enters. See every step and who does the work.</span></span><span class="mb-btn"><span class="when-shut">View pipeline</span><span class="when-open">Hide pipeline</span><span class="chev">${ic('chev')}</span></span></summary>
   <div class="work"><div>${flowHtml(true)}</div>
     <div class="inbox"><div class="in-h"><h2>Who does the work</h2><span class="meta">${SEATS.filter(s=>s.kind!=='human').length} agents, ${SEATS.filter(s=>s.kind==='human').length} people</span></div><div class="in-l">${SEATS.map(s=>`<div class="ag st-idle"><span class="ag-num num" aria-hidden="true">${esc(s.n)}</span><span class="ag-b"><span class="ag-n"><b>${esc(s.label)}</b><span class="ag-w">${s.kind==='human'?'Person':'Agent'}</span></span><span class="ag-l" style="-webkit-line-clamp:2">${esc(s.note)}</span></span></div>`).join('')}</div></div>
   </div></details>`;
@@ -1397,7 +1661,7 @@ function gateDetail(g){
       <dt>Approver</dt><dd>${esc(G.approver)}</dd>
       <dt>Releases</dt><dd>${esc(GATE_RELEASES[g])}</dd>
       <dt>Reopens</dt><dd>${esc(GATE_ROLLBACK[g])}</dd>
-      <dt>Not applicable</dt><dd>${g==='B'?'Allowed on talents, props and locations. A decision, recorded with who made it.':'Never accepted at this gate.'}</dd>
+      <dt>Not applicable</dt><dd>${esc(PIPE.naNote(g))}</dd>
     </dl>
   </div>`;
 }
@@ -1407,6 +1671,12 @@ const STAGE0 = {n:0, name:'Intake', sub:''};
 const NODE = {approved:ic('check'), running:'<span class="pip"></span>', draft:'<span class="pip"></span>', needs_input:ic('q'), needs_review:ic('change'), blocked:ic('gate'), pending:'', na:''};
 // What the step is holding beyond its summary: rows entered, references chosen, panels drawn.
 function stepCount(it){
+  if(KIND==='post'){
+    if(it.id==='bgm') return bgm.length?`${bgm.length} candidate${bgm.length===1?'':'s'}${it.choiceTitle?', chosen: '+it.choiceTitle:''}`:'';
+    if(it.id==='broll'){ const rs=brollReqs(); const q=rs.filter(r=>r.status==='quoted').length; return rs.length?`${rs.length} request${rs.length===1?'':'s'}${q?`, ${q} quoted`:''}`:''; }
+    if(it.id==='mograph') return mograph.length?`${mograph.filter(m=>m.thumb).length} of ${mograph.length} rendered`:'';
+    return '';
+  }
   if(REG_FIELDS[it.id]) return regs[it.id].length?`${regs[it.id].length} row${regs[it.id].length===1?'':'s'}${regUnknowns(it.id)?`, ${regUnknowns(it.id)} with blanks`:''}`:'';
   if(it.id==='scraper'&&refs.length) return `${chosenCount()} of ${refs.length} chosen`;
   if(it.id==='storyboard'&&panels.length) return `${panels.filter(p=>p.thumb).length} of ${panels.length} drawn`;
@@ -1458,7 +1728,7 @@ function projectHead(){
   let map='', last=null;
   for(const it of its){ if(last!=null&&it.stage!==last&&it.stage>1) map+='<b></b>'; last=it.stage; map+=`<i class="s-${blockedBy(it)?'blocked':shownStatus(it)}" title="${esc(it.name)}: ${esc(blockedBy(it)?'waiting':STATUS_LABEL[shownStatus(it)])}"></i>`; }
   return `<div class="phead" data-signal-anchor>
-    <div class="ph-l">${blob(project.id, BLOB_MOOD[project.status]||'idle', 44)}<div><h2>${esc(project.title)}</h2><p class="meta">${[project.client,project.scriptFormat,project.storyboardStyle,statusWord(project.status)].filter(Boolean).map(esc).join(' · ')}${project.example?' · example data':''}</p></div></div>
+    <div class="ph-l">${blob(project.id, BLOB_MOOD[project.status]||'idle', 44)}<div><h2>${esc(project.title)}</h2><p class="meta">${[...projSub(project),statusWord(project.status)].filter(Boolean).map(esc).join(' · ')}${project.example?' · example data':''}</p></div></div>
     <div class="ph-r">${alaCarte()?`<span class="scope" title="Only these steps were asked for. The full pipeline has ${ITEMS.length}.">A la carte · ${its.length} step${its.length===1?'':'s'}</span>`:''}${costTxt?`<button class="ghost num" data-agent="orchestrator" title="Cost so far, by step">${esc(costTxt)}</button>`:''}<button class="ghost" data-copy title="Copy a plain-text summary of this board to paste into a Claude chat">${ic('copy')} Copy board</button></div>
     <div class="mini"><div class="minimap" role="img" aria-label="${ok} of ${its.length} steps approved">${map}</div><span class="meta num">${ok} of ${its.length} steps approved</span></div>
   </div>`;
@@ -1485,8 +1755,9 @@ function pendingHtml(){
     const thumb = r.thumb&&/^data:image\/(png|jpe?g|webp);base64,/.test(r.thumb)?`<div class="qthumb"><img src="${esc(r.thumb)}" alt="${esc(r.text)}"></div>`:'';
     return `<div class="pq ${r.status==='waiting'?'waiting':''}"><span class="ag-f">${blob(r.from, 'surprised', 32)}</span><div class="pq-b"><div class="qm"><b>${esc(whoName(r.from))}</b><span>${r.item?esc(itemOf(r.item).name):'Project'}</span><span>${fmt(r.createdAt)}</span></div><div class="bub"><p class="qt">${esc(r.text)}</p>${thumb}${opts?`<div class="bub-act">${opts}</div>`:''}</div><form class="qf cmp-row" data-answer-form="${esc(r.id)}"><input name="text" id="ans-${esc(r.id)}" aria-label="Your answer" placeholder="${opts?'Or type a different answer':'Type your answer'}"><button type="submit" class="primary icon" aria-label="Send answer" title="Send answer">${ic('send')}</button></form>${tail}</div></div>`;
   }).join('');
-  const pend = others.length ? `<div class="hist" ${open.length?'':'style="border:0;padding:0"'}>${others.map(r=>`<div><b>${esc(r.type==='generate'?'Drawing':r.type==='export'?'Exporting':r.type==='change'?'Change sent':r.type)}</b> · ${esc(r.text)}${r.status==='waiting'?' · waiting on '+esc(r.waitingText||'a question'):r.status==='quoted'?' · quoted '+esc(r.credits||'?')+' credits':''}</div>`).join('')}</div>` : '';
-  return `<section class="needs ${open.length?'':'quiet'}" id="pending" aria-label="${open.length?'Needs you':'In hand'}"><div class="ph"><h2>${open.length?`Needs you <span class="n">${open.length}</span>`:'In hand'}</h2><span class="meta">${open.length?'The run is waiting on you; one press answers and wakes it.':'Picked up by the run; nothing for you to do.'}</span></div>${q}${pend}</section>`;
+  const pend = others.length ? `<div class="hist" ${open.length?'':'style="border:0;padding:0"'}>${others.map(r=>`<div><b>${esc(r.type==='generate'?'Drawing':r.type==='export'?'Exporting':r.type==='change'?'Change sent':r.type)}</b> · ${esc(r.text)}${r.status==='waiting'?' · waiting on '+esc(r.waitingText||'a question'):r.status==='quoted'?' · quoted '+esc(r.credits||'?')+' credits':''}${r.status==='quoted'&&r.item==='broll'?` <span class="bub-act" style="display:inline-flex;margin-left:8px;vertical-align:middle">${quoteBtns(r)}</span>`:''}</div>`).join('')}</div>` : '';
+  const need=open.length+others.filter(r=>r.status==='quoted').length;
+  return `<section class="needs ${need?'':'quiet'}" id="pending" aria-label="${need?'Needs you':'In hand'}"><div class="ph"><h2>${need?`Needs you <span class="n">${need}</span>`:'In hand'}</h2><span class="meta">${need?'The run is waiting on you; one press answers and wakes it.':'Picked up by the run; nothing for you to do.'}</span></div>${q}${pend}</section>`;
 }
 
 /* ---------- the agent inbox, and the open agent's chat ---------- */
@@ -1569,9 +1840,9 @@ function chatMsgs(seat){
 function itemCard(it){
   const sh=shownStatus(it), why=blockedBy(it), isReg=!!REG_FIELDS[it.id];
   if(why) return {side:'sys', html:`${esc(it.name)} waits on ${esc(why.gate?'Gate '+why.gate:why.deps.map(d=>itemOf(d).name).join(', '))}`};
-  if(sh==='pending'&&!isReg) return {side:'sys', html:`${esc(it.name)} has not started. It will produce: ${esc(it.produces)}`};
-  const canApprove=!['approved','na','running'].includes(it.status)&&(it.status!=='pending'||(isReg&&regs[it.id].length>0));
-  const tab=defaultTab(it.id); const openLabel={panels:'Open storyboard',references:'Open references',register:'Open register',sheet:'Open sheet'}[tab]||'Open details';
+  if(sh==='pending'&&!isReg&&!canApproveItem(it)) return {side:'sys', html:`${esc(it.name)} has not started. It will produce: ${esc(it.produces)}`};
+  const canApprove=canApproveItem(it);
+  const tab=defaultTab(it.id); const openLabel={panels:'Open storyboard',references:'Open references',register:'Open register',sheet:'Open sheet',candidates:'Open candidates',requests:'Open requests',alphas:'Open alphas'}[tab]||'Open details';
   const cnt=stepCount(it);
   const th=it.id==='storyboard'?panelList().filter(p=>safeImg(p.thumb)).slice(0,6):[];
   return {side:'card', html:`<div class="dc s-${sh}">
@@ -1622,9 +1893,7 @@ function orchestratorHtml(){
     ${answered.length?`<div class="box"><h3>Answered</h3><div class="hist" style="border:0;padding:0">${answered.map(r=>`<div><b>${esc(r.text)}</b> → ${esc(r.answer||'')} · ${esc(humanName(r.answeredBy))} ${fmt(r.answeredAt)}</div>`).join('')}</div></div>`:''}
     <div class="box"><h3>Project</h3><dl class="kv">
       <dt>Client</dt><dd>${esc(project.client||'')}</dd>
-      <dt>Drive folder</dt><dd>${esc(project.driveFolder||'')}</dd>
-      <dt>Script format</dt><dd>${esc(project.scriptFormat||'')}</dd>
-      <dt>Storyboard</dt><dd>${esc(project.storyboardStyle||'')}</dd>
+      ${KIND==='post'?`<dt>Footage</dt><dd>${esc(project.driveFolder||'')}</dd><dt>Release</dt><dd>${esc(project.preRelease||'')}</dd>${project.referencesFolder?`<dt>References</dt><dd>${esc(project.referencesFolder)}</dd>`:''}<dt>Frame</dt><dd>${esc(project.aspectRatio||'')}${project.deliverableDurationSec?' · '+esc(project.deliverableDurationSec)+' s':''}${project.audioLed?' · audio-led':' · picture-led'}</dd>`:`<dt>Drive folder</dt><dd>${esc(project.driveFolder||'')}</dd><dt>Script format</dt><dd>${esc(project.scriptFormat||'')}</dd><dt>Storyboard</dt><dd>${esc(project.storyboardStyle||'')}</dd>`}
       <dt>Pipeline</dt><dd>${alaCarte()?'A la carte: '+scopeItems().map(i=>esc(i.name)).join(', '):'Full, '+ITEMS.length+' steps'}</dd>
       <dt>Status</dt><dd>${esc(statusWord(project.status))}</dd>
       <dt>Opened</dt><dd>${fmt(project.createdAt)} by ${esc(humanName(project.createdBy))}</dd>
@@ -1637,7 +1906,7 @@ function filesOf(it, v){
   const rec = v || (versions[it.id]||[]).find(x=>Number(x.n)===Number(it.version)) || null;
   const list = (rec&&rec.files) || it.files || [];
   if(list.length) return list;
-  const p = (rec&&rec.path) || it.artifactPath;
+  const p = (rec&&(rec.path||rec.file)) || it.artifactPath || it.file;
   return p ? [{name:p.split('/').pop(), path:p}] : [];
 }
 function fullPath(it, f, v){
@@ -1647,7 +1916,7 @@ function fullPath(it, f, v){
 function sizeLabel(b){ if(b==null) return ''; return b<1024?b+' B':b<1048576?(b/1024).toFixed(1)+' KB':(b/1048576).toFixed(1)+' MB'; }
 function filesHtml(it){
   const vs=(versions[it.id]||[]).slice().sort((a,b)=>Number(b.n)-Number(a.n));
-  const groups = vs.length ? vs : (it.artifactPath?[null]:[]);
+  const groups = vs.length ? vs : (it.artifactPath||it.file?[null]:[]);
   if(!groups.length) return '<p class="empty">Nothing has been written for this step yet.</p>';
   return groups.map((v,i)=>{
     const fs=filesOf(it, v); const n=v?v.n:it.version; const more=(v&&v.filesMore)||0;
@@ -1662,23 +1931,26 @@ function itemPanelHtml(seat){
   const its=seatItems(seat.id); if(!its.length) return '<p class="empty">This agent has no step on this pipeline.</p>';
   const it=its.find(i=>i.id===drawer)||its[0]; const isReg=!!REG_FIELDS[it.id]; const vs=versions[it.id]||[]; const rs=runsOf(it.id);
   const run = rs.find(r=>r.id===runSel) || rs[0] || null; const sh=shownStatus(it); const why=blockedBy(it);
-  const tabs=[...(it.id==='storyboard'?[['panels','Storyboard']]:[]),...(it.id==='scraper'?[['references','References']]:[]),...(isReg?[['register','Register']]:[]),...(SHEET_ITEMS.includes(it.id)?[['sheet','Sheet']]:[]),['output','Output'],['files','Files'],['prompt','Prompt'],['trace','Trace'],['about','About']];
+  const tabs=[...(KIND==='post'&&it.id==='bgm'?[['candidates','Candidates']]:[]),...(KIND==='post'&&it.id==='broll'?[['requests','Requests']]:[]),...(KIND==='post'&&it.id==='mograph'?[['alphas','Alphas']]:[]),...(it.id==='storyboard'?[['panels','Storyboard']]:[]),...(it.id==='scraper'?[['references','References']]:[]),...(isReg?[['register','Register']]:[]),...(SHEET_ITEMS.includes(it.id)?[['sheet','Sheet']]:[]),['output','Output'],['files','Files'],['prompt','Prompt'],['trace','Trace'],['about','About']];
   const tab = tabs.some(t=>t[0]===drawerTab)?drawerTab:defaultTab(it.id);
   const runPick = rs.length>1?`<select id="runsel" aria-label="Which run" style="width:auto;min-height:30px;padding:3px 26px 3px 8px;font-size:var(--t1)">${rs.map(r=>`<option value="${esc(r.id)}" ${run&&r.id===run.id?'selected':''}>v${r.version} · ${fmt(r.startedAt)} · ${esc(r.status||'')}</option>`).join('')}</select>`:'';
-  const canApprove=!['approved','na','running'].includes(it.status)&&(it.status!=='pending'||(isReg&&regs[it.id].length>0));
+  const canApprove=canApproveItem(it);
   const log=messages.filter(m=>m.item===it.id).slice(0,4);
   let body='';
-  if(tab==='output'){
-    body = (run ? `<div class="runmeta"><span class="pill ${run.status==='done'?'approved':run.status==='running'?'running':'draft'}">${esc(run.status==='done'?'Done':run.status==='running'?'Working':run.status||'')}</span><span class="num">${esc(run.model||'')}${run.turns!=null?' · '+run.turns+' turns':''}${run.tokens!=null?' · '+Number(run.tokens).toLocaleString()+' tokens':''}</span><span style="word-break:break-all">${esc(run.artifactPath||it.artifactPath||'')}</span></div>
+  if(tab==='candidates'){ body = candidatesHtml(it); }
+  else if(tab==='requests'){ body = requestsHtml(it); }
+  else if(tab==='alphas'){ body = alphasHtml(it); }
+  else if(tab==='output'){
+    body = previewHtml(it) + (run ? `<div class="runmeta"><span class="pill ${run.status==='done'?'approved':run.status==='running'?'running':'draft'}">${esc(run.status==='done'?'Done':run.status==='running'?'Working':run.status||'')}</span><span class="num">${esc(run.model||'')}${run.turns!=null?' · '+run.turns+' turns':''}${run.tokens!=null?' · '+Number(run.tokens).toLocaleString()+' tokens':''}</span><span style="word-break:break-all">${esc(run.artifactPath||it.artifactPath||'')}</span></div>
       <div class="out" data-scroll="out-${esc(it.id)}">${run.output?md(run.output):'<span class="empty">This run wrote its file to disk without a board copy. The file path is above.</span>'}</div>`
-      : `<p class="empty">${why?'Waits on '+esc(why.gate?'Gate '+why.gate:why.deps.map(d=>itemOf(d).name).join(', '))+'. '+esc(it.produces)+'.':it.status==='pending'?'Nothing has run for this step yet. It will produce: '+esc(it.produces)+'.':'No run record on the board. The file is at '+esc(it.artifactPath||'(not set)')+'.'}</p>`)
+      : `<p class="empty">${why?'Waits on '+esc(why.gate?'Gate '+why.gate:why.deps.map(d=>itemOf(d).name).join(', '))+'. '+esc(it.produces)+'.':it.status==='pending'?'Nothing has run for this step yet. It will produce: '+esc(it.produces)+'.':(it.summary?esc(it.summary)+' ':'')+'No run record on the board. The file is at '+esc(it.artifactPath||it.file||'(not set)')+'.'}</p>`)
       + (log.length?`<div class="box" style="margin-top:12px"><h3>Decisions on this step</h3>${log.map(m=>`<div class="msg"><div class="by"><span>${esc(humanName(m.by))}</span><span>${fmt(m.at)}</span></div>${esc(m.text)}</div>`).join('')}</div>`:'');
   } else if(tab==='files'){
     body = filesHtml(it);
   } else if(tab==='prompt'){
     body = run ? `<div class="runmeta"><span>What the orchestrator asked ${esc(seatLabel(run.seat))} to do</span><span>${(run.skills||[]).map(esc).join(' · ')}</span></div><pre class="pre">${esc(run.prompt||'(prompt not recorded)')}</pre>${run.system?`<div class="subh" style="margin-top:10px">Agent file, first lines</div><pre class="pre">${esc(run.system)}</pre>`:''}` : '<p class="empty">No run to show a prompt for.</p>';
   } else if(tab==='trace'){
-    body = run && (run.trace||[]).length ? `<div class="trace">${run.trace.map(s=>`<div class="tr"><span class="num">${esc(s.t||'')}</span><span style="color:var(--wait)">${esc(s.tool||'')}</span><span>${esc(s.note||'')}</span></div>`).join('')}</div>` : '<p class="empty">No tool trace recorded for this run.</p>';
+    body = run && typeof run.trace==='string' && run.trace ? `<pre class="pre">${esc(run.trace)}</pre>` : run && (run.trace||[]).length ? `<div class="trace">${run.trace.map(s=>`<div class="tr"><span class="num">${esc(s.t||'')}</span><span style="color:var(--wait)">${esc(s.tool||'')}</span><span>${esc(s.note||'')}</span></div>`).join('')}</div>` : '<p class="empty">No tool trace recorded for this run.</p>';
   } else if(tab==='register'){
     body = dlStrip(it) + regHtml(it.id);
   } else if(tab==='panels'){
@@ -1691,8 +1963,8 @@ function itemPanelHtml(seat){
     body = `<dl class="kv">
       <dt>Produces</dt><dd>${esc(it.produces)}</dd>
       <dt>Summary</dt><dd>${esc(it.summary||'Nothing written yet.')}</dd>
-      <dt>File</dt><dd>${esc(it.artifactPath||'')}</dd>
-      <dt>Hash</dt><dd>${esc((it.hash||'').slice(0,16))}</dd>
+      <dt>File</dt><dd>${esc(it.artifactPath||it.file||'')}</dd>
+      <dt>Hash</dt><dd>${esc(String(it.hash||it.sha256||'').slice(0,16))}</dd>
       <dt>Approved</dt><dd>${it.approvedVersion!=null?`v${it.approvedVersion} by ${esc(humanName(it.approvedBy))} ${fmt(it.approvedAt)}`:'Not yet'}</dd>
       <dt>Reads from</dt><dd>${it.deps.map(d=>esc(itemOf(d).name)).join(', ')||'Drive folder'}</dd>
       <dt>Feeds</dt><dd>${dependents(it.id).map(d=>esc(itemOf(d).name)).join(', ')||'Shoot day'}</dd>
@@ -1705,7 +1977,7 @@ function itemPanelHtml(seat){
       <div class="actions">
         ${canApprove?`<button class="primary" data-approve="${it.id}" ${busy.has('ap'+it.id)?'disabled':''}>${ic('check')} Approve v${it.version||0}</button>`:''}
         ${it.status!=='pending'?`<button data-change="${it.id}">${ic('change')} Request change</button>`:''}
-        ${it.stage===2&&it.xx&&it.status!=='approved'?(isArmed('na'+it.id)?`<button class="primary" data-na="${it.id}">Confirm not applicable</button>`:`<button class="ghost" data-na="${it.id}">Not applicable</button>`):''}
+        ${PIPE.na(it)&&it.status!=='approved'?(isArmed('na'+it.id)?`<button class="primary" data-na="${it.id}">Confirm not applicable</button>`:`<button class="ghost" data-na="${it.id}">Not applicable</button>`):''}
       </div>
     </div>
     ${sh==='needs_review'&&it.changeNote?`<p style="color:var(--hold);font-size:var(--t2)">Change requested: ${esc(it.changeNote)}</p>`:''}
@@ -1721,21 +1993,16 @@ function regHtml(kind){
     <form class="regform" data-reg="${kind}">${F.map(f=>`<label>${f}<input name="${f}" id="reg-${kind}-${f}" ${f==='cost'||f==='loading'||f==='age'?'inputmode="numeric"':''} autocomplete="off"></label>`).join('')}<div class="add"><button class="tape" type="submit">Add row</button></div></form>
   </div>`;
 }
-function footer(){ return `<footer class="foot-note"><details data-k="rules"><summary>House rules for every pre-production project</summary><ul>
-    <li><b>XX</b> means a person enters or approves it. The pipeline never fills an XX for you.</li>
-    <li><b>Unknown is not N/A.</b> A blank stays a question; not applicable is a decision.</li>
-    <li><b>One style per storyboard.</b> Sketches, live pictures or cartoon, never mixed.</li>
-    <li><b>The client's templates, never invented.</b></li>
-    <li><b>Every approval is a record on the board.</b> The pipeline reads it, never assumes it.</li>
-  </ul></details></footer>`; }
+function footer(){ if(route().page==='home') return ''; return `<footer class="foot-note"><details data-k="rules-${KIND}"><summary>House rules for every ${esc(PIPE.label.toLowerCase())} project</summary><ul>${PIPE.rules.map(r=>`<li>${r}</li>`).join('')}</ul></details></footer>`; }
 
 /* ---------- events ---------- */
 function wire(){
   const app=$('#app');
   app.onclick = async e=>{
-    const t=e.target.closest('[data-open],[data-open-item],[data-open-run],[data-tab],[data-approve],[data-change],[data-na],[data-lock],[data-answer],[data-agent],[data-agent-close],[data-attach],[data-unattach],[data-sheet-open],[data-sheet-close],[data-wide],[data-goto-pending],[data-demo],[data-gate],[data-copy],[data-signal],[data-change-cancel],[data-gen],[data-approve-panel],[data-ref-toggle],[data-wider],[data-faces],[data-redo],[data-redo-cancel],[data-lightbox],[data-lightbox-close],[data-copy-sheet],[data-export],[data-copy-path],[data-home],[data-dl],[data-dl-csv]');
+    const t=e.target.closest('[data-open],[data-open-item],[data-open-run],[data-tab],[data-approve],[data-change],[data-na],[data-lock],[data-answer],[data-agent],[data-agent-close],[data-nav],[data-choose-bgm],[data-approve-req],[data-decline-req],[data-approve-alpha],[data-attach],[data-unattach],[data-sheet-open],[data-sheet-close],[data-wide],[data-goto-pending],[data-demo],[data-gate],[data-copy],[data-signal],[data-change-cancel],[data-gen],[data-approve-panel],[data-ref-toggle],[data-wider],[data-faces],[data-redo],[data-redo-cancel],[data-lightbox],[data-lightbox-close],[data-copy-sheet],[data-export],[data-copy-path],[data-home],[data-dl],[data-dl-csv]');
     if(!t) return;
     if(t.dataset.demo!=null){ startDemo(); return; }
+    if(t.dataset.nav!=null){ e.preventDefault(); closePanel(); refocus=null; gateOpen=null; location.hash=t.dataset.nav; return; }
     if(t.dataset.wider){ e.preventDefault(); await guarded('wider', ()=>searchWider(t.dataset.wider)); return; }
     if(t.dataset.dl){ await guarded('dl'+t.dataset.dl, ()=>downloadExport(t.dataset.dl)); return; }
     if(t.dataset.dlCsv){ await downloadCsv(t.dataset.dlCsv); return; }
@@ -1768,6 +2035,10 @@ function wire(){
     if(t.dataset.lock){ const g=t.dataset.lock, k='lock'+g; if(!isArmed(k)){ arm(k); toast('Press again to confirm the sign-off. The pipeline continues from this record.'); return; } armed=null; await guarded(k, ()=>lockGate(g)); return; }
     if(t.dataset.export){ await guarded('x'+t.dataset.export, ()=>requestExport(t.dataset.export)); return; }
     if(t.dataset.gen){ const k='gen-'+t.dataset.gen; if(!isArmed(k)){ arm(k); toast('Press again to confirm. Credits are spent on 3echo.'); return; } armed=null; await guarded(k, ()=>requestGenerate(t.dataset.gen)); return; }
+    if(t.dataset.chooseBgm){ const id=t.dataset.chooseBgm; if(!isArmed('bgm'+id)){ arm('bgm'+id); toast('Press again to confirm the music'); return; } armed=null; await guarded('bgm'+id, ()=>chooseBgm(id)); return; }
+    if(t.dataset.approveReq){ const r=inbox.find(x=>x.id===t.dataset.approveReq); if(!r) return; if(!isArmed('q'+r.id)){ arm('q'+r.id); toast('Press again to confirm. Credits are spent on 3echo.'); return; } armed=null; await guarded('q'+r.id, ()=>approveBroll(r)); return; }
+    if(t.dataset.declineReq){ const r=inbox.find(x=>x.id===t.dataset.declineReq); if(r) await guarded('d'+r.id, ()=>declineBroll(r)); return; }
+    if(t.dataset.approveAlpha){ await guarded('al'+t.dataset.approveAlpha, ()=>approveMograph(t.dataset.approveAlpha)); return; }
     if(t.dataset.approvePanel){ await guarded('pp'+t.dataset.approvePanel, ()=>approvePanel(t.dataset.approvePanel)); return; }
     if(t.dataset.refToggle){ await guarded('rf'+t.dataset.refToggle, ()=>toggleRef(t.dataset.refToggle)); return; }
     if(t.dataset.redoCancel!=null){ redoFor=null; render(); return; }
@@ -1777,6 +2048,8 @@ function wire(){
   app.onsubmit = async e=>{
     e.preventDefault(); const f=e.target; if(f.classList.contains('composer')) chatJump=true;
     if(f.id==='newp') return createProject(f);
+    if(f.id==='newpost') return createPostProject(f);
+    if(f.id==='brollf') return guarded('brollf', ()=>requestBroll(f));
     if(f.id==='msgf'){ if(attachBusy){ toast('Still uploading; send in a moment'); return; } const v=f.text.value.trim()||(attach.length?'See the attached file'+(attach.length>1?'s':''):''); if(!v) return; const fs=takeFiles(); f.reset(); await signalPipeline('Message from '+humanName(me)+': '+v.slice(0,80), 'Message on the board from '+humanName(me)+': '+v+'. Read it, act on it if it asks for something, and reply in chat.'+filesOrder(fs)); await log(v, null, fs); f.reset(); toast('Sent to the run', 'ok'); return; }
     if(f.dataset.reg) return addRow(f.dataset.reg, f);
     if(f.dataset.redoForm){ const v=f.text.value.trim(); if(!v) return; redoFor=null; await redoPanel(f.dataset.redoForm, v); return; }

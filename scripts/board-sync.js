@@ -95,7 +95,8 @@ function toWrite(rec) {
       const data = { ...p }; delete data.key;
       // A project record is the whole document (open writes it), so it is a set: the database
       // refuses an update on a document that does not exist yet.
-      return { op: 'set', collection: 'projects', doc_id: jobId, data: { ...data, updatedAt: at } };
+      // kind says which pipeline the project is in: the studio board holds both.
+      return { op: 'set', collection: 'projects', doc_id: jobId, data: { kind: 'pre', ...data, updatedAt: at } };
     }
     case 'item': {
       if (!ITEMS.includes(p.item)) return { warn: 'unknown item ' + p.item };
