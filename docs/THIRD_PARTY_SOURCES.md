@@ -62,3 +62,4 @@ OpenMontage is AGPL-3.0. Nothing from it is copied; each row names a structure t
 | `playbooks/review-rubrics.md` (leaf R) | `skills/meta/reviewer.md` | calesthio/OpenMontage | AGPL-3.0 | pattern only, no prose copied | accurate, complete, constructive findings; two revision rounds maximum; review the artifact not the process |
 
 The client's own documents in the handoff (shoot board, concept breakdown, call sheet, project timeline) are the standard the breakdown, call sheet, shot list, storyboard and planning playbooks describe. Their structure is described; their content is never reproduced in this plugin.
+| Step pictures on the board (`STEP_IMG` in `board/src/pre-production.html`) | 22 Fluent 3D emoji PNGs, shrunk to 112 px and embedded | https://github.com/microsoft/fluentui-emoji | MIT | pictures only, unchanged apart from size |
