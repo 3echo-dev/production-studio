@@ -653,6 +653,22 @@ details.model .work{margin-top:16px}
 details.model.k-post>summary{background:radial-gradient(34% 190% at 60% 40%,#FF2D6F,rgb(255 45 111/0) 100%),radial-gradient(30% 200% at 86% 55%,#FF7A3D,rgb(255 122 61/0) 100%),radial-gradient(36% 170% at 34% 90%,#B5104E,rgb(181 16 78/0) 100%),linear-gradient(90deg,#2B0715,#4F0C26 26%,#7E1238 70%,#5A0E2A);box-shadow:inset 0 0 0 1px rgb(255 255 255/.14),inset 0 1px 0 rgb(255 255 255/.18),0 14px 34px -20px rgb(255 60 110/.75)}
 details.model.k-post .mb-ic{background:#FFD0DC}
 details.model.k-post .mb-t em{color:#FFD9E2}
+/* ---------- what a step is holding, on its card ---------- */
+.step-acts{display:flex;align-items:center;gap:6px}
+.step>.step-acts{position:relative;z-index:2}
+.step-acts>button.icon{color:var(--faint)}
+.sx-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.sx-chip{display:inline-flex;align-items:center;gap:5px;max-width:100%;font-style:normal;font-size:var(--t1);font-weight:600;color:var(--dim);padding:2px 8px;border:1px solid var(--line2);border-radius:999px;background:rgb(0 0 0/.32);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sx-chip.on{color:var(--go);border-color:var(--go-dim)}
+.sx-chip.more{color:var(--faint)}
+.sx-chip u{text-decoration:none;color:var(--faint);font-weight:500}
+.sx-chip svg{width:12px;height:12px;flex:none}
+.sx-quote{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-top:6px;padding-left:9px;border-left:2px solid rgb(var(--c)/.55);font-size:var(--t1);color:var(--dim);line-height:1.45;white-space:normal}
+.sx-media{position:relative;display:flex;align-items:center;gap:10px;margin-top:6px}
+.sx-media>i{display:block;flex:none;height:54px;aspect-ratio:16/9;border-radius:6px;border:1px solid var(--line2);background-color:#000}
+.sx-play{position:absolute;left:0;top:0;height:54px;aspect-ratio:16/9;display:grid;place-items:center}
+.sx-play svg{width:22px;height:22px;fill:#fff;stroke:none;filter:drop-shadow(0 1px 3px rgb(0 0 0/.7))}
+.sx-media em{font-style:normal;font-size:var(--t1);color:var(--dim);white-space:normal}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -681,6 +697,7 @@ details.model.k-post .mb-t em{color:#FFD9E2}
   <symbol id="ic-s-locations" viewBox="0 0 24 24"><path d="M12 21s7-6.200 7-11a7 7 0 0 0-14 0c0 4.800 7 11 7 11z"/><circle cx="12" cy="10" r="2.500"/></symbol>
   <symbol id="ic-s-concept_breakdown" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M3 15h18M9 4v16"/></symbol>
   <symbol id="ic-s-call_sheet" viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1"/><path d="m9 13 2 2 4-4"/></symbol>
+  <symbol id="ic-play" viewBox="0 0 24 24"><path d="M8 5.500v13l11-6.500z"/></symbol>
   <symbol id="ic-music" viewBox="0 0 24 24"><path d="M9 18V6l10-2v12"/><circle cx="6.500" cy="18" r="2.500"/><circle cx="16.500" cy="16" r="2.500"/></symbol>
   <symbol id="ic-film" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M8 5v14M16 5v14M3 10h5M3 14h5M16 10h5M16 14h5"/></symbol>
   <symbol id="ic-s-ingest" viewBox="0 0 24 24"><path d="M12 4v10"/><path d="m8 10 4 4 4-4"/><path d="M5 17v2h14v-2"/></symbol>
@@ -1408,6 +1425,7 @@ function seedDemo(d){
   run(R,'p3',{item:'vo_drop',seat:'audio-engineer',version:1,startedAt:T(52),finishedAt:T(40),turns:6,tokens:28000,output:'4 voice-over takes placed against the script markers. Take 2 of line 3 runs 0.4 s long.'});
   run(R,'p4',{item:'sync',seat:'audio-engineer',version:1,status:'running',startedAt:T(12),turns:5,tokens:22000,output:'Levels set. Ducking the music under lines 1 to 4.'});
   [['c1','Paper Lanterns',34,92,'Library A','Warm, a little wistful.'],['c2','Low Tide',41,84,'Library A','Sparse and steady; leaves room for the voice.'],['c3','Night Bus',36,104,'Library B','More drive than the cut has.']].forEach(c=>d.seed(R+'/bgm/'+c[0],{title:c[1],durationSec:c[2],bpm:c[3],source:c[4],mood:c[5],...(c[0]==='c2'?{chosen:true,chosenBy:'creative-director',chosenAt:T(95)}:{})}));
+  d.seed(R+'/previews/sequence',{thumb:frame('#1b2330','#11161f',120),caption:'First cut v2 · 29.6 s · 8 takes',w:320,h:180,updatedAt:T(160)});
   d.seed(R+'/inbox/q1',{type:'question',item:'vo_drop',text:'Are these the final voice-over takes, or scratch to be replaced?',options:['Final','Scratch'],from:'audio-engineer',status:'open',createdAt:T(38)});
   [['pipeline','Project opened from the release package.',null,318],['creative-director','First cut v2 approved.','sequence',150]].forEach((m,i)=>d.seed(R+'/messages/m'+i,{by:m[0],text:m[1],item:m[2],at:T(m[3])}));
 }
@@ -1685,6 +1703,29 @@ function stepCount(it){
   if(it.id==='storyboard'&&panels.length) return `${panels.filter(p=>p.thumb).length} of ${panels.length} drawn`;
   return '';
 }
+// What a step is holding, shown on its card: the picture or the cut where there is one, the
+// choices where a person picks, the first rows of a register or a sheet, else the opening lines
+// of what the agent wrote. The card still opens the chat; the Open button beside it opens the work.
+function excerpt(s){
+  const ls=String(s||'').split('\n').map(l=>l.replace(/^#+\s*/,'').replace(/\*\*/g,'').replace(/^\s*[-*]\s+/,'').trim()).filter(l=>l&&!/^\|?[-:| ]+\|?$/.test(l));
+  return ls.slice(0,2).map(l=>l.replace(/^\|\s*/,'').replace(/\s*\|$/,'').replace(/\s*\|\s*/g,' · ')).join(' — ').slice(0,220);
+}
+function stepSnippet(it){
+  const chips=a=>`<span class="sx-chips">${a.join('')}</span>`;
+  const strip=a=>`<span class="step-th" style="--panel-ar:${panelRatio()}">${a.slice(0,5).map(u=>`<i style="background-image:url(${esc(u)});background-size:contain;background-repeat:no-repeat;background-position:center"></i>`).join('')}${a.length>5?`<em class="num">+${a.length-5}</em>`:''}</span>`;
+  const pv=previews[it.id];
+  if(pv&&(pv.thumb||pv.poster||pv.video)){ const img=pv.poster||pv.thumb; return `<span class="sx-media">${img&&safeImg(img)?`<i style="background-image:url(${esc(img)});background-size:contain;background-repeat:no-repeat;background-position:center"></i>`:'<i></i>'}${pv.video?`<b class="sx-play">${ic('play')}</b>`:''}<em>${esc(pv.caption||(pv.video?'Watch it from Open':''))}</em></span>`; }
+  if(KIND==='post'){
+    if(it.id==='bgm'&&bgm.length) return chips(bgm.slice(0,4).map(c=>`<i class="sx-chip ${c.chosen?'on':''}">${ic('music')}${esc(c.title||c.id)}${c.durationSec?` <u>${tc(c.durationSec)}</u>`:''}${c.chosen?' <u>chosen</u>':''}</i>`));
+    if(it.id==='broll'){ const rs=brollReqs(); if(rs.length) return chips(rs.slice(0,3).map(r=>`<i class="sx-chip ${r.status==='delivered'?'on':''}">${esc(String(r.shot||r.text||'').slice(0,40))} <u>${esc(r.status==='quoted'?(r.credits||'?')+' credits quoted':r.status==='open'?'generating':r.status||'')}</u></i>`)); }
+    if(it.id==='mograph'){ const th=mograph.filter(m=>safeImg(m.thumb)).map(m=>m.thumb); if(th.length) return strip(th); }
+  }
+  if(it.id==='scraper'&&refs.length){ const ch=refs.filter(r=>refsel[r.id]&&refsel[r.id].selected); const list=(ch.length?ch:refs); return chips(list.slice(0,3).map(r=>`<i class="sx-chip ${ch.length?'on':''}">${esc(String(r.title||r.url||'').slice(0,36))}</i>`).concat(list.length>3?[`<i class="sx-chip more">+${list.length-3}</i>`]:[])); }
+  if(REG_FIELDS[it.id]&&regs[it.id].length) return chips(regs[it.id].slice(0,4).map(r=>`<i class="sx-chip">${esc(String(r.name||'unnamed').slice(0,28))}</i>`).concat(regs[it.id].length>4?[`<i class="sx-chip more">+${regs[it.id].length-4}</i>`]:[]));
+  const sh=sheets[it.id]; if(sh&&(sh.rows||[]).length) return chips(sh.rows.slice(0,3).map(r=>`<i class="sx-chip">${esc(String((r||[]).filter(v=>v!=null&&String(v).trim()).slice(0,2).join(' · ')).slice(0,44))}</i>`).concat(sh.rows.length>3?[`<i class="sx-chip more">+${sh.rows.length-3} rows</i>`]:[]));
+  const r=runsOf(it.id).find(x=>x.output); const ex=r?excerpt(r.output):'';
+  return ex&&ex!==String(it.summary||'').trim() ? `<span class="sx-quote">${esc(ex)}</span>` : '';
+}
 function stepRow(it, model){
   const why=model?null:blockedBy(it); const sh=model?'pending':shownStatus(it); const cls=why?'blocked':sh;
   const gl=gateOpen?(GATES[gateOpen].items.includes(it.id)?'hl':'dimmed'):'';
@@ -1696,11 +1737,13 @@ function stepRow(it, model){
   const body=`<span class="step-t"><b>${esc(it.name)}</b>${it.xx?'<span class="xx" title="A person enters or approves this">XX</span>':''}${!model&&it.version?`<span class="v">v${it.version}</span>`:''}${model||why?'':`<span class="pill ${sh}">${STATUS_LABEL[sh]||sh}</span>`}</span><span class="step-s" title="${esc(sub)}">${esc(sub)}${cnt?` <span class="x num">· ${esc(cnt)}</span>`:''}</span>`;
   const th=!model&&it.id==='storyboard'?panelList().filter(p=>safeImg(p.thumb)):[];
   const thumbs=th.length?`<span class="step-th" style="--panel-ar:${panelRatio()}">${th.slice(0,5).map(p=>`<i style="background-image:url(${esc(p.thumb)});background-size:contain;background-repeat:no-repeat;background-position:center"></i>`).join('')}${th.length>5?`<em class="num">+${th.length-5}</em>`:''}</span>`:'';
+  const snip=!model&&!why&&!thumbs?stepSnippet(it):'';
+  const openB=!model&&!why&&(it.status!=='pending'||snip||thumbs)?`<button class="ghost icon sm" data-open-item="${it.id}" data-open-tab="${defaultTab(it.id)}" aria-label="Open ${esc(it.name)}" title="Open ${esc(it.name)}">${ic('open')}</button>`:'';
   return `<li class="step s-${cls} ${gl} ${sel}" data-item="${it.id}">
     <span class="node" aria-hidden="true">${ic('s-'+it.id)}<i class="st">${NODE[cls]||''}</i></span>
-    ${model?`<div class="step-m">${body}</div>`:`<button class="step-m" data-open-item="${it.id}" aria-pressed="${!!sel}">${body}${thumbs}</button>`}
+    ${model?`<div class="step-m">${body}</div>`:`<button class="step-m" data-open-item="${it.id}" aria-pressed="${!!sel}">${body}${thumbs}${snip}</button>`}
     <span class="step-a" title="${esc(seatLabel(it.seat))}">${model?'':blob(it.seat, BLOB_MOOD[sh]||'idle', 22)}<span class="ag-s">${esc(seatLabel(it.seat))}</span></span>
-    ${act}
+    <span class="step-acts">${openB}${act}</span>
   </li>`;
 }
 function gateBand(g, model){
