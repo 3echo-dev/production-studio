@@ -2,7 +2,7 @@
   "name": "production-studio",
   "displayName": "Production Studio",
   "description": "One plugin for the studio's pre-production and post-production pipelines. /pre-production takes a client folder to call sheets (ten director agents, three sign-off gates); /post takes shot footage and the release package to a Premiere bundle (nine director agents, two gates). Both run on one Production Studio board where every decision is a person's.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "keywords": [
     "pre-production",
     "post-production",
