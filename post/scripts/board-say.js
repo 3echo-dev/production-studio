@@ -22,7 +22,7 @@ const ITEMS = ['intake', 'ingest', 'sequence', 'bgm', 'vo_drop', 'sync', 'review
 
 const argv = process.argv.slice(2);
 const valueOf = flag => { const i = argv.indexOf(flag); return i >= 0 ? argv[i + 1] : undefined; };
-const VALUE = ['--as', '--item', '--slate'];
+const VALUE = ['--as', '--item', '--slate', '--root'];
 const rest = [];
 for (let i = 0; i < argv.length; i++) { if (argv[i].startsWith('--')) { if (VALUE.includes(argv[i])) i++; continue; } rest.push(argv[i]); }
 const slate = valueOf('--slate');
