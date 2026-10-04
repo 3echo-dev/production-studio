@@ -39,6 +39,16 @@ ok('an unknown agent, an unknown step or no words queues nothing and exits 2', (
   }
   assert.strictEqual(fs.readFileSync(path.join(tmp, '.board', 'outbox.jsonl'), 'utf8'), before);
 });
+ok('a slate project with no job folder gets the write printed for ArtifactData, nothing queued', () => {
+  const before = fs.readFileSync(path.join(tmp, '.board', 'outbox.jsonl'), 'utf8');
+  const r = run('--slate', 'htf-2026-awrx', '--as', 'orchestrator', 'Type go ahead in the chat.');
+  assert.strictEqual(r.status, 0, r.stderr);
+  const line = r.stdout.split(/\r?\n/).find(l => l.startsWith('{'));
+  const out = JSON.parse(line);
+  assert.strictEqual(out.writes[0].collection, 'projects/htf-2026-awrx/messages');
+  assert.deepStrictEqual({ by: out.writes[0].data.by, text: out.writes[0].data.text, item: out.writes[0].data.item }, { by: 'orchestrator', text: 'Type go ahead in the chat.', item: null });
+  assert.strictEqual(fs.readFileSync(path.join(tmp, '.board', 'outbox.jsonl'), 'utf8'), before);
+});
 ok('the board draws a message from an agent as that agent\'s bubble and asks the run for one', () => {
   const src = fs.readFileSync(path.join(ROOT, 'board', 'src', 'pre-production.html'), 'utf8');
   assert.ok(src.includes('function isAgentSeat('), 'the board knows an agent from a person');

@@ -1812,10 +1812,15 @@ function projectPage(id){
 }
 // The questions the run is waiting on, above the pipeline, each with its options and a text
 // box; one press answers and rings the bell. With nothing waiting the box is not drawn at all.
+// The run's newest word, when it is the newest thing in the project's chat: an answer that only
+// said where to look, or that something is needed in the chat, is still a message to the person.
+function runSaid(){ const m=messages.find(m=>!m.item); return m&&isAgentSeat(m.by)&&!/^Gate [A-C] /.test(String(m.text||''))?m:null; }
 function pendingHtml(){
   const open=inbox.filter(r=>r.type==='question'&&['open','waiting'].includes(r.status));
   const others=inbox.filter(r=>r.type!=='question'&&['open','waiting','requested','quoted'].includes(r.status));
-  if(!open.length&&!others.length) return '';
+  const said=runSaid();
+  if(!open.length&&!others.length&&!said) return '';
+  const say=said?`<div class="pq"><span class="ag-f">${blob(said.by, 'idle', 32)}</span><div class="pq-b"><div class="qm"><b>${esc(seatLabel(said.by))}</b><span>Said in chat</span><span>${fmt(said.at)}</span></div><div class="bub"><p class="qt">${esc(said.text)}</p><div class="bub-act"><button class="sm" data-agent="${esc(said.by)}">${ic('open')} Open the chat</button></div></div></div></div>`:'';
   const q=open.map(r=>{
     const opts=(r.options||[]).map((o,i)=>`<button data-answer="${esc(r.id)}" data-value="${esc(o)}" class="${i===0?'first':''}">${esc(o)}</button>`).join('');
     const tail = r.status==='waiting' ? `<div class="qa">Picked up by the run · waiting on: ${esc(r.waitingText||'this answer')}</div>` : '';
@@ -1823,8 +1828,8 @@ function pendingHtml(){
     return `<div class="pq ${r.status==='waiting'?'waiting':''}"><span class="ag-f">${blob(r.from, 'surprised', 32)}</span><div class="pq-b"><div class="qm"><b>${esc(whoName(r.from))}</b><span>${r.item?esc(itemOf(r.item).name):'Project'}</span><span>${fmt(r.createdAt)}</span></div><div class="bub"><p class="qt">${esc(r.text)}</p>${thumb}${opts?`<div class="bub-act">${opts}</div>`:''}</div><form class="qf cmp-row" data-answer-form="${esc(r.id)}"><input name="text" id="ans-${esc(r.id)}" aria-label="Your answer" placeholder="${opts?'Or type a different answer':'Type your answer'}"><button type="submit" class="primary icon" aria-label="Send answer" title="Send answer">${ic('send')}</button></form>${tail}</div></div>`;
   }).join('');
   const pend = others.length ? `<div class="hist" ${open.length?'':'style="border:0;padding:0"'}>${others.map(r=>`<div><b>${esc(r.type==='generate'?'Drawing':r.type==='export'?'Exporting':r.type==='change'?'Change sent':r.type)}</b> · ${esc(r.text)}${r.status==='waiting'?' · waiting on '+esc(r.waitingText||'a question'):r.status==='quoted'?' · quoted '+esc(r.credits||'?')+' credits':''}${r.status==='quoted'&&r.item==='broll'?` <span class="bub-act" style="display:inline-flex;margin-left:8px;vertical-align:middle">${quoteBtns(r)}</span>`:''}</div>`).join('')}</div>` : '';
-  const need=open.length+others.filter(r=>r.status==='quoted').length;
-  return `<section class="needs ${need?'':'quiet'}" id="pending" aria-label="${need?'Needs you':'In hand'}"><div class="ph"><h2>${need?`Needs you <span class="n">${need}</span>`:'In hand'}</h2><span class="meta">${need?'The run is waiting on you; one press answers and wakes it.':'Picked up by the run; nothing for you to do.'}</span></div>${q}${pend}</section>`;
+  const need=open.length+others.filter(r=>r.status==='quoted').length+(said?1:0);
+  return `<section class="needs ${need?'':'quiet'}" id="pending" aria-label="${need?'Needs you':'In hand'}"><div class="ph"><h2>${need?`Needs you <span class="n">${need}</span>`:'In hand'}</h2><span class="meta">${need?'The run is waiting on you; one press answers and wakes it.':'Picked up by the run; nothing for you to do.'}</span></div>${say}${q}${pend}</section>`;
 }
 
 /* ---------- the agent inbox, and the open agent's chat ---------- */
