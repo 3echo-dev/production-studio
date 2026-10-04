@@ -31,13 +31,10 @@ Each pipeline keeps its own scripts. They share the board, the board address and
 root; the two sets of scripts are being brought together one script at a time, with both test
 suites green at every step.
 
-## Running from the board
+## If a permission check blocks a script
 
-A decision on the board reaches the run as a comment sent to Claude. In Auto permission mode
-that turn is refused when it tries to write files, because nobody typed the request in the
-chat. Give the session that watches the board allow rules for the plugin's scripts
-(`Bash(node:*)` and `Bash(python:*)` in the workspace's `.claude/settings.local.json`), or
-type the go-ahead in its chat. `board-setup` offers to write the rules.
+Allow the plugin's scripts for the workspace: `Bash(node:*)` and `Bash(python:*)` in its
+`.claude/settings.local.json`.
 
 ## Tests
 

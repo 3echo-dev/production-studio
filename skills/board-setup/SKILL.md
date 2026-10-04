@@ -59,10 +59,6 @@ page: the home page has a door for each.
    then ask the person to press **Signal pipeline** on the board once and approve the prompt that
    lets the page message this session. Never repeat the address.
 
-7. **Say how the session must run.** Auto permission mode refuses a turn that only a board
-   comment asked for, so a board-driven run needs allow rules for the plugin's scripts,
-   `Bash(node:*)` and `Bash(python:*)` in the workspace's `.claude/settings.local.json`, or the
-   go-ahead typed in this chat each time. Offer to write them; write on a yes.
 
 ## Rules
 
@@ -85,5 +81,5 @@ assets; `boardUrl` and `boardSetAt` in both `<root>/.creative-studio-pipeline/co
 |---|---|
 | Publish refused for the capabilities | Say which; the page needs all five |
 | A decision on the board wakes nobody | Press Signal pipeline and approve the prompt |
-| The run says the permission check blocked it | Auto mode refused a board-driven action: add the two allow rules (step 7) or type the go-ahead in chat |
+| The run says a permission check blocked a script | Allow the plugin's scripts for that workspace: `Bash(node:*)` and `Bash(python:*)` in its `.claude/settings.local.json` |
 | The consent for the first write is declined | Stop; the board stays published but unused |
