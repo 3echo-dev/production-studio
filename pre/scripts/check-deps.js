@@ -98,7 +98,7 @@ const GETTING_STARTED = [
   'No client has been set up here yet. If the user asks how to begin, or seems unsure what to do',
   'first, tell them:',
   '',
-  '  1. /production-studio:1-22                       opens the board and asks whether to start or resume a project',
+  '  1. /production-studio:pre-production                       opens the board and asks whether to start or resume a project',
   '  2. /production-studio:new-project {client}       pulls the Drive folder, reads the brief, runs to Gate A',
   '  3. /production-studio:review {job} approve       or "change ..." or "start over", at any gate, when the board is not to hand',
   '',

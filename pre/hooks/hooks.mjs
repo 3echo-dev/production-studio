@@ -134,7 +134,7 @@ export const register = (on) => {
     try {
       const ctx = await context($);
       const block = lib.contextBlock(ctx);
-      if (block && typeof e.text === 'string' && !e.text.includes('1-22, this folder:')) {
+      if (block && typeof e.text === 'string' && !e.text.includes('Pre-production, this folder:')) {
         return next({ ...e, text: e.text + '\n\n' + block });
       }
     } catch {

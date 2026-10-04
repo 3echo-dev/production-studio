@@ -61,7 +61,7 @@ for (const g of ['A', 'B', 'C']) {
 if (/—/.test(rubric)) problems.push('review-rubrics.md contains an em dash');
 
 // 4. The workflow has three review rows naming review-pass, one before each gate.
-const wf = read('workflows/1-22.md').split(/\r?\n/).filter(l => l.startsWith('| '));
+const wf = read('workflows/pre-production.md').split(/\r?\n/).filter(l => l.startsWith('| '));
 const cells = l => l.split('|').slice(1, -1).map(c => c.trim());
 const head = cells(wf.find(l => cells(l).includes('Skills')));
 const skillsCol = head.indexOf('Skills'), gateCol = head.indexOf('Gate'), stageCol = head.indexOf('Stage');

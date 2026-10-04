@@ -1,9 +1,9 @@
 ---
-name: 1-22
+name: pre-production
 description: >
-  Entry point for CS Pre-production pre-production. Reads what is already in progress, opens the
+  Entry point for pre-production. Reads what is already in progress, opens the
   board, then asks whether to start a new project, resume one, or onboard a client, and routes
-  accordingly. Use when the user types /1-22 or says any of "start 1-22", "start pre-production", "run pre-production",
+  accordingly. Use when the user types /pre-production or says any of "start pre-production", "run pre-production",
   "new project", "call sheets for", "where is the HTF job", or asks what this plugin does.
 argument-hint: "[client]"
 metadata:

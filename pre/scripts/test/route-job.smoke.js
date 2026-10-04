@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 // The router is a script so the same folder routes the same way every time. Three answers it
-// must give: a complete project routes to 1-22 with every director in support and three
+// must give: a complete project routes to pre-production with every director in support and three
 // gates; a project whose Brief never landed is BLOCKED, not researched; a kind nobody built
 // is UNSUPPORTED. And the plan it produces carries every row of the workflow table, because
-// 1-22 has no conditional stage a real job would drop.
+// pre-production has no conditional stage a real job would drop.
 //   node scripts/test/route-job.smoke.js
 const assert = require('assert');
 const fs = require('fs');
@@ -39,25 +39,25 @@ try {
   assert.strictEqual(r.status, 0, 'a complete project routes: ' + r.stdout + r.stderr);
   const route = JSON.parse(fs.readFileSync(path.join(dir, 'route.json'), 'utf8'));
   assert.strictEqual(route.status, 'ROUTED');
-  assert.strictEqual(route.workflowId, '1-22');
+  assert.strictEqual(route.workflowId, 'pre-production');
   assert.strictEqual(route.owner, 'orchestrator');
   assert.strictEqual(route.support.length, 10, 'ten directors in support: ' + route.support.join(', '));
   assert.deepStrictEqual(route.gates, ['A', 'B', 'C']);
   assert.deepStrictEqual([...route.tags].sort(), ['has_trailer', 'multi_day']);
   assert.ok(!/AWAITING_|_DRAFTED/.test(r.stdout), 'no state id is printed at a person');
-  console.log('ok   a complete project routes to 1-22 with ten directors and three gates');
+  console.log('ok   a complete project routes to pre-production with ten directors and three gates');
 
   // The plan carries every row of the table.
   r = run('plan-job.js', [path.join(dir, 'route.json')], tmp);
   assert.strictEqual(r.status, 0, 'plan: ' + r.stderr);
   const cells = l => l.split('|').slice(1, -1).map(c => c.trim());
-  const tableRows = fs.readFileSync(path.join(ROOT, 'workflows', '1-22.md'), 'utf8').split(/\r?\n/)
+  const tableRows = fs.readFileSync(path.join(ROOT, 'workflows', 'pre-production.md'), 'utf8').split(/\r?\n/)
     .filter(l => l.trim().startsWith('|')).map(cells).filter(c => c.length > 5 && !c.includes('Condition') && !c.every(x => /^:?-+:?$/.test(x)));
   const planRows = fs.readFileSync(path.join(dir, 'plan.md'), 'utf8').split(/\r?\n/)
     .filter(l => l.trim().startsWith('|')).map(cells).filter(c => c.length > 5 && !c.includes('State after') && !c.every(x => /^:?-+:?$/.test(x)));
-  assert.strictEqual(planRows.length, tableRows.length, 'plan.md keeps every row of workflows/1-22.md (' + planRows.length + ' of ' + tableRows.length + ')');
+  assert.strictEqual(planRows.length, tableRows.length, 'plan.md keeps every row of workflows/pre-production.md (' + planRows.length + ' of ' + tableRows.length + ')');
   assert.ok(planRows.every(c => c.some(x => /^(owner|support|-)$/.test(x))), 'every row has an ownership');
-  console.log('ok   plan.md carries all ' + planRows.length + ' rows of the 1-22 table');
+  console.log('ok   plan.md carries all ' + planRows.length + ' rows of the pre-production table');
 
   // 2. The brief never landed: blocked, exit 3, and it names what is missing.
   fs.rmSync(path.join(inputs, 'HTF_Brief_v2.pdf'));

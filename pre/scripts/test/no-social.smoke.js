@@ -27,7 +27,7 @@ assert.deepStrictEqual(hits, [], 'social words left in instruction files:\n  ' +
 
 // Control: the pattern fires on a known positive.
 assert.ok(RE.test('write the caption for tiktok'), 'control: detector fires');
-assert.ok(!RE.test('the call sheet for day 2'), 'control: detector is quiet on 1-22 text');
+assert.ok(!RE.test('the call sheet for day 2'), 'control: detector is quiet on pre-production text');
 
 console.log('ok   no social skin words in ' + DIRS.filter(d => fs.existsSync(path.join(ROOT, d))).join(', '));
 console.log('no-social verification passed');

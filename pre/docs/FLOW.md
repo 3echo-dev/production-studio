@@ -77,7 +77,7 @@ Before every decision: read the board, `board-sync.js land`.
 
 ## The one workflow
 
-`workflows/1-22.md`. Every row runs on every project; the two tags only add milestones.
+`workflows/pre-production.md`. Every row runs on every project; the two tags only add milestones.
 
 ```
  0   Open               drive-pull, job.json, route, plan, board open       PLANNED

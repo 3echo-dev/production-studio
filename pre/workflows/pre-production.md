@@ -1,4 +1,4 @@
-# Workflow: 1-22 (v0.1.0)
+# Workflow: pre-production (v0.1.0)
 
 Kinds: `preproduction`.
 `plan-job.js` keeps a row when its Condition holds. Conditions: `always`, `if:tag`, `unless:tag`.

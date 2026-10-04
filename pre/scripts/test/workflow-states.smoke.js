@@ -61,7 +61,7 @@ for (const sc of scenarios) {
 
   const route = {
     schemaVersion: '1.0', status: 'ROUTED', jobId, client: 'htf',
-    workflowId: '1-22', workflowVersion: '0.1.0',
+    workflowId: 'pre-production', workflowVersion: '0.1.0',
     requiredDisciplines: [], gates: ['A', 'B', 'C'], tags: sc.tags,
     owner: 'orchestrator', support: ['intake-director', 'reference-scout', 'script-director', 'storyboard-director',
       'shot-list-director', 'production-planner', 'audio-supervisor', 'logistics-registrar', 'breakdown-compiler', 'call-sheet-builder'],

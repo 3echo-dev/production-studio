@@ -12,7 +12,7 @@ metadata:
 
 # Resume a project
 
-**Purpose:** continue a project from disk and the board, not from memory of a conversation. Used by the user, `1-22`, and `review`.
+**Purpose:** continue a project from disk and the board, not from memory of a conversation. Used by the user, `pre-production`, and `review`.
 
 ## Steps
 

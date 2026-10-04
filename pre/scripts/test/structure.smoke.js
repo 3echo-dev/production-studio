@@ -66,7 +66,7 @@ for (const id of active) {
 assert.deepStrictEqual(problems, [], 'agent frontmatter problems:\n  ' + problems.join('\n  '));
 
 // The workflow table names only agents that exist (or a script or board row).
-const table = fs.readFileSync(path.join(ROOT, 'workflows', '1-22.md'), 'utf8').split(/\r?\n/);
+const table = fs.readFileSync(path.join(ROOT, 'workflows', 'pre-production.md'), 'utf8').split(/\r?\n/);
 const cells = l => l.split('|').slice(1, -1).map(c => c.trim());
 const head = cells(table.find(l => l.trim().startsWith('|') && cells(l).includes('Agent')));
 const agentCol = head.indexOf('Agent');

@@ -23,7 +23,7 @@ Gate stages are reported by the gate record, never by the run: a gate is "waitin
 
 ## Client onboarding stages
 
-Onboarding a client has its own short list, used only by the `1-22` skill's onboard path: `reading-the-handoff`, `a-few-questions`, `writing-the-client-files`, `your-approval`, `done`.
+Onboarding a client has its own short list, used only by the `pre-production` skill's onboard path: `reading-the-handoff`, `a-few-questions`, `writing-the-client-files`, `your-approval`, `done`.
 
 ## Who the person sees working
 

@@ -105,7 +105,7 @@ Claude invokes these itself. Four are for you.
 
 | Skill | Runs when |
 |---|---|
-| `/1-22` | The entry point. What is in progress, the board, and where to go next |
+| `/pre-production` | The entry point. What is in progress, the board, and where to go next |
 | `/new-project` | Starting a project from a Drive folder and running to Gate A |
 | `/resume-project` | Picking one back up, after landing what the board decided |
 | `/review` | Landing a gate decision, or recording one typed in chat |
@@ -217,7 +217,7 @@ Or pass `--root`, or set `CREATIVE_STUDIO_ROOT`, or run in the folder you want. 
 
 ### 5. Onboard a client, once
 
-`/1-22`, then **Onboard a client**. Give it the client's name, the client's site list, and his four
+`/pre-production`, then **Onboard a client**. Give it the client's name, the client's site list, and his four
 template files: budget, timeline, breakdown, call sheet. Unpack his skills zip under
 `workspaces/{client}/client/skills/`. The plugin wraps them there and never copies them.
 
@@ -228,7 +228,7 @@ template files: budget, timeline, breakdown, call sheet. Unpack his skills zip u
 ### Start
 
 ```
-/1-22
+/pre-production
 ```
 
 It reads what is on disk, opens the board beside the chat, and asks whether to start a

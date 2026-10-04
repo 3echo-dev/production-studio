@@ -5,7 +5,7 @@
 // the project's .claude/settings.json. Asking a person to open that file and type JSON is how a
 // guard ends up switched off on every machine that needs it most. So every entry point that
 // establishes "this folder is the pipeline's" calls arm() instead: set-root.js when the folder is
-// chosen, scaffold-client.js when the first client lands, and the /1-22 skill on the way in.
+// chosen, scaffold-client.js when the first client lands, and the /pre-production skill on the way in.
 //
 // arm() never replaces. A settings file it cannot parse is left byte for byte and the caller
 // prints the line to add by hand, because somebody's own configuration outranks this convenience.

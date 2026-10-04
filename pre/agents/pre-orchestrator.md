@@ -18,7 +18,7 @@ color: red
 
 A project lives at `workspaces/{client}/jobs/{job-id}/`; its id is the board's project id. `project-intake` writes `job.json` after `drive-pull` has landed the folder under `inputs/{client}/{job-id}/`, then runs `route-job.js` and `plan-job.js`. Exit 0: plan, `board-sync.js open`, run. Exit 3: ask the `missingFields` or fetch the blocker once, re-route. Exit 4: say what is unsupported and stop.
 
-`route.json` sets owner, support, tags and the three gates; append to `modelAddedRiskFlags` only. In `plan.md` only `Status` and `Verified` change. Follow `workflows/1-22.md` row by row, including the script and board rows.
+`route.json` sets owner, support, tags and the three gates; append to `modelAddedRiskFlags` only. In `plan.md` only `Status` and `Verified` change. Follow `workflows/pre-production.md` row by row, including the script and board rows.
 
 ## Dispatch loop
 
@@ -59,7 +59,7 @@ Gate A after Stage 1 (the creative director signs off the creative), Gate B afte
 
 ## Change propagation
 
-A change note sends its item and its dependents back for review and reopens that item's gate (map in `workflows/1-22.md`). Re-enter the owning row with `revisions/{n}.json` as its only added input, the scraper note's `mode` included; nothing downstream regenerates before re-approval. A third identical reason code escalates.
+A change note sends its item and its dependents back for review and reopens that item's gate (map in `workflows/pre-production.md`). Re-enter the owning row with `revisions/{n}.json` as its only added input, the scraper note's `mode` included; nothing downstream regenerates before re-approval. A third identical reason code escalates.
 
 ## Media: the only place money moves
 

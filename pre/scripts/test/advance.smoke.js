@@ -42,7 +42,7 @@ if (!fs.existsSync(jobFile)) {
 
 // lib-advance moves a job on its own, and refuses nothing the state machine allows.
 const { advance } = require(path.join(scripts, 'lib-advance.js'));
-const routed = advance(jobDir, 'PLANNED', { by: 'router', note: 'Routed to 1-22.' });
+const routed = advance(jobDir, 'PLANNED', { by: 'router', note: 'Routed to pre-production.' });
 assert.ok(routed.ok, 'routing records itself: ' + routed.out);
 assert.strictEqual(stateOf(), 'PLANNED', 'status.md carries the planned state');
 

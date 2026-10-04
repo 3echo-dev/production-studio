@@ -5,7 +5,7 @@ inputs/
 .pane/
 .creative-studio-pipeline/
 .creative-studio-post/
-.3echo-1-22/
+.3echo-pre-production/
 node_modules/
 __pycache__/
 *.pyc

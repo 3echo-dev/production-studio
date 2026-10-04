@@ -54,7 +54,7 @@ The shared rules in `${CLAUDE_PLUGIN_ROOT}/docs/SHARED-RULES.md` apply.
 
 ## Output contract
 
-`job.json` valid against `${CLAUDE_PLUGIN_ROOT}/schemas/job.schema.json`; `route.json` at `ROUTED`; `plan.md` with every row of `workflows/1-22.md`. The state is `PLANNED` when the planner has run.
+`job.json` valid against `${CLAUDE_PLUGIN_ROOT}/schemas/job.schema.json`; `route.json` at `ROUTED`; `plan.md` with every row of `workflows/pre-production.md`. The state is `PLANNED` when the planner has run.
 
 ## Boundary
 

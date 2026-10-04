@@ -158,7 +158,7 @@ export const HEREDOC = /<<-?\s*['"]?\w+/;
 // ---------------------------------------------------------------------------------------
 export function contextBlock(ctx) {
   if (!ctx || !ctx.jobId || !(ctx.client || ctx.brand)) return null;
-  const lines = ['1-22, this folder:'];
+  const lines = ['Pre-production, this folder:'];
   lines.push('- ' + (ctx.client || ctx.brand) + ', ' + ctx.jobId + '. ' + (ctx.sentence || 'Working on it.'));
   if (ctx.isTheirTurn) {
     // A decision on the board reaches the run only when a turn lands it, so the block says when

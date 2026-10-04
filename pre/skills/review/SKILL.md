@@ -3,7 +3,7 @@ name: review
 description: >
   Lands a gate decision. A gate in pre-production is decided on the board; this skill reads the record
   back, binds it to the files as an approval, and moves the project on, or records a verdict
-  typed in chat with the same weight. Use for "/1-22:review", "approve", "sign off gate A", "lock gate A",
+  typed in chat with the same weight. Use for "/pre-production:review", "approve", "sign off gate A", "lock gate A",
   "send it back", "start over", "released", or after any decision on the board.
 argument-hint: "[job] approve | change | start over"
 metadata:
@@ -40,7 +40,7 @@ Three verdicts: **approve** (ok, yes, go, sign off, lock, release) moves the pro
 
    `--from-chat` queues the same decision for the board so the card closes on the next push. `decidedBy` is a name, never "user"; it is an audit record.
 
-5. **On change or start over**, write `revisions/{n}.json`: reason code from `templates/revision.json`, target row, scope, the quoted finding, the directive. Reset the row to `pending` in `plan.md`. A change on an approved item sends its dependents back for review; `workflows/1-22.md` has the map.
+5. **On change or start over**, write `revisions/{n}.json`: reason code from `templates/revision.json`, target row, scope, the quoted finding, the directive. Reset the row to `pending` in `plan.md`. A change on an approved item sends its dependents back for review; `workflows/pre-production.md` has the map.
 
 6. **The project moves itself**: `record-approval.js` calls `set-state.js`; if that failed, run the printed line. Push the board. Hand back to the orchestrator, which continues from the row the state names.
 

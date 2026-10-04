@@ -24,7 +24,7 @@ bound to content hashes, so an edit after the sign-off invalidates it mechanical
 |---|---|---|
 | **Project** | The typed request. One folder, one project | `workspaces/{client}/jobs/{job-id}/job.json` |
 | **Router** | Rules that decide workflow, owner, tags, gates | `scripts/route-job.js` -> `route.json` |
-| **Workflow** | An ordered stage table with conditions | `workflows/1-22.md` -> `plan.md` |
+| **Workflow** | An ordered stage table with conditions | `workflows/pre-production.md` -> `plan.md` |
 | **Agent** | Who is responsible for an item | `agents/*.md` |
 | **Skill** | How one capability is executed | `skills/*/SKILL.md` |
 | **Playbook** | The method for one craft, read at the row, never preloaded | `playbooks/*.md` |
@@ -101,7 +101,7 @@ confidence, or drop a gate.
 
 ## The workflow table is executable
 
-`plan-job.js` reads `workflows/1-22.md`, keeps the rows whose Condition holds, and writes
+`plan-job.js` reads `workflows/pre-production.md`, keeps the rows whose Condition holds, and writes
 `plan.md`. Adding a stage is editing a table row. There is no second place where the order is
 written down, so the two cannot disagree.
 

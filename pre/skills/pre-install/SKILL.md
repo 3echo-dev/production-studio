@@ -50,7 +50,7 @@ user-invocable: true
 
    Everything except storyboard pictures works without it.
 
-6. **What next,** in one line: `/production-studio:board-setup` once to get their board, then `/production-studio:1-22` to start.
+6. **What next,** in one line: `/production-studio:board-setup` once to get their board, then `/production-studio:pre-production` to start.
 
 ## Rules
 

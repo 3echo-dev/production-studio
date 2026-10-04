@@ -2,7 +2,7 @@
 
 One plugin for the studio's two pipelines, on one board.
 
-- **Pre-production** (`/1-22`): a client folder, local or on Google Drive, becomes a project; ten
+- **Pre-production** (`/pre-production`): a client folder, local or on Google Drive, becomes a project; ten
   director agents take it through brief, references, script, storyboard, shot list, budget,
   timeline, audio and the logistics registers to a concept breakdown and one call sheet per shoot
   day, in the client's templates. Three gates: Creative sign-off, Logistics sign-off, Release to
