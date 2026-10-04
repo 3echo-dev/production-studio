@@ -1,0 +1,20 @@
+{
+  "name": "3echo-studio",
+  "owner": {
+    "name": "3echo",
+    "url": "https://github.com/3echo-dev"
+  },
+  "plugins": [
+    {
+      "name": "cs-pre-production",
+      "displayName": "CS Pre-production",
+      "source": "./",
+      "description": "Drive folder in, call sheets out. the studio's pre-production pipeline: ten director agents, six XX items a human fills, three gates decided on the Pre-production board.",
+      "version": "0.1.28",
+      "author": {
+        "name": "3echo"
+      }
+    }
+  ],
+  "description": "Production tooling from 3echo for the studio. Director agents with mandatory human gates."
+}

@@ -1,0 +1,23 @@
+{
+  "name": "cs-pre-production",
+  "displayName": "CS Pre-production",
+  "description": "Runs the studio's pre-production pipeline end to end: a client folder, local or on Google Drive, becomes a project, an orchestrator walks the pre-production stage table spawning ten director agents that wrap the client's skills, every XX item waits on a human, three gates (A Creative sign-off, B Logistics sign-off, C Release to shoot) are decided on the Pre-production board, and the release package is the concept breakdown plus one call sheet per shoot day in the client's templates.",
+  "version": "0.1.29",
+  "keywords": [
+    "pre-production",
+    "call sheet",
+    "storyboard",
+    "shot list",
+    "concept breakdown",
+    "production",
+    "agency",
+    "pipeline",
+    "creative studio"
+  ],
+  "author": {
+    "name": "3echo"
+  },
+  "homepage": "https://github.com/3echo-dev/cs-pre-production",
+  "repository": "https://github.com/3echo-dev/cs-pre-production",
+  "license": "MIT"
+}

@@ -1,0 +1,87 @@
+#!/usr/bin/env node
+// Record a delivery: one line in versions.jsonl and the item on the board.
+//
+//   node record-version.js <client> <job-id> --item script --n 3 --note "..." --file script/v3.md [--seat script-director]
+//
+// Every director runs this after writing a file, so the board, the hash-bound gate record and
+// the file on disk all name the same version. The version number is the director's; the hash
+// is computed here, from the file as it is now. A version is never overwritten: a second call
+// with the same item and number is refused, because that is exactly how an approved file
+// drifts from the hash that approved it.
+//
+// Exit 0 recorded · 1 refused (duplicate version) · 2 usage · 3 the file is not there
+// On exit 1, 2 or 3 nothing was written, and the first line of stderr says so.
+const fs = require('fs');
+const path = require('path');
+const ws = require('./lib-workspace.js');
+const board = require('./lib-board.js');
+const { hashFile } = require('./hash-artifact.js');
+
+const ITEMS = ['intake', 'scraper', 'script', 'storyboard', 'shot_list', 'budget_sheet', 'timeline',
+  'audio', 'talents', 'props', 'locations', 'concept_breakdown', 'call_sheet'];
+
+const argv = process.argv.slice(2);
+const opt = name => { const i = argv.indexOf(name); return i >= 0 && argv[i + 1] ? argv[i + 1] : null; };
+const { brand: client, jobId, dir } = ws.resolveJobArgs(argv, argv);
+const item = opt('--item'), n = Number(opt('--n')), note = opt('--note') || '', file = opt('--file'), seat = opt('--seat') || null;
+// A skeleton a person must fill (an XX item) is recorded as needs_input, so the board shows the
+// tape stamp and opens the register. The plugin never records approved or na; those are human acts.
+const status = opt('--status') || 'draft';
+const missing = [];
+if (!client) missing.push('the client');
+if (!jobId) missing.push('the job id');
+if (!ITEMS.includes(item)) missing.push('--item <' + ITEMS.join('|') + '>' + (item ? ', not "' + item + '"' : ''));
+if (!Number.isInteger(n) || n < 1) missing.push('--n <whole number from 1>' + (opt('--n') ? ', not "' + opt('--n') + '"' : ''));
+if (!file) missing.push('--file <path relative to the job>');
+if (!['draft', 'needs_input', 'running', 'needs_review'].includes(status)) missing.push('--status draft, needs_input, running or needs_review, not "' + status + '"');
+if (missing.length) {
+  // Say what did not happen before saying how to call it: a usage line on its own has been read as success.
+  console.error('Nothing was recorded. This call needs ' + missing.join('; ') + '.');
+  console.error('usage: record-version.js <client> <job-id> --item <' + ITEMS.join('|') + '> --n <1..> --file <path relative to the job> [--note "..."] [--seat <agent>] [--status draft|needs_input]');
+  process.exit(2);
+}
+const abs = path.join(dir, file);
+if (!fs.existsSync(abs)) { console.error('Nothing was recorded. The file is not there: ' + ws.fwd(abs)); process.exit(3); }
+// A directory version (a storyboard folder) hashes its panels.md; a file hashes itself.
+const target = fs.statSync(abs).isDirectory() ? path.join(abs, 'panels.md') : abs;
+if (!fs.existsSync(target)) { console.error('Nothing was recorded. A folder version needs a panels.md inside it: ' + ws.fwd(target)); process.exit(3); }
+
+const log = path.join(dir, 'versions.jsonl');
+let lines = [];
+try { lines = fs.readFileSync(log, 'utf8').split(/\r?\n/).filter(Boolean).map(l => JSON.parse(l)); } catch { lines = []; }
+if (lines.some(v => v.item === item && Number(v.n) === n)) {
+  console.error('REFUSED: ' + item + ' v' + n + ' is already recorded. A new delivery is a new number.');
+  process.exit(1);
+}
+const h = hashFile(target);
+const rel = path.relative(dir, target).split(path.sep).join('/');
+const at = ws.now(client, argv);
+
+// Every file this delivery produced, for the board's Files tab: the file itself, or every file
+// inside a folder version, plus anything named with --also (a file or a folder, relative to the
+// job, repeatable). jobDir is the job folder's full path, so the board can show where each file
+// sits on this computer. Capped so a large storyboard does not bloat the board document.
+const FILES_CAP = 400;
+const found = [];
+const walk = p => {
+  let st; try { st = fs.statSync(p); } catch { return; }
+  if (st.isDirectory()) { for (const e of fs.readdirSync(p).sort()) if (!e.startsWith('.')) walk(path.join(p, e)); }
+  else found.push({ name: path.basename(p), path: path.relative(dir, p).split(path.sep).join('/'), bytes: st.size });
+};
+walk(abs);
+argv.forEach((a, i) => { if (a === '--also' && argv[i + 1]) walk(path.join(dir, argv[i + 1])); });
+const seen = new Set();
+const all = found.filter(f => !seen.has(f.path) && seen.add(f.path));
+const files = all.slice(0, FILES_CAP);
+const filesMore = all.length - files.length;
+const jobDir = ws.fwd(path.resolve(dir));
+
+const rec = { item, n, note, path: rel, hash: h.sha256, bytes: h.bytes, seat, at, files, ...(filesMore ? { filesMore } : {}) };
+fs.appendFileSync(log, JSON.stringify(rec) + '\n');
+
+(async () => {
+  await board.call('version', { key: jobId, item, n, note, path: rel, hash: h.sha256, seat, at, files, filesMore, jobDir }, { argv });
+  await board.call('item', { key: jobId, item, status, version: n, summary: note, artifactPath: rel, hash: h.sha256, files, jobDir, updatedBy: seat || 'pipeline' }, { argv });
+  if (argv.includes('--json')) console.log(JSON.stringify(rec, null, 2));
+  else console.log(item + ' v' + n + ' recorded: ' + rel + ' (' + h.sha256.slice(0, 12) + '). Queued for the board.');
+})();

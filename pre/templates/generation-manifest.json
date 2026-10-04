@@ -1,0 +1,41 @@
+{
+  "schemaVersion": "1.0",
+  "jobId": "{job-id}",
+  "boardVersion": 1,
+  "style": "",
+  "continuity": "",
+  "negative": "no readable text, no logos but the client's, no other brands, no extra people",
+  "referenceAssets": [],
+  "items": [
+    {
+      "panel": "P01",
+      "kind": "image",
+      "sample": true,
+      "prompt": "",
+      "aspectRatio": "16:9",
+      "assetIds": [],
+      "status": "pending",
+      "file": "storyboard/v1/P01.png",
+      "credits": 1
+    },
+    {
+      "panel": "P02",
+      "kind": "image",
+      "sample": false,
+      "prompt": "",
+      "aspectRatio": "16:9",
+      "assetIds": [],
+      "status": "pending",
+      "file": "storyboard/v1/P02.png",
+      "credits": 1
+    }
+  ],
+  "_status": ["pending", "quoted", "approved", "generated", "downloaded", "validated", "rejected"],
+  "_notes": {
+    "sample": "exactly one item; generated first and approved on the board before any other item is sent",
+    "aspectRatio": "job.json aspectRatio, asked at intake, never assumed; the board shows every panel in the ratio its file has",
+    "credits": "images are 1 each; credit_ceiling_per_job in CONFIG.md is the hard limit before the sample approval, and after it the batch figure the person agreed on top of the panels then on disk",
+    "status": "for people reading the manifest; the preflight and the spend guard count files on disk, so a panel stops counting against the batch the moment its file lands, whatever this says",
+    "kind": "image only; pre-production makes no video"
+  }
+}
