@@ -1,0 +1,20 @@
+{
+  "name": "3echo-post",
+  "owner": {
+    "name": "3echo",
+    "url": "https://github.com/3echo-dev"
+  },
+  "plugins": [
+    {
+      "name": "creative-studio-post",
+      "displayName": "Creative Studio Post",
+      "source": "./",
+      "description": "Footage in, Premiere bundle out. The studio's post-production pipeline: ten director agents, eight XX items a person declares, two gates decided on the Post Control board.",
+      "version": "0.3.1",
+      "author": {
+        "name": "3echo"
+      }
+    }
+  ],
+  "description": "Post-production tooling from 3echo for the studio. Sibling to the 3echo-studio pre-production marketplace."
+}

@@ -1,0 +1,69 @@
+# Workflow: post-production pipeline
+
+One workflow. Twelve states. Two gates. Seven director agents.
+
+Read left to right. `State after` is the next state on a clean pass. `Rollback to` is where an XX (human hold) or a failed review sends us. Picture and audio lock together at Gate A — in agency post they go to the client in the same review, so one gate carries both.
+
+| # | State | Director agent | Skill invoked | Playbook | Human required | Output artefact | State after | Rollback to |
+|---|-------|----------------|---------------|----------|----------------|-----------------|-------------|-------------|
+| 1 | intake | post-intake-director | new-post-project | intake-rules | XX Drive folder, pre-prod release path, aspect ratio, duration, audio-led flag | project.json | 2 | 1 |
+| 2 | ingest | ingest-director | ingest-footage | ingest-rules | XX confirm footage + audio file counts | manifest.json (clips, audio, checksums) | 3 | 2 |
+| 3 | sequence | sequence-director | sequence-first-cut | cut-rules | - | rough-edl.json, timeline.png, previews/cut-v{n}.mp4 | 4 | 3 |
+| 4 | bgm | bgm-supervisor | bgm-options | bgm-rules | XX pick 1 of 3 | bgm-choice.json | 5 | 4 |
+| 5 | vo-drop | audio-engineer | vo-drop-in | sync-rules | XX confirm VO takes | vo-track.json | 6 | 5 |
+| 6 | sync | audio-engineer | audio-sync | sync-rules | - | synced-track.wav, synced-track.json, waveform.png, previews/sync-v{n}.mp4 | 7 | 6 |
+| 7 | cut-audio-review | review-director | review-pass | review-rubrics | XX approve/reject combined picture+audio | validation/review-a-{round}.md | 8 | 3 |
+| 8 | GATE A picture+audio lock | orchestrator | board-sync | - | XX board approval | approvals/gate-a.json (hash-bound) | 9 | 7 |
+| 9 | broll | broll-director | broll-generate | broll-rules | XX request shots (on-demand, one per request) | bundle/broll/*.mp4 | 10 | 9 |
+| 10 | mograph | mograph-director | mograph-generate | mograph-rules | XX confirm template + variants | bundle/mograph/*.mov (alpha) | 11 | 10 |
+| 11 | package | premiere-packager | export-premiere-bundle | delivery-rules | - | bundle/project.fcpxml, bundle/README.md | 12 | 11 |
+| 12 | GATE B delivery released | orchestrator | board-sync | - | XX editor handoff acknowledged | approvals/gate-b.json (hash-bound) | done | 11 |
+
+## Generated footage
+
+A job with `footageSource: generated` (a microdrama, one AI clip per storyboard panel) runs the same table. Row 2 is the generate stage (`generate-clips` skill: brief, sample quoted and approved on the board, batch, then ingest of `footage/generated/`), row 3 cuts by panel id (`sequence-first-cut.py --by-panel`), and row 11 adds `bundle/master.mp4` (`render-preview.js --stage master`) since there is no editor to hand to. The release needs no call sheets. Credits are the only spend and every scope has its yes on the board first.
+
+## Hybrid footage
+
+A cut from footage-repurpose re-finishes here with `scripts/import-repurpose.js <repurpose-job> <out> --location "..."`: talent scenes become plates, the rest `footage/keep/`, with the VO, music and effects; the release carries `origin: footage-repurpose`, so no concept breakdown or call sheet is asked for.
+
+
+A job with `footageSource: hybrid` (real actors, AI backgrounds) runs the same table. Row 2 is plates, backgrounds, composite and ingest: the plate-director briefs the plates and locations (`hybrid.js brief`) and cuts the actor out of every plate as a transparent layer (`cutout.py`: chroma key on any green or blue screen, rembg otherwise); the composite-director gets a background per location (the reference library's picture, or one generated on AgentC after a quote and a yes), lays the actor over it (`composite.py`) and checks the actor's pixels are unchanged. Ingest catalogues only `footage/composite/`; row 3 cuts by panel id. The actor is never redrawn. Rules: `playbooks/hybrid-rules.md`.
+
+## State machine invariants
+
+- Every `State after` and `Rollback to` value points at a real state in this table.
+- Every gate (`GATE A`, `GATE B`) is a state on its own row.
+- Gate A is preceded by the combined cut+audio review row.
+- Gate B has no review row — delivery is a mechanical `build-bundle.js` check plus the human's release call.
+- No stage runs without the prior stage's output artefact on disk. The orchestrator reads the artefact set to decide the next state.
+- Human holds (`XX`) block the orchestrator until the item lands on the Post Control board.
+
+## Inputs from pre-prod
+
+The intake state expects the pre-prod release package at a known path:
+
+- `script.md` — final approved script
+- `storyboard.json` — the panel table with frame references
+- `concept-breakdown.xlsx` — the line items
+- `call-sheet-day-*.pdf` — one per shoot day
+- `storyboard/v{n}/P*.png` — the visual panels used for CLIP retrieval
+
+If any of these are missing, intake refuses with a clear message and does not advance.
+
+## Handoff to editor
+
+Gate B release payload:
+
+- `bundle/project.fcpxml` — Premiere-importable timeline
+- `bundle/footage/` — selected takes, transcoded to editing proxies where the codec needed it
+- `bundle/audio/synced-track.wav` — synced VO + BGM + SFX
+- `bundle/broll/` — on-demand generated clips with a slate frame each
+- `bundle/mograph/` — alpha-channel overlays (ProRes 4444)
+- `bundle/README.md` — what the editor picks up on the timeline, what is in the bins, unmatched panels, colour direction
+- `bundle/.pipeline/manifest.json` — sha256 index for the Gate B hash-binding
+
+## Notes for the review pass
+
+- Cut+audio review (state 7) checks: shot order matches storyboard, best takes selected, no orphan clips, VO in sync with picture, BGM level ducked under VO, EDL sha256 bound to synced track.
+- Gate B has no review — `build-bundle.js` is the mechanical check, and the human's editor-handoff acknowledgement is the sign-off.

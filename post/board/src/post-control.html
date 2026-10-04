@@ -1,0 +1,826 @@
+<title>Post Control</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap">
+<style>
+:root{
+  --ink:#071A3A;--panel:#0D2149;--panel2:#14295A;--panel3:#1A3268;--line:#1E3160;--line2:#2F4677;
+  --paper:#ffffff;--dim:#C8D2E6;--faint:#8A97B5;
+  --tape:#ffc629;--tape-ink:#071A3A;--spend:#ff9500;--go:#89e6a5;--go-dim:#2f6b4a;--hold:#ff8a85;--hold-dim:#7a2d2a;--wait:#84A8FF;--wait-dim:#2B4A75;--indigo:#3E4BE1;
+  --scrub:var(--tape);--scrub-ink:var(--tape-ink);
+  --gate-a:var(--tape);--gate-a-dim:#6b5410;--gate-b:#84A8FF;--gate-b-dim:#2B4A75;
+  --mono:'Manrope',ui-monospace,SFMono-Regular,Menlo,monospace;
+  --sans:'Manrope',Inter,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --cond:'Manrope',Inter,system-ui,sans-serif;
+  --r1:6px;--r2:8px;--r3:12px;
+  --ease-out:cubic-bezier(.23,1,.32,1);--ease-drawer:cubic-bezier(.32,.72,0,1);
+  --shadow:0 24px 70px -48px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.04);
+  --z-scrim:19;--z-drawer:20;--z-toast:30;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{background:var(--ink);scrollbar-color:var(--line2) var(--ink)}
+body{margin:0;background:var(--ink);color:var(--paper);font-family:var(--sans);font-size:14px;line-height:1.5;padding-block:0 48px;padding-inline:clamp(16px,2.5vw,32px);caret-color:var(--scrub);-webkit-font-smoothing:antialiased}
+::selection{background:var(--scrub);color:var(--scrub-ink)}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-thumb{background:var(--line2);border-radius:6px;border:2px solid var(--ink)}
+::-webkit-scrollbar-track{background:transparent}
+a{color:inherit}
+button{font:inherit;color:inherit;background:none;border:1px solid var(--line2);border-radius:var(--r2);padding:5px 11px;min-height:32px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;line-height:1.2;transition:border-color 150ms ease,background-color 150ms ease,color 150ms ease,transform 160ms var(--ease-out)}
+button:hover{border-color:var(--dim);background:rgba(255,255,255,.03)}
+button:active{transform:scale(.97)}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--scrub);outline-offset:2px}
+button.primary{background:var(--tape);color:var(--tape-ink);border-color:var(--tape);font-weight:700}
+button.primary:hover{background:#ffd95c;border-color:#ffd95c}
+button.scrub{background:var(--tape);color:var(--tape-ink);border-color:var(--tape);font-weight:700}
+button.ghost{border-color:transparent;color:var(--dim)}
+button.ghost:hover{color:var(--paper);border-color:var(--line2)}
+button:disabled{opacity:.4;cursor:not-allowed;transform:none}
+button svg{width:14px;height:14px;flex:none}
+input,textarea,select{font:inherit;color:var(--paper);background:var(--ink);border:1px solid var(--line2);border-radius:var(--r2);padding:7px 9px;width:100%;min-height:34px;transition:border-color 150ms ease}
+input:hover,textarea:hover,select:hover{border-color:var(--dim)}
+input::placeholder,textarea::placeholder{color:var(--faint)}
+textarea{min-height:68px;resize:vertical}
+select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239da7b4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;background-size:14px;padding-right:28px}
+h1,h2,h3{font-family:var(--sans);letter-spacing:-.01em;margin:0;text-wrap:balance;font-weight:800;color:#fff}
+.mono{font-family:var(--mono);font-size:12px}
+.num{font-variant-numeric:tabular-nums}
+.meta{font-size:12px;color:var(--dim)}
+svg.i{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none;vertical-align:-2px}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+
+/* top bar */
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 0 12px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.brand{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.brand a{text-decoration:none}
+.brand h1{font-size:28px;line-height:1}
+.brand h1 i{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--hold);margin-right:8px;vertical-align:2px}
+.brand .sub{color:var(--dim);font-size:13px}
+.brand .sub b{color:var(--paper);font-weight:500}
+.who{display:flex;align-items:center;gap:14px;font-size:13px;color:var(--dim);flex-wrap:wrap}
+.who label{display:inline-flex;align-items:center;gap:8px}
+.who select{width:auto;min-height:32px;padding:4px 28px 4px 9px}
+.conn{display:inline-flex;align-items:center;gap:7px;font-size:12px;color:var(--dim)}
+.conn i{width:8px;height:8px;border-radius:50%;background:var(--faint);display:inline-block;transition:background-color 300ms ease}
+.conn.on i{background:var(--go);box-shadow:0 0 0 3px rgba(63,211,155,.18)}
+.rules{display:flex;gap:6px 22px;flex-wrap:wrap;padding:10px 0;border-bottom:1px solid var(--line);font-size:12px;color:var(--dim)}
+.rules b{color:var(--paper);font-weight:600}
+
+/* slate */
+.sect{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-top:26px;margin-bottom:10px}
+.sect h2{font-size:20px}
+.slate{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:12px}
+.pcard{background:var(--panel);border:1px solid var(--line);border-radius:var(--r3);padding:14px 16px;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:10px;cursor:pointer;text-align:left;transition:border-color 150ms ease,transform 160ms var(--ease-out),background-color 150ms ease}
+.pcard:hover{border-color:var(--line2);background:var(--panel2)}
+.pcard:active{transform:scale(.99)}
+.pcard h3{font-size:20px;line-height:1.15;text-align:left}
+.pcard .meta{text-align:left}
+.pcard > *{width:100%}
+.pcard .row{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.gchips{display:inline-flex;gap:4px}
+.gchip{font-family:var(--cond);font-weight:700;font-size:12px;width:20px;height:20px;border-radius:var(--r1);border:1px solid var(--line2);display:inline-flex;align-items:center;justify-content:center;color:var(--faint)}
+.gchip.passed{color:var(--ink);background:var(--go);border-color:var(--go)}
+.gchip.ready{color:var(--scrub-ink);background:var(--scrub);border-color:var(--scrub)}
+.newp{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;align-items:end;margin-top:14px;padding:14px 16px;border:1px dashed var(--line2);border-radius:var(--r3)}
+.newp label{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--dim)}
+.newp label .opt{font-weight:400;color:var(--faint,var(--dim));opacity:.7;margin-left:4px}
+
+/* gate strip */
+.gates{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:18px 0 12px}
+.gate{background:var(--panel);border:1px solid var(--line);border-radius:var(--r3);padding:12px 14px;display:grid;grid-template-columns:auto 1fr;gap:4px 14px;align-items:start;position:relative;text-align:left;cursor:pointer;transition:border-color 150ms ease,background-color 150ms ease,transform 160ms var(--ease-out)}
+.gate:hover{border-color:var(--dim)}
+.gate .letter{font-family:var(--cond);font-size:44px;font-weight:700;line-height:.85;grid-row:1/6;grid-column:1;color:var(--g);opacity:.45;letter-spacing:-.02em;transition:color 200ms ease,opacity 200ms ease}
+.gate .name,.gate .bar,.gate .live,.gate .cond,.gate .approver{grid-column:2}
+.gate .name{font-family:var(--cond);letter-spacing:.02em;font-weight:700;font-size:15px;font-weight:600;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.gate .cond{font-size:12px;color:var(--dim);line-height:1.4}
+.gate .approver{font-size:11px;color:var(--faint);display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap}
+.gate .chev{color:var(--faint);transition:transform 200ms var(--ease-out)}
+.gate.sel .chev{transform:rotate(180deg)}
+.gate.passed{border-color:var(--go-dim)}
+.gate.passed .letter{color:var(--go)}
+.gate.ready{border-color:var(--scrub)}
+.gate.ready .letter{color:var(--scrub)}
+.gate.reopened{border-color:var(--hold-dim)}
+.gate.reopened .letter{color:var(--hold)}
+.gate.sel{background:var(--panel2);border-color:var(--paper)}
+.gate[data-gate=A]{--g:var(--gate-a);--g-dim:var(--gate-a-dim)}
+.gate[data-gate=B]{--g:var(--gate-b);--g-dim:var(--gate-b-dim)}
+.gate{border-left:4px solid var(--g-dim)}
+.gate.ready,.gate.passed,.gate.working{border-left-color:var(--g)}
+.gate.ready .letter,.gate.passed .letter,.gate.working .letter{opacity:1}
+.gate.ready{border-color:var(--g)}
+.gate.passed .letter{color:var(--go)}
+.gate .bar{height:4px;border-radius:2px;background:var(--panel3);overflow:hidden;margin-top:2px}
+.gate .bar i{display:block;height:100%;background:var(--g);transition:width 300ms var(--ease-out)}
+.gate.passed .bar i{background:var(--go)}
+.gate .live{display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--dim)}
+.gate .live i{width:7px;height:7px;border-radius:50%;background:var(--faint);display:inline-block;flex:none}
+.gate.working .live i{background:var(--wait);box-shadow:0 0 0 3px rgba(47,111,214,.18);animation:pulse 1.4s ease-in-out infinite}
+.gate.ready .live i{background:var(--g)}
+.gate.passed .live i{background:var(--go)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.gatedetail{background:var(--panel2);border:1px solid var(--paper);border-radius:var(--r3);padding:14px 18px 16px;margin:-4px 0 16px;display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:8px 24px}
+.gatedetail h3{font-size:22px;grid-column:1/-1;display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.gatedetail h3 span{font-family:var(--sans);text-transform:none;letter-spacing:0;font-weight:400;font-size:12px;color:var(--dim)}
+.gatedetail .gi{display:grid;grid-template-columns:1fr auto auto;gap:2px 10px;align-items:center;font-size:13px;padding:7px 0;border-bottom:1px solid var(--line)}
+.gatedetail .gi:last-child{border-bottom:0}
+.gatedetail .gi .who{font-size:11px;color:var(--faint);white-space:nowrap}
+.gatedetail .gi .what{color:var(--dim);font-size:12px;grid-column:1/-1}
+.gatedetail dl{display:grid;grid-template-columns:auto 1fr;gap:7px 12px;font-size:13px;margin:0;align-content:start}
+.gatedetail dt{color:var(--faint);font-family:var(--cond);letter-spacing:.02em;font-weight:700;font-size:12px;padding-top:1px}
+.gatedetail dd{margin:0;color:var(--dim)}
+
+/* board */
+.board{display:grid;grid-template-columns:minmax(0,1fr) 312px;gap:16px;align-items:start}
+.stages{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.stage{display:flex;flex-direction:column;gap:8px;min-width:0}
+.stage .head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;border-bottom:2px solid var(--line2);padding-bottom:5px}
+.stage .head h2{font-size:18px}
+.stage .head h2 span{color:var(--dim);font-weight:500}
+.stage .head .cnt{font-size:12px;color:var(--dim);font-variant-numeric:tabular-nums}
+.intake{margin-bottom:12px}
+.item{background:var(--panel);border:1px solid var(--line);border-radius:var(--r3);padding:11px 12px 10px;display:flex;flex-direction:column;gap:7px;transition:border-color 150ms ease,opacity 200ms ease}
+.item.nr{border-color:var(--hold-dim)}
+.item.hl{border-color:var(--paper)}
+.item.dimmed{opacity:.45}
+.item.working{border-color:var(--tape);box-shadow:0 0 0 1px rgba(255,198,41,.35),0 0 22px rgba(255,198,41,.28);animation:glow 1.8s ease-in-out infinite}
+.pcard.working{border-color:var(--tape);box-shadow:0 0 0 1px rgba(255,198,41,.35),0 0 26px rgba(255,198,41,.28);animation:glow 1.8s ease-in-out infinite}
+@keyframes glow{0%,100%{box-shadow:0 0 0 1px rgba(255,198,41,.35),0 0 14px rgba(255,198,41,.18)}50%{box-shadow:0 0 0 1px rgba(255,198,41,.6),0 0 30px rgba(255,198,41,.42)}}
+@media (prefers-reduced-motion: reduce){.item.working,.pcard.working{animation:none}}
+.item .t{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.item h3{font-size:17px;line-height:1.1}
+.item .v{font-family:var(--mono);font-size:11px;color:var(--faint)}
+.item .s{font-size:12px;color:var(--dim);line-height:1.4}
+.item .foot{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.item .seat{font-size:11px;color:var(--faint)}
+.item .actions{display:flex;gap:6px;flex-wrap:wrap}
+.item .actions button{min-height:28px;padding:3px 9px;font-size:12px}
+.xx{font-family:var(--cond);font-weight:700;font-size:11px;letter-spacing:.08em;color:var(--scrub-ink);background:var(--scrub);border-radius:var(--r1);padding:1px 5px;margin-left:7px;vertical-align:2px}
+.pill{font-size:11px;font-weight:500;border-radius:999px;padding:2px 8px;border:1px solid var(--line2);color:var(--dim);white-space:nowrap}
+.pill.pending{color:var(--faint)}
+.pill.running{color:var(--wait);border-color:var(--wait-dim)}
+.pill.draft{color:var(--paper)}
+.pill.needs_input{color:var(--scrub-ink);background:var(--scrub);border-color:var(--scrub)}
+.pill.needs_review{color:var(--hold);border-color:var(--hold-dim)}
+.pill.approved{color:var(--ink);background:var(--go);border-color:var(--go)}
+.pill.na{color:var(--faint);text-decoration:line-through}
+.pill.plain{color:var(--dim)}
+.cnt{font-family:var(--mono);font-size:11px;color:var(--faint)}
+
+/* rail */
+.rail{display:flex;flex-direction:column;gap:12px;min-width:0}
+.box{background:var(--panel);border:1px solid var(--line);border-radius:var(--r3);padding:12px 14px}
+.box h2{font-size:16px;display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:8px}
+.box h2 span{font-family:var(--sans);text-transform:none;letter-spacing:0;font-size:11px;font-weight:400;color:var(--dim)}
+.req{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;padding:9px 0;border-top:1px solid var(--line);font-size:13px}
+.req:first-of-type{border-top:0}
+.req .ic{color:var(--scrub);grid-row:1/4;padding-top:2px}
+.req.answered .ic,.req.delivered .ic{color:var(--go)}
+.req.waiting .ic{color:var(--wait)}
+.req.change .ic{color:var(--hold)}
+.req .from{font-size:11px;color:var(--faint)}
+.req .body{line-height:1.4}
+.req .opts{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.req .opts button{min-height:28px;padding:3px 9px;font-size:12px}
+.req .thumb{margin-top:6px;border:1px solid var(--line);border-radius:var(--r2);max-width:100%;display:block}
+.msg{padding:8px 0;border-top:1px solid var(--line);font-size:13px}
+.msg .by{display:flex;justify-content:space-between;gap:8px;font-size:11px;color:var(--faint)}
+.seats{display:flex;flex-direction:column;gap:2px}
+.seat-row{display:grid;grid-template-columns:28px 1fr auto;gap:8px;align-items:center;font-size:12px;padding:5px 0;border:0;border-top:1px solid var(--line);border-radius:0;min-height:0;text-align:left;width:100%}
+.seat-row:first-child{border-top:0}
+.seat-row .st{font-size:10px;letter-spacing:.02em;font-weight:700;color:var(--faint)}
+.seat-row .st.working{color:var(--wait)}
+.seat-row .st.done{color:var(--go)}
+.seat-row .st.human{color:var(--scrub)}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:5px 12px;font-size:12px;margin:0}
+.kv dt{color:var(--faint)}
+.kv dd{margin:0;color:var(--dim);word-break:break-word}
+.empty{color:var(--faint);font-size:12px;margin:6px 0}
+.skel{background:var(--panel2);border-radius:var(--r3);animation:sk 1.2s ease-in-out infinite}
+@keyframes sk{0%,100%{opacity:.6}50%{opacity:1}}
+
+/* drawer */
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:var(--z-scrim)}
+.drawer{position:fixed;top:env(safe-area-inset-top,0px);right:0;bottom:0;width:min(720px,100vw);background:var(--panel);border-left:1px solid var(--line2);z-index:var(--z-drawer);display:flex;flex-direction:column;box-shadow:var(--shadow)}
+.drawer .dh{padding:14px 18px 10px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.drawer .dh h2{font-size:24px}
+.drawer .tabs{display:flex;gap:2px;padding:0 12px;border-bottom:1px solid var(--line);overflow-x:auto}
+.drawer .tabs button{border:0;border-bottom:2px solid transparent;border-radius:0;padding:9px 10px;color:var(--dim);font-size:13px}
+.drawer .tabs button.on{color:var(--paper);border-bottom-color:var(--scrub)}
+.drawer .dbody{padding:14px 18px 40px;overflow:auto;flex:1;font-size:13px}
+.drawer .dbody pre{font-family:var(--mono);font-size:12px;white-space:pre-wrap;word-break:break-word;background:var(--ink);border:1px solid var(--line);border-radius:var(--r2);padding:10px 12px;margin:0}
+.subh{font-family:var(--cond);letter-spacing:.02em;font-weight:700;font-size:13px;color:var(--dim);margin:12px 0 6px}
+.subh:first-child{margin-top:0}
+.runmeta{display:flex;justify-content:space-between;gap:10px;font-size:12px;color:var(--faint);margin-bottom:8px;flex-wrap:wrap}
+.vlist{display:flex;flex-direction:column;gap:4px}
+.vrow{display:grid;grid-template-columns:auto 1fr auto;gap:10px;font-size:12px;padding:6px 0;border-top:1px solid var(--line);align-items:baseline}
+.vrow:first-child{border-top:0}
+.note{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.note .row{display:flex;gap:6px;justify-content:flex-end}
+.preview{border:1px solid var(--line);border-radius:var(--r2);background:var(--ink);padding:6px;margin-bottom:12px}
+.preview img,.preview video{display:block;max-width:100%;width:100%;border-radius:var(--r1);background:#000}
+.preview .cap{font-size:11px;color:var(--faint);margin-top:6px;display:flex;justify-content:space-between;gap:8px}
+.cands{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;align-items:stretch}
+.cand{background:var(--panel2);border:1px solid var(--line);border-radius:var(--r3);padding:12px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.cand.chosen{border-color:var(--go);box-shadow:0 0 0 1px var(--go)}
+.cand h4{font-family:var(--sans);font-weight:800;font-size:16px;margin:0;line-height:1.2;min-height:2.4em;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.cand .tc{font-family:var(--mono);font-size:11px;color:var(--faint)}
+.cand audio{width:100%;height:32px;display:block}
+.cand p{margin:0;font-size:12px;color:var(--dim);line-height:1.45}
+.cand .path{font-size:10px;color:var(--faint);word-break:break-all;opacity:.8}
+.cand .foot{margin-top:auto;display:flex;flex-direction:column;gap:6px}
+.cand .tag{align-self:flex-start;font-size:10px;letter-spacing:.02em;font-weight:700;padding:1px 6px;border-radius:var(--r1);background:var(--go);color:var(--ink)}
+.reqform{display:grid;grid-template-columns:1fr;gap:8px;margin-bottom:14px;padding:12px;border:1px dashed var(--line2);border-radius:var(--r3)}
+.reqform .two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.reqform label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--dim)}
+.brs{display:flex;flex-direction:column;gap:8px}
+.br{background:var(--panel2);border:1px solid var(--line);border-radius:var(--r3);padding:10px 12px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 12px;align-items:start}
+.br .t{font-size:13px}
+.br .m{font-size:11px;color:var(--faint);grid-column:1/-1;display:flex;gap:10px;flex-wrap:wrap}
+.br img{grid-column:1/-1;max-width:100%;border-radius:var(--r2);border:1px solid var(--line)}
+.br .st{font-size:11px;font-weight:500;white-space:nowrap}
+.alphas{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px}
+.alpha{background:var(--panel2);border:1px solid var(--line);border-radius:var(--r3);overflow:hidden;display:flex;flex-direction:column}
+.alpha.sample{border-color:var(--scrub)}
+.alpha .th{aspect-ratio:16/9;max-width:100%;background:repeating-conic-gradient(var(--panel3) 0 25%,var(--panel) 0 50%);background-size:16px 16px;display:flex;align-items:center;justify-content:center;color:var(--faint);font-size:11px}
+.alpha .th img{width:100%;height:100%;object-fit:contain;display:block}
+.alpha .cap{padding:8px 10px;font-size:12px;display:flex;flex-direction:column;gap:4px}
+.alpha .cap b{font-family:var(--cond);text-transform:uppercase;font-size:14px}
+.toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--paper);color:var(--ink);padding:9px 14px;border-radius:var(--r2);font-size:13px;z-index:var(--z-toast);box-shadow:var(--shadow);display:flex;gap:8px;align-items:center;max-width:min(560px,calc(100vw - 32px))}
+.toast.out{opacity:0;transition:opacity 220ms ease}
+.foot{margin-top:28px;padding-top:12px;border-top:1px solid var(--line);font-size:11px;color:var(--faint);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+@media (max-width:1000px){.board{grid-template-columns:1fr}.stages{grid-template-columns:1fr}.gatedetail{grid-template-columns:1fr}}
+@media (max-width:560px){.gates{grid-template-columns:1fr}.brand h1{font-size:24px}.reqform .two{grid-template-columns:1fr}}
+</style>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="ic-check" viewBox="0 0 24 24"><path d="m5 12 5 5L20 7"/></symbol>
+  <symbol id="ic-open" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M19 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"/></symbol>
+  <symbol id="ic-change" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 15.5-6.3L21 8M21 3v5h-5M21 12a9 9 0 0 1-15.5 6.3L3 16M3 21v-5h5"/></symbol>
+  <symbol id="ic-gate" viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></symbol>
+  <symbol id="ic-q" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 .9-1 1.7M12 17h.01"/></symbol>
+  <symbol id="ic-send" viewBox="0 0 24 24"><path d="M21 3 10 14M21 3l-7 18-4-8-8-4 19-6Z"/></symbol>
+  <symbol id="ic-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></symbol>
+  <symbol id="ic-chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+  <symbol id="ic-back" viewBox="0 0 24 24"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></symbol>
+  <symbol id="ic-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+  <symbol id="ic-music" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></symbol>
+  <symbol id="ic-film" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 4v16M17 4v16M3 9h4M3 15h4M17 9h4M17 15h4"/></symbol>
+</svg>
+<div id="app" data-signal-anchor></div><script>
+/* ---------- The post model: what the board knows without a database ---------- */
+const ITEMS = [
+  {id:'intake',   stage:0, name:'Intake',             xx:true,  seat:'post-intake-director', produces:'job.json: the pre-prod release verified, aspect ratio, deliverable duration and the audio-led flag declared', deps:[]},
+  {id:'ingest',   stage:1, name:'Ingest',             xx:true,  seat:'ingest-director',      produces:'manifest.json: every clip and audio file with size, hash and probe data; the counts confirmed by a person', deps:['intake']},
+  {id:'sequence', stage:1, name:'First cut',          xx:false, seat:'sequence-director',    produces:'rough-edl.json and timeline.png: storyboard panels matched to the best takes, in story order', deps:['ingest']},
+  {id:'bgm',      stage:2, name:'BGM',                xx:true,  seat:'bgm-supervisor',       produces:'Three candidates with source and duration; one chosen here before the sync runs', deps:['sequence']},
+  {id:'vo_drop',  stage:2, name:'Voice-over',         xx:true,  seat:'audio-engineer',       produces:'vo-track.json: the takes placed against the script markers; final or scratch confirmed by a person', deps:['sequence']},
+  {id:'sync',     stage:2, name:'Audio sync',         xx:false, seat:'audio-engineer',       produces:'synced-track.wav and waveform.png: VO, BGM and SFX mixed, music ducked under voice', deps:['bgm','vo_drop']},
+  {id:'review',   stage:2, name:'Cut + audio review', xx:false, seat:'review-director',      produces:'validation/review-a-{n}.md: the rubric verdict on picture and audio together, before Gate A', deps:['sequence','sync']},
+  {id:'broll',    stage:3, name:'B-roll',             xx:true,  seat:'broll-director',       produces:'bundle/broll/*.mp4: one generated shot per request, each quoted and approved here', deps:['review']},
+  {id:'mograph',  stage:3, name:'Motion graphics',    xx:true,  seat:'mograph-director',     produces:'bundle/mograph/*.mov: alpha overlays from the chosen template; one sample before the batch', deps:['review']},
+  {id:'package',  stage:3, name:'Premiere bundle',    xx:false, seat:'premiere-packager',    produces:'bundle/project.fcpxml and README: the editor imports one file and the timeline is loaded', deps:['broll','mograph']},
+];
+const STAGES = [
+  {n:1, name:'Picture', sub:'Ingest and cut', gate:'A'},
+  {n:2, name:'Audio',   sub:'Music, voice, sync', gate:'A'},
+  {n:3, name:'Finish',  sub:'Generated and packaged', gate:'B'},
+];
+const GATES = {
+  A:{name:'Picture + audio lock', after:2, items:['ingest','sequence','bgm','vo_drop','sync','review'], approver:'The creative director locks picture and audio together', cond:'Counts confirmed. First cut approved. One BGM chosen. VO takes confirmed or not applicable. Synced track approved. Review verdict on disk.'},
+  B:{name:'Delivery released',    after:3, items:['broll','mograph','package'], approver:'The production lead releases the bundle; the editor acknowledges the handoff', cond:'Every requested B-roll shot delivered or not applicable. Motion graphics approved or not applicable. FCPXML bundle built and checked.'},
+};
+const GATE_RELEASES = {A:'Finish: B-roll requests open, the motion-graphics template is proposed, the bundle can be built.', B:'The editor picks up bundle/project.fcpxml; the job is done.'};
+const GATE_ROLLBACK = {A:'A change on any picture or audio item reopens Gate A only; approved versions are kept and the next number is written.', B:'A released bundle is never edited; a change makes a new bundle and Gate B is asked again.'};
+const SEATS = [
+  {id:'orchestrator',         n:'00', label:'Orchestrator',        kind:'agent', note:'Walks the plan, verifies every file on disk, stops at both gates, the only seat that spends credits'},
+  {id:'post-intake-director', n:'01', label:'Post Intake',         kind:'agent', note:'Verifies the pre-prod release and the shoot folder; asks the XX declarations'},
+  {id:'ingest-director',      n:'02', label:'Ingest',              kind:'agent', note:'Probes every clip and audio file; writes the manifest with hashes'},
+  {id:'sequence-director',    n:'03', label:'Sequence',            kind:'agent', note:'Matches storyboard panels to takes; writes the rough EDL'},
+  {id:'bgm-supervisor',       n:'04', label:'BGM Supervisor',      kind:'agent', note:'Proposes three music candidates; never picks'},
+  {id:'audio-engineer',       n:'05', label:'Audio Engineer',      kind:'agent', note:'Places the VO, syncs and ducks the mix, draws the waveform'},
+  {id:'review-director',      n:'06', label:'Reviewer',            kind:'agent', note:'Runs the Gate A rubric; returns a verdict, never a decision'},
+  {id:'broll-director',       n:'07', label:'B-roll',              kind:'agent', note:'Turns one approved request into one generated shot'},
+  {id:'mograph-director',     n:'08', label:'Motion Graphics',     kind:'agent', note:'One sample alpha from the template, then the batch'},
+  {id:'premiere-packager',    n:'09', label:'Premiere Packager',   kind:'agent', note:'Writes the FCPXML and the bundle README'},
+  {id:'creative-director',    n:'H1', label:'Creative director',   kind:'human', note:'Approves the cut, picks the music, locks Gate A'},
+  {id:'lead',                 n:'H2', label:'Production lead',     kind:'human', note:'Releases the bundle at Gate B'},
+  {id:'editor',               n:'H3', label:'Editor',              kind:'human', note:'Opens the bundle in Premiere; acknowledges the handoff'},
+];
+const STATUS_LABEL = {pending:'Not started', running:'Working', draft:'Draft', needs_input:'Your input', needs_review:'Needs review', approved:'Approved', na:'Not applicable'};
+const HUMANS = [{id:'creative-director',label:'Creative director'},{id:'lead',label:'Production lead'},{id:'editor',label:'Editor'},{id:'assistant',label:'Production assistant'}];
+const NA_ALLOWED = ['vo_drop','broll','mograph'];
+const ASPECTS = ['16:9','9:16','1:1','4:5','2.39:1'];
+const ic = n => `<svg class="i" aria-hidden="true"><use href="#ic-${n}"/></svg>`;
+
+/* ---------- state ---------- */
+let db = null, dbState = 'connecting';
+let projects = [], project = null, items = {}, gates = {}, inbox = [], messages = [], versions = {}, runs = {}, bgm = [], mograph = [], previews = {};
+let unsubs = [];
+let drawer = null, drawerTab = 'output', runSel = null, gateOpen = null, busy = new Set();
+// Browser popups are blocked inside the artifact sandbox, so every consequential action
+// confirms in the page: a second press within a few seconds.
+let armed = null;
+function isArmed(key){ return armed && armed.key===key && Date.now()<armed.until; }
+function arm(key){ armed={key, until:Date.now()+8000}; render(); setTimeout(()=>{ if(armed&&armed.key===key&&Date.now()>=armed.until){ armed=null; render(); } }, 8200); }
+let changeFor = null, answerFor = null;
+let me = (()=>{ try { return localStorage.getItem('postctl.me') || 'creative-director'; } catch(e){ return 'creative-director'; } })();
+const $ = s => document.querySelector(s);
+const esc = s => String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const now = () => new Date().toISOString();
+const fmt = iso => { if(!iso) return ''; const d=new Date(iso); return isNaN(d)?iso:d.toLocaleString('en-SG',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}); };
+const tc = s => { const n=Number(s); if(!isFinite(n)||!n) return ''; const m=Math.floor(n/60), r=Math.round(n%60); return `${String(m).padStart(2,'0')}:${String(r).padStart(2,'0')}`; };
+const slug = s => String(s).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,40) || 'project';
+const humanName = id => (HUMANS.find(h=>h.id===id)||{}).label || (id==='pipeline'?'Pipeline':id||'');
+let toastEl=null;
+function toast(t, kind){ if(toastEl) toastEl.remove(); const el=document.createElement('div'); el.className='toast'; el.setAttribute('role','status'); el.innerHTML=(kind==='ok'?ic('check'):'')+esc(t); document.body.appendChild(el); toastEl=el; setTimeout(()=>{ el.classList.add('out'); setTimeout(()=>{ if(el===toastEl) toastEl=null; el.remove(); },240); },2200); }
+
+/* ---------- routing ---------- */
+function route(){ const h=location.hash||'#/'; const m=h.match(/^#\/p\/([^/]+)/); return m?{page:'project',id:decodeURIComponent(m[1])}:{page:'slate'}; }
+window.addEventListener('hashchange', ()=>{ drawer=null; gateOpen=null; bindProject(); render(); });
+window.addEventListener('keydown', e=>{ if(e.key!=='Escape') return; if(drawer){ drawer=null; render(); } else if(route().page==='project' && !/^(INPUT|TEXTAREA|SELECT)$/.test((e.target&&e.target.tagName)||'')){ location.hash='#/'; } });
+
+/* ---------- db binding ---------- */
+async function boot(){
+  render();
+  try { db = await claude.use('db'); } catch(e){ db=null; }
+  dbState = db ? 'on' : 'off';
+  if(db){
+    db.collection('projects').orderBy('createdAt','desc').onSnapshot(q=>{ projects=q.docs.map(d=>({id:d.id,...d.data()})); render(); }, e=>{ dbState='off'; render(); });
+  }
+  bindProject(); render();
+}
+function bindProject(){
+  unsubs.forEach(u=>{try{u()}catch(e){}}); unsubs=[];
+  items={}; gates={}; inbox=[]; messages=[]; versions={}; runs={}; project=null; bgm=[]; mograph=[]; previews={};
+  const r=route(); if(r.page!=='project'||!db) return;
+  const base='projects/'+r.id;
+  // A slate card the run adopted points at the job; carry the person to the job's own page, where the questions are.
+  unsubs.push(db.doc(base).onSnapshot(s=>{ project=s.exists?{id:s.id,...s.data()}:{id:r.id,missing:true}; if(project.status==='moved'&&project.movedTo&&project.movedTo!==r.id){ toast('This card became '+project.movedTo+'; opening it', 'ok'); location.hash='#/p/'+encodeURIComponent(project.movedTo); return; } render(); }));
+  unsubs.push(db.collection(base+'/items').onSnapshot(q=>{ items={}; q.docs.forEach(d=>items[d.id]=d.data()); render(); }));
+  unsubs.push(db.collection(base+'/gates').onSnapshot(q=>{ gates={}; q.docs.forEach(d=>gates[d.id]=d.data()); render(); }));
+  unsubs.push(db.collection(base+'/inbox').orderBy('createdAt','desc').limit(60).onSnapshot(q=>{ inbox=q.docs.map(d=>({id:d.id,...d.data()})); render(); }));
+  unsubs.push(db.collection(base+'/messages').orderBy('at','desc').limit(40).onSnapshot(q=>{ messages=q.docs.map(d=>({id:d.id,...d.data()})); render(); }));
+  unsubs.push(db.collection(base+'/versions').orderBy('at','desc').limit(100).onSnapshot(q=>{ versions={}; q.docs.forEach(d=>{const v=d.data(); (versions[v.item]=versions[v.item]||[]).push({id:d.id,...v});}); render(); }));
+  unsubs.push(db.collection(base+'/runs').orderBy('startedAt','desc').limit(120).onSnapshot(q=>{ runs={}; q.docs.forEach(d=>{const v=d.data(); (runs[v.item]=runs[v.item]||[]).push({id:d.id,...v});}); render(); }));
+  unsubs.push(db.collection(base+'/bgm').onSnapshot(q=>{ bgm=q.docs.map(d=>({id:d.id,...d.data()})); render(); }));
+  unsubs.push(db.collection(base+'/mograph').onSnapshot(q=>{ mograph=q.docs.map(d=>({id:d.id,...d.data()})); render(); }));
+  unsubs.push(db.collection(base+'/previews').onSnapshot(q=>{ previews={}; q.docs.forEach(d=>previews[d.id]=d.data()); render(); }));
+}
+
+/* ---------- derived ---------- */
+function itemOf(id){ const def=ITEMS.find(i=>i.id===id); return Object.assign({status:'pending',version:0,summary:''}, def, items[id]||{}); }
+function shownStatus(it){ if(['pending','running'].includes(it.status) && inbox.some(r=>r.type==='question'&&r.status==='open'&&r.item===it.id)) return 'needs_input'; if(it.id==='broll' && ['pending','running','draft'].includes(it.status) && inbox.some(r=>r.type==='generate'&&r.item==='broll'&&r.status==='quoted')) return 'needs_input'; return it.status; }
+function gateReady(g){ return GATES[g].items.every(id=>['approved','na'].includes(itemOf(id).status)); }
+function gateView(g){ const rec=gates[g]||{}; const ready=gateReady(g); const st = rec.status==='passed'?'passed': rec.status==='reopened'?'reopened': ready?'ready':'locked'; return {...rec, st, ready}; }
+function dependents(id){ const out=new Set(); const walk=x=>ITEMS.filter(i=>i.deps.includes(x)).forEach(i=>{ if(!out.has(i.id)){out.add(i.id); walk(i.id);} }); walk(id); return [...out]; }
+function gateOfItem(id){ return Object.keys(GATES).find(g=>GATES[g].items.includes(id)) || null; }
+function runsOf(id){ return runs[id]||[]; }
+function lastRunOfSeat(seat){ let best=null; for(const k in runs) for(const r of runs[k]) if(r.seat===seat && (!best || (r.startedAt||'')>(best.startedAt||''))) best=r; return best; }
+function seatLabel(id){ const s=SEATS.find(x=>x.id===id); return s?s.label:id; }
+function statusWord(s){ return {intake:'Intake',picture:'Picture',audio:'Audio',gate_a:'At Gate A',finish:'Finish',gate_b:'At Gate B',released:'Released',killed:'Killed'}[s]||s||''; }
+function md(s){
+  const lines=String(s||'').split('\n'); let out='', inTable=false;
+  const inline=t=>esc(t).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/`(.+?)`/g,'<code class="mono">$1</code>');
+  for(const raw of lines){
+    const l=raw.replace(/\s+$/,'');
+    if(/^\|.*\|$/.test(l)){ const cells=l.slice(1,-1).split('|').map(c=>c.trim()); if(cells.every(c=>/^:?-{2,}:?$/.test(c))) continue; if(!inTable){ out+='<div style="overflow-x:auto"><table style="border-collapse:collapse;font-size:12px">'; inTable='head'; }
+      out+='<tr>'+cells.map(c=>inTable==='head'?`<th style="text-align:left;padding:4px 8px;border-bottom:1px solid var(--line2)">${inline(c)}</th>`:`<td style="padding:4px 8px;border-bottom:1px solid var(--line)">${inline(c)}</td>`).join('')+'</tr>'; if(inTable==='head') inTable='body'; continue; }
+    if(inTable){ out+='</table></div>'; inTable=false; }
+    if(/^#{1,3} /.test(l)){ out+=`<div class="subh">${inline(l.replace(/^#+ /,''))}</div>`; }
+    else if(/^\s*[-*] /.test(l)) out+=`<div style="padding-left:14px;text-indent:-10px">· ${inline(l.replace(/^\s*[-*] /,''))}</div>`;
+    else if(l==='') out+='<div style="height:6px"></div>';
+    else out+=`<div>${inline(l)}</div>`;
+  }
+  if(inTable) out+='</table></div>';
+  return out;
+}
+
+/* ---------- writes ---------- */
+async function write(path, data, merge){
+  if(!db){ toast('Not connected to the board database'); return false; }
+  try { const ref=db.doc(path); if(merge){ await ref.update(data); } else { await ref.set(data); } return true; }
+  catch(e){ if(merge && e && e.code==='invalid_argument'){ try{ await db.doc(path).set(data); return true; }catch(e2){} } toast('Could not save: '+(e&&e.message||e)); return false; }
+}
+function strip(o){ const c={...o}; delete c.id; return c; }
+async function guarded(key, fn){ if(busy.has(key)) return; busy.add(key); render(); try{ await fn(); } finally { busy.delete(key); render(); } }
+async function log(text, item){ if(!project) return; await write('projects/'+project.id+'/messages/'+Date.now().toString(36), {by:me, text, item:item||null, at:now()}); }
+async function setItem(id, patch, note){
+  const base='projects/'+project.id;
+  const next={...items[id], ...patch, updatedAt:now(), updatedBy:me};
+  for(const k of ['deps','produces','name','seat','stage','xx']) delete next[k];
+  await write(base+'/items/'+id, next);
+  if(note) await log(note, id);
+}
+async function approve(id){
+  const it=itemOf(id); if(['approved','na'].includes(it.status)) return;
+  if(id==='bgm' && !bgm.some(c=>c.chosen)){ drawer='bgm'; drawerTab='candidates'; render(); toast('Choose one of the candidates first'); return; }
+  await setItem(id,{status:'approved', approvedBy:me, approvedAt:now(), approvedVersion:it.version||0}, `${it.name} v${it.version||0} approved.`);
+  toast(`${it.name} v${it.version||0} approved`, 'ok'); signalPipeline(`${it.name} v${it.version||0} approved`);
+}
+async function markNA(id){ const it=itemOf(id); await setItem(id,{status:'na', naBy:me, naAt:now()}, `${it.name} marked not applicable for this job.`); toast(`${it.name} marked not applicable`, 'ok'); signalPipeline(`${it.name} marked not applicable`); }
+async function requestChange(id, note){
+  const it=itemOf(id); if(note==null||!note.trim()) return;
+  const base='projects/'+project.id;
+  await setItem(id,{status:'needs_review', changeNote:note.trim()});
+  const deps=dependents(id).filter(d=>['approved','draft','needs_review'].includes(itemOf(d).status));
+  for(const d of deps) await setItem(d,{status:'needs_review', changeNote:'Upstream change on '+it.name});
+  const g=gateOfItem(id); if(g && gates[g] && gates[g].status==='passed') await write(base+'/gates/'+g,{...gates[g],status:'reopened',reopenedAt:now(),reopenedBy:me,reason:'Change on '+it.name});
+  await write(base+'/inbox/'+Date.now().toString(36),{type:'change',item:id,text:note.trim(),from:me,status:'open',createdAt:now()});
+  await log(`Change requested on ${it.name}: ${note.trim()}${deps.length?` (${deps.length} dependent item${deps.length>1?'s':''} sent back for review)`:''}`, id);
+  toast(`Change sent to ${seatLabel(it.seat)}`, 'ok'); signalPipeline(`Change requested on ${it.name}`);
+}
+// The lock carries each item's file and hash as the pipeline last pushed them, so the run can
+// bind the approval to the files on disk (board-sync.js pull refuses a file changed after this).
+async function lockGate(g){
+  if(!gateReady(g)) return; const base='projects/'+project.id;
+  const stamp={status:'passed', decidedBy:me, decidedAt:now(), round:((gates[g]&&gates[g].round)||0)+1, items:Object.fromEntries(GATES[g].items.map(id=>{ const it=itemOf(id); return [id,{status:it.status,version:it.version||0,file:it.file||null,sha256:it.sha256||null,bytes:it.bytes||null}]; }))};
+  await write(base+'/gates/'+g, stamp);
+  const nextStatus = g==='A'?'finish':'released';
+  await write(base, {...strip(project), status: nextStatus, updatedAt: now()});
+  await write(base+'/inbox/'+Date.now().toString(36),{type:'gate',gate:g,text:`Gate ${g} ${GATES[g].name} locked by ${humanName(me)}`,from:me,status:'open',createdAt:now()});
+  await log(`Gate ${g} ${GATES[g].name} locked.`);
+  await signalPipeline(`Gate ${g} locked`);
+}
+async function chooseBgm(id){
+  const c=bgm.find(x=>x.id===id); if(!c) return; const base='projects/'+project.id;
+  for(const x of bgm){ const want=x.id===id; if(!!x.chosen!==want) await write(base+'/bgm/'+x.id, {...strip(x), chosen:want, chosenBy:want?me:null, chosenAt:want?now():null}); }
+  await setItem('bgm',{status:'approved', approvedBy:me, approvedAt:now(), approvedVersion:itemOf('bgm').version||0, choice:id, choiceTitle:c.title||id}, `BGM chosen: ${c.title||id}${c.source?' ('+c.source+')':''}.`);
+  await write(base+'/inbox/'+Date.now().toString(36),{type:'bgm-choice',item:'bgm',candidate:id,text:`BGM chosen: ${c.title||id}`,from:me,status:'answered',answer:id,answeredBy:me,answeredAt:now(),createdAt:now()});
+  toast('BGM chosen: '+(c.title||id), 'ok'); await signalPipeline('BGM chosen: '+(c.title||id));
+}
+async function requestBroll(form){
+  const shot=(form.querySelector('[name=shot]').value||'').trim(); if(!shot){ toast('Describe the shot'); form.querySelector('[name=shot]').focus(); return; }
+  const durationSec=Number(form.querySelector('[name=duration]').value)||5; const aspect=form.querySelector('[name=aspect]').value||(project.aspectRatio||'16:9');
+  const id='b-'+Date.now().toString(36);
+  await write('projects/'+project.id+'/inbox/'+id,{type:'generate',item:'broll',shot,durationSec,aspect,text:`B-roll: ${shot} · ${durationSec}s · ${aspect}`,from:me,status:'requested',createdAt:now()});
+  const it=itemOf('broll'); if(['pending','needs_input'].includes(it.status)) await setItem('broll',{status:'draft'});
+  await log(`B-roll requested: ${shot} (${durationSec}s, ${aspect}). Waiting for the quote.`, 'broll');
+  form.reset(); toast('Request sent; the pipeline quotes it before anything is spent', 'ok'); await signalPipeline('B-roll requested: '+shot.slice(0,60));
+}
+async function approveBroll(r){
+  await write('projects/'+project.id+'/inbox/'+r.id,{...strip(r), status:'open', approvedBy:me, approvedAt:now()});
+  await log(`B-roll approved for ${r.credits||'?'} credit${r.credits===1?'':'s'}: ${r.shot||r.text}`, 'broll');
+  toast('Approved; the shot will be generated', 'ok'); await signalPipeline('B-roll approved ('+(r.credits||'?')+' credits): '+String(r.shot||'').slice(0,50));
+}
+async function approveMograph(id){
+  const m=mograph.find(x=>x.id===id); if(!m||!m.thumb) return;
+  await write('projects/'+project.id+'/mograph/'+id,{...strip(m), approvedBy:me, approvedAt:now()});
+  const rest=mograph.filter(x=>x.id!==id&&!x.thumb).length;
+  if(m.sample && rest) await write('projects/'+project.id+'/inbox/'+('g-'+Date.now().toString(36)),{type:'generate',item:'mograph',scope:'batch',text:`Render the motion-graphics batch: ${rest} alpha${rest===1?'':'s'} from the approved sample`,from:me,status:'open',approvedBy:me,approvedAt:now(),createdAt:now()});
+  await log(m.sample?`Sample alpha ${id} approved; the batch may render.`:`Alpha ${id} approved.`, 'mograph');
+  toast((m.sample?'Sample ':'')+id+' approved', 'ok'); await signalPipeline((m.sample?'Sample alpha ':'Alpha ')+id+' approved');
+}
+async function answer(req, value){
+  await write('projects/'+project.id+'/inbox/'+req.id, {...strip(req), status:'answered', answer:value, answeredBy:me, answeredAt:now()});
+  await log(`Answered: ${req.text} → ${value}`, req.item||null);
+  await signalPipeline('Answered: '+String(req.text||'').slice(0,70)+' -> '+value);
+}
+async function createProject(form){
+  const title=form.querySelector('[name=title]').value.trim(); if(!title){ toast('Give the project a title'); form.querySelector('[name=title]').focus(); return; }
+  const id=slug(title)+'-'+Date.now().toString(36).slice(-4); const base='projects/'+id;
+  const doc={title, client:form.querySelector('[name=client]').value.trim(), driveFolder:form.querySelector('[name=drive]').value.trim(), preRelease:form.querySelector('[name=pre]').value.trim(), referencesFolder:((form.querySelector('[name=refs]')||{}).value||'').trim()||null, aspectRatio:form.querySelector('[name=aspect]').value, deliverableDurationSec:Number(form.querySelector('[name=duration]').value)||null, audioLed:form.querySelector('[name=led]').value==='audio', footageSource:['generated','hybrid'].includes((form.querySelector('[name=source]')||{}).value)?form.querySelector('[name=source]').value:'shoot', status:'intake', createdAt:now(), createdBy:me};
+  // The bell rings first, on the press itself: a send to Claude is allowed only from a recent
+  // viewer gesture, and the writes below take seconds. The order carries the seven answers, so
+  // the woken turn starts the job without asking them again; the card lands a moment later.
+  await signalPipeline('New post project opened: '+title+(doc.client?' for '+doc.client:'')+' ('+id+')', slateOrderFor(doc, id));
+  if(!await write(base, doc)) return;
+  for(const it of ITEMS) await write(base+'/items/'+it.id, {status:'pending', version:0, summary:'', updatedAt:now(), updatedBy:me});
+  await write(base+'/messages/'+Date.now().toString(36), {by:me, text:'Project opened from the slate. The run scaffolds the job from these answers and adopts this card.', at:now()});
+  location.hash='#/p/'+encodeURIComponent(id);
+}
+
+/* ---------- the bell ---------- */
+// A comment sent to Claude starts a turn in the session watching this artifact, so every
+// decision a person makes here rings it; a republish from the page's own pristine source is
+// the fallback and delivers a version without starting a turn.
+function pristineSource(){ const el=document.getElementById('__src'); if(!el) return null; try{ const bin=atob(el.textContent.trim()); const bytes=new Uint8Array(bin.length); for(let i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i); return new TextDecoder().decode(bytes); }catch(e){ return null; } }
+function embedSource(src){ const bytes=new TextEncoder().encode(src); let bin=''; for(let i=0;i<bytes.length;i++) bin+=String.fromCharCode(bytes[i]); return '<script type="text/plain" id="__src">'+btoa(bin)+'</scr'+'ipt>'; }
+function buildDocument(src){ const cut=src.indexOf('<svg width="0"'); const head=cut>0?src.slice(0,cut):''; const body=cut>0?src.slice(cut):src; return '<!doctype html>'+String.fromCharCode(10)+'<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">'+head+'</head><body>'+body+String.fromCharCode(10)+embedSource(src)+String.fromCharCode(10)+'</body></html>'; }
+// Every bell outcome is written to the board database (bells/*, meta/bell), so a press that
+// seemed to do nothing can be read back with ArtifactData.
+async function bellLog(why, outcome, detail){ if(!db) return; const rec={at:now(), why, outcome, detail:detail==null?null:String(detail).slice(0,600), by:me, project:project&&project.id||null}; try{ await db.doc('bells/'+Date.now().toString(36)+Math.random().toString(36).slice(2,5)).set(rec); }catch(e){} try{ await db.doc('meta/bell').set(rec); }catch(e){} }
+// The slate form's project has a board id and no folder: the bell carries the order to start it,
+// so the woken turn runs new-post-project with the seven answers instead of asking them again.
+function slateOrderFor(d, id){ return 'This is a slate project with no job folder yet'+(id?', slate id '+id:'')+'. Run the new-post-project skill for it now, in this turn, with these answers already given: client '+(d.client||'not given, ask for it')+', title '+(d.title||'')+', footage folder '+(d.driveFolder||'not given, ask for it')+', pre-prod release folder '+(d.preRelease||'not given, ask for it')+', aspect ratio '+(d.aspectRatio||'not given')+', duration '+(d.deliverableDurationSec?d.deliverableDurationSec+' s':'not given, ask for it')+', '+(d.audioLed?'voice-over leads the cut (audioLed true)':'picture leads the cut (audioLed false)')+', references folder '+(d.referencesFolder||'the references/ folder inside the footage folder, if there is one')+', footage '+(d.footageSource==='hybrid'?'hybrid: real actors kept as shot, backgrounds replaced (footageSource hybrid; actor plates under the footage folder\'s footage/plates, one per panel)':d.footageSource==='generated'?'generated per storyboard panel (footageSource generated; the footage folder is where the clips land)':'shot rushes (footageSource shoot)')+'. Ask nothing these answer. Scaffold the client if it does not exist, scaffold the job, write these into job.json, route, plan, run scan-references.js and put its summary on the Intake item (ask only about what must be drawn from text), board-sync.js open and push; when the job id exists run board-sync.js adopt with --from the slate id, push, and carry on to Gate A. Do not reply asking whether to start.'; }
+function slateOrder(){ return project&&project.createdBy&&project.createdBy!=='pipeline'&&project.status!=='moved'&&project.driveFolder!=null ? slateOrderFor(project, project.id) : null; }
+// Consent is per board and per viewer; asking for it here, on the person's own press, holds the
+// dialog open instead of letting the first send fail with consent_required and fall back.
+async function consentForComments(why){ let pm=null; try{ pm=await claude.use('permissions'); }catch(e){ pm=null; } if(!pm){ await bellLog(why,'permissions','no permissions capability'); return true; } let before='?'; try{ before=JSON.stringify(await pm.state()); }catch(e){ before='state failed: '+(e&&e.message||e); } let res=null, st='granted'; try{ res=await pm.request(['comments']); st=(res&&res.comments)||'granted'; }catch(e){ st='granted'; res='request failed: '+(e&&e.message||e); } await bellLog(why,'permissions', before+' -> '+(typeof res==='string'?res:JSON.stringify(res))); if(st==='denied'){ await bellLog(why,'consent_denied'); toast(why+'. Consent declined; say it in chat.'); return false; } return true; }
+async function signalPipeline(why, order){
+  const what=why+(project&&project.title?' on '+project.title:'')+(project&&project.id?' ('+project.id+')':'');
+  let cm=null; try{ cm=await claude.use('comments'); }catch(e){ cm=null; }
+  if(cm){
+    let can='off'; try{ can=await cm.canSendToClaude(); }catch(e){ can='off'; }
+    if(can==='available' && await consentForComments(why)){
+      try{
+        const el=document.querySelector('[data-signal-anchor]')||document.body.firstElementChild||document.body;
+        const anchor=await cm.anchorFor(el);
+        await cm.sendToClaude({anchor, text:'Post board: '+what+'. '+(order||slateOrder()||'Land the board (board-sync.js land) and carry on; reply here in one line.')});
+        await bellLog(why,'sent'); toast(why+'. The run has been told.', 'ok'); return true;
+      }catch(e){ await bellLog(why,'send_failed',(e&&(e.code+' '+e.message))||e); if(e&&e.code==='consent_required') toast(why+'. Allow this page to send comments to Claude, or the run has to be told in chat.'); }
+    } else if(can==='no_session'){ await bellLog(why,'no_session'); toast(why+'. No run is watching the board right now; say it in chat when one is.'); }
+    else if(can==='writers_only'){ await bellLog(why,'writers_only'); toast(why+'. Only an editor of the board can send it to the run; say it in chat.'); }
+    else if(can!=='available'){ await bellLog(why,'not_available',can); }
+  } else { await bellLog(why,'no_comments_capability'); }
+  let art=null; try{ art=await claude.use('artifact'); }catch(e){ art=null; }
+  const src=pristineSource();
+  if(!art||!src){ toast(why+'. The pipeline will see it on its next check.'); return false; }
+  try{ await art.publish(buildDocument(src)); await bellLog(why,'republished'); toast(why+'. The pipeline has been signalled.', 'ok'); return true; }
+  catch(e){ await bellLog(why,'republish_failed',(e&&e.code)||e); toast(why+'. Signal not sent ('+((e&&e.code)||'error')+'); the pipeline will see it on its next check.'); return false; }
+}
+function chatSummary(){
+  const open=inbox.filter(r=>['open','waiting','requested','quoted'].includes(r.status));
+  const lines=[`Post · ${project.title}${project.client?' · '+project.client:''}`, `Status: ${statusWord(project.status)} · ${project.aspectRatio||''}${project.deliverableDurationSec?' · '+project.deliverableDurationSec+'s':''}${project.audioLed?' · audio-led':''}`, ''];
+  for(const g of ['A','B']){ const v=gateView(g); lines.push(`Gate ${g} ${GATES[g].name}: ${v.st==='passed'?'locked by '+humanName(v.decidedBy)+' '+fmt(v.decidedAt):v.st==='ready'?'ready to lock':v.st==='reopened'?'reopened ('+(v.reason||'')+')':'not yet'}`); }
+  lines.push('', 'Items:');
+  for(const d of ITEMS){ const it=itemOf(d.id); lines.push(`- ${it.name}${it.xx?' [XX]':''}: ${STATUS_LABEL[shownStatus(it)]} v${it.version||0}${it.approvedBy?' (approved by '+humanName(it.approvedBy)+')':''}${it.choiceTitle?' — chosen: '+it.choiceTitle:''}${it.changeNote?' — change: '+it.changeNote:''}`); }
+  if(open.length){ lines.push('', 'Open in the inbox:'); for(const r of open) lines.push(`- [${r.type}] ${r.text}${r.status==='quoted'?' — quoted '+(r.credits||'?')+' credits, awaiting approval':r.status==='waiting'?' — picked up, waiting on: '+(r.waitingText||'a question'):''}`); }
+  const answered=inbox.filter(r=>r.status==='answered'&&r.type==='question');
+  if(answered.length){ lines.push('', 'Answered:'); for(const r of answered) lines.push(`- ${r.text} → ${r.answer} (${humanName(r.answeredBy)})`); }
+  if(messages.length){ lines.push('', 'Council log, newest first:'); for(const m of messages.slice(0,6)) lines.push(`- ${fmt(m.at)} ${humanName(m.by)}: ${m.text}`); }
+  return lines.join('\n');
+}
+async function copyForChat(){
+  const text=chatSummary();
+  try { await navigator.clipboard.writeText(text); toast('Board summary copied. Paste it into the chat.', 'ok'); }
+  catch(e){ const ta=document.createElement('textarea'); ta.value=text; document.body.appendChild(ta); ta.select(); try{ document.execCommand('copy'); toast('Board summary copied', 'ok'); }catch(e2){ toast('Copy blocked by the browser. Select the text in the log instead.'); } ta.remove(); }
+}
+/* ---------- render ---------- */
+function render(){
+  const r=route(); const app=$('#app');
+  app.innerHTML = topbar() + (r.page==='project' ? projectPage(r.id) : slatePage()) + footer() + (drawer?drawerHtml():'');
+  wire();
+}
+function topbar(){
+  const p=route().page==='project'&&project&&!project.missing?` / <b>${esc(project.title)}</b>`:'';
+  const back=route().page==='project'?`<button class="ghost" data-home title="Back to every project on the slate">${ic('back')} All projects</button>`:'';
+  return `<div class="top">
+    <div class="brand">${back}<a href="#/" data-home><h1><i aria-hidden="true"></i>Post Control</h1></a><span class="sub">Creative studio post-production${p}</span></div>
+    <div class="who">
+      <span class="conn ${dbState==='on'?'on':''}"><i></i>${dbState==='on'?'Board connected':dbState==='connecting'?'Connecting to the board…':'Model view only'}</span>
+      <label>Acting as <select id="me" aria-label="Acting as">${HUMANS.map(h=>`<option value="${h.id}" ${h.id===me?'selected':''}>${h.label}</option>`).join('')}</select></label>
+    </div>
+  </div>
+  <div class="rules">
+    <span><b>XX</b> means a person declares or approves it. The pipeline never fills an XX for you.</span>
+    <span><b>Picture and audio lock together</b> at Gate A; they go to the client in one review.</span>
+    <span><b>Nothing is generated unquoted.</b> Every B-roll shot and every alpha shows its credits before a yes.</span>
+    <span><b>A lock binds to the files.</b> A file changed after the lock is refused, not re-approved by silence.</span>
+  </div>`;
+}
+function slatePage(){
+  const live=projects.filter(p=>p.status!=='moved'); const cards = live.length ? live.map(p=>`<button class="pcard ${p.activity&&!p.status.startsWith('gate')&&!['released','killed','intake'].includes(p.status)&&p.heartbeatAt&&(Date.now()-new Date(p.heartbeatAt).getTime())<15*60*1000?'working':''}" data-open="${esc(p.id)}">
+      <div class="row"><h3>${esc(p.title)}</h3><span class="pill ${p.status==='released'?'approved':'plain'}">${esc(statusWord(p.status))}</span></div>
+      <div class="row meta"><span>${esc(p.client||'')}${p.client?' · ':''}${esc(p.aspectRatio||'')}${p.deliverableDurationSec?' · '+esc(p.deliverableDurationSec)+'s':''}${p.audioLed?' · audio-led':''}</span><span class="gchips" aria-label="Gates">${['A','B'].map(x=>`<span class="gchip ${gateChipState(p,x)}">${x}</span>`).join('')}</span></div>
+      <div class="meta">Opened ${fmt(p.createdAt)} by ${esc(humanName(p.createdBy))}</div>
+      ${costLine(p.cost)?`<div class="meta num">Cost so far: <b style="color:var(--paper)">${esc(costLine(p.cost))}</b></div>`:''}
+      ${p.activity&&!['released','killed'].includes(p.status)?(()=>{ const live=p.heartbeatAt&&!String(p.status).startsWith('gate')&&(Date.now()-new Date(p.heartbeatAt).getTime())<15*60*1000; return `<div class="meta"><span class="pill ${live?'running':'plain'}">${live?'Working':'Last update'}</span> ${esc(p.activity)}${p.heartbeatAt?' · '+fmt(p.heartbeatAt):''}</div>`; })():''}
+    </button>`).join('')
+    : `<p class="empty">${dbState==='on'?'No projects on the board yet. Open one below, or let the pipeline open it from job.json.':dbState==='connecting'?'Connecting to the board…':'This is the pipeline model. Open the page in claude.ai to connect the board.'}</p>`;
+  return `<div class="sect"><h2>Slate</h2><span class="meta">${live.length} project${live.length===1?'':'s'}</span></div>
+  <div class="slate">${cards}</div>
+  <form class="newp" id="newp">
+    <label>Project title<input name="title" id="np-title" placeholder="Late Again" required autocomplete="off"></label>
+    <label>Client<input name="client" id="np-client" placeholder="3echo"></label>
+    <label>Footage folder<input name="drive" id="np-drive" placeholder="Shoot / Day 01 …"></label>
+    <label>Pre-prod release<input name="pre" id="np-pre" placeholder="Release package folder"></label>
+    <label>References <span class="opt">optional</span><input name="refs" id="np-refs" placeholder="characters, locations, wardrobe…"></label>
+    <label>Aspect ratio<select name="aspect" id="np-aspect">${ASPECTS.map(a=>`<option>${a}</option>`).join('')}</select></label>
+    <label>Duration (s)<input name="duration" id="np-duration" type="number" min="5" max="900" placeholder="30"></label>
+    <label>Leads the cut<select name="led" id="np-led"><option value="picture">Picture</option><option value="audio">Voice-over</option></select></label>
+    <label>Footage<select name="source" id="np-source" required><option value="" disabled selected>Choose…</option><option value="shoot">Shot rushes</option><option value="generated">Generated per panel</option><option value="hybrid">Hybrid: real actors, AI backgrounds</option></select></label>
+    <button class="primary" type="submit">Open project</button>
+  </form>
+  ${modelPreview()}`;
+}
+function gateChipState(p, g){ const order={intake:0,picture:1,audio:1,gate_a:1,finish:2,gate_b:2,released:3}; const n=order[p.status]??0; const after={A:1,B:2}[g]; return n>after?'passed':n===after&&String(p.status).startsWith('gate')?'ready':''; }
+function modelPreview(){
+  return `<div class="sect"><h2>The pipeline</h2><span class="meta">Footage and the pre-prod release in, a Premiere bundle out. Three stages, two gates, eight XX items.</span></div>
+  <div class="gates">${['A','B'].map(g=>`<button class="gate ${gateOpen===g?'sel':''}" data-gate="${g}" aria-expanded="${gateOpen===g}"><span class="letter">${g}</span><span class="name">${GATES[g].name}<span class="chev">${ic('chev')}</span></span><span class="cond">${esc(GATES[g].cond)}</span><span class="approver">${esc(GATES[g].approver)}</span></button>`).join('')}</div>
+  ${gateOpen?gateDetail(gateOpen):''}
+  <div class="box"><h2>Seats <span>Ten agents, three people</span></h2><div class="seats">${SEATS.map(s=>`<div class="seat-row"><span class="mono">${s.n}</span><span><b>${esc(s.label)}</b> · ${esc(s.note)}</span><span class="st ${s.kind==='human'?'human':''}">${s.kind}</span></div>`).join('')}</div></div>`;
+}
+function gateDetail(g){
+  const G=GATES[g]; const done=G.items.filter(id=>['approved','na'].includes(itemOf(id).status)).length;
+  return `<div class="gatedetail" data-gate-detail="${g}" role="region" aria-label="Gate ${g} details">
+    <h3>Gate ${g} · ${esc(G.name)} <span class="num">${route().page==='project'?`${done} of ${G.items.length} ready`:`${G.items.length} items`}</span></h3>
+    <div>${G.items.map(id=>{ const it=itemOf(id); return `<div class="gi"><span><b>${esc(it.name)}</b>${it.xx?' <span class="xx">XX</span>':''}</span><span class="pill ${it.status}">${STATUS_LABEL[it.status]}</span><span class="who">${esc(seatLabel(it.seat))}</span><span class="what">${esc(it.produces)}</span></div>`; }).join('')}</div>
+    <dl>
+      <dt>Passes when</dt><dd>${esc(G.cond)}</dd>
+      <dt>Approver</dt><dd>${esc(G.approver)}</dd>
+      <dt>Releases</dt><dd>${esc(GATE_RELEASES[g])}</dd>
+      <dt>Reopens</dt><dd>${esc(GATE_ROLLBACK[g])}</dd>
+      <dt>Not applicable</dt><dd>${g==='A'?'Allowed on voice-over only, for a picture-only cut. A decision, recorded with who made it.':'Allowed on B-roll and motion graphics. The bundle itself is never not applicable.'}</dd>
+    </dl>
+  </div>`;
+}
+function projectPage(id){
+  if(dbState==='off') return `<p class="empty" style="margin-top:20px">The board database is not reachable from this view. <a href="#/">Back to the slate</a>.</p>`;
+  if(!project) return `<div class="gates" aria-busy="true">${[0,1].map(()=>'<div class="skel" style="height:104px"></div>').join('')}</div><div class="board"><div class="stages">${[0,1,2].map(()=>'<div class="stage"><div class="skel" style="height:34px"></div><div class="skel" style="height:120px"></div><div class="skel" style="height:120px"></div></div>').join('')}</div><div class="rail"><div class="skel" style="height:180px"></div><div class="skel" style="height:220px"></div></div></div>`;
+  if(project.missing) return `<p class="empty" style="margin-top:20px">No project called ${esc(id)}. <a href="#/">Back to the slate</a>.</p>`;
+  const openReqs=inbox.filter(r=>(r.status==='open' && r.type==='question') || r.status==='quoted');
+  return `<div class="gates">${['A','B'].map(gateCard).join('')}</div>
+  ${gateOpen?gateDetail(gateOpen):''}
+  <div class="board">
+    <div>
+      <div class="intake">${itemCard(itemOf('intake'))}</div>
+      <div class="stages">${STAGES.map(s=>{ const ids=ITEMS.filter(i=>i.stage===s.n); const ok=ids.filter(i=>['approved','na'].includes(itemOf(i.id).status)).length; return `<div class="stage"><div class="head"><h2>${s.name} <span>${s.sub}</span></h2><span class="cnt">${ok}/${ids.length} · Gate ${s.gate}</span></div>${ids.map(i=>itemCard(itemOf(i.id))).join('')}</div>`; }).join('')}</div>
+    </div>
+    <div class="rail">
+      <div class="box"><h2>Inbox <span>${openReqs.length} waiting on you</span></h2>
+        ${inbox.length?inbox.slice(0,14).map(reqHtml).join(''):'<p class="empty">Questions from the pipeline, quotes and your change notes land here.</p>'}
+        <h2 style="margin-top:14px;padding-top:12px;border-top:1px solid var(--line)">Pipeline <span>hand-off to the Claude session</span></h2>
+        <div style="display:flex;gap:6px;flex-wrap:wrap"><button type="button" class="ghost" data-copy title="Copy a plain-text summary of this board to paste into a Claude chat">${ic('copy')} Copy board for chat</button><button type="button" class="ghost" data-signal title="Wake the pipeline now, for example after answering questions">${ic('send')} Signal pipeline</button></div>
+      </div>
+      <div class="box"><h2>Seats <span>what each one last did</span></h2><div class="seats">${SEATS.filter(s=>s.kind!=='human').map(s=>{ const r=lastRunOfSeat(s.id); const it=ITEMS.find(i=>i.seat===s.id); return `<button class="seat-row" ${r?`data-open-run="${esc(r.item)}" data-run="${esc(r.id)}"`:'disabled'}><span class="mono">${s.n}</span><span><b>${esc(s.label)}</b>${r?` · ${esc(itemOf(r.item).name)} v${r.version}`:it?` · ${esc(it.name)}`:''}</span><span class="st ${r?(r.status==='running'?'working':'done'):''}">${r?(r.status==='running'?'working':'done'):'idle'}</span></button>`; }).join('')}</div></div>
+      ${costBox()}
+      <div class="box"><h2>Project</h2><dl class="kv">
+        <dt>Client</dt><dd>${esc(project.client||'')}</dd>
+        <dt>Footage</dt><dd>${esc(project.driveFolder||'')}</dd>
+        <dt>Pre-prod release</dt><dd>${esc(project.preRelease||'')}</dd>
+        ${project.referencesFolder?`<dt>References</dt><dd>${esc(project.referencesFolder)}</dd>`:''}
+        <dt>Frame</dt><dd>${esc(project.aspectRatio||'')}${project.deliverableDurationSec?' · '+esc(project.deliverableDurationSec)+' s':''}${project.audioLed?' · audio-led':' · picture-led'}</dd>
+        <dt>Status</dt><dd>${esc(statusWord(project.status))}</dd>
+        <dt>Opened</dt><dd>${fmt(project.createdAt)} by ${esc(humanName(project.createdBy))}</dd>
+      </dl></div>
+    </div>
+  </div>`;
+}
+function gateCard(g){
+  const v=gateView(g); const G=GATES[g];
+  const done=G.items.filter(id=>['approved','na'].includes(itemOf(id).status)).length;
+  const working=G.items.map(id=>itemOf(id)).filter(it=>it.status==='running');
+  const waiting=G.items.map(id=>itemOf(id)).filter(it=>['needs_input','needs_review'].includes(shownStatus(it)));
+  const next=G.items.map(id=>itemOf(id)).find(it=>!['approved','na'].includes(it.status));
+  const live = v.st==='passed' ? `Locked ${fmt(v.decidedAt)}` : v.st==='ready' ? 'Every item in; the lock is yours' : v.st==='reopened' ? 'Reopened; items back in review' : working.length ? `Run working on ${esc(working.map(w=>w.name).join(', '))}` : waiting.length ? `Waiting on you: ${esc(waiting.map(w=>w.name).join(', '))}` : next ? `Idle; next up ${esc(next.name)}` : 'Not started';
+  const isWorking = v.st!=='passed' && working.length>0;
+  const right = v.st==='passed' ? `<span class="pill approved">Locked · ${esc(humanName(v.decidedBy))}</span>`
+              : v.st==='ready' ? `<span class="pill needs_input">Ready to lock</span>`
+              : v.st==='reopened' ? `<span class="pill needs_review">Reopened</span>`
+              : `<span class="pill plain num">${done}/${G.items.length}</span>`;
+  const foot = v.st==='passed' ? `<span>${fmt(v.decidedAt)}</span>`
+             : v.st==='ready' ? (isArmed('lock'+g) ? `<button class="primary" data-lock="${g}" ${busy.has('lock'+g)?'disabled':''}>${ic('check')} Confirm: lock Gate ${g}</button>` : `<button class="scrub" data-lock="${g}" ${busy.has('lock'+g)?'disabled':''}>${ic('gate')} Lock Gate ${g}</button>`)
+             : v.st==='reopened' ? `<span>${esc(v.reason||'')}</span>`
+             : `<span>${esc(G.approver)}</span>`;
+  return `<div class="gate ${v.st} ${isWorking?'working':''} ${gateOpen===g?'sel':''}" data-gate="${g}" role="button" tabindex="0" aria-expanded="${gateOpen===g}"><span class="letter">${g}</span><span class="name">${G.name}<span style="display:inline-flex;gap:6px;align-items:center">${right}<span class="chev">${ic('chev')}</span></span></span><span class="bar"><i style="width:${Math.round(100*done/G.items.length)}%"></i></span><span class="live"><i></i>${live} · ${done}/${G.items.length} items</span><span class="cond">${esc(G.cond)}</span><span class="approver">${foot}</span></div>`;
+}
+function itemCard(it){
+  const st=it.status;
+  const canApprove = !['approved','na'].includes(st) && !(it.id==='intake' && st==='pending') && !(it.id==='package' && st!=='draft');
+  const naAllowed = NA_ALLOWED.includes(it.id) && st!=='approved';
+  const gl = gateOpen ? (GATES[gateOpen].items.includes(it.id)?'hl':'dimmed') : '';
+  const who = st==='approved'&&it.approvedBy?`Approved by ${humanName(it.approvedBy)}`: st==='na'&&it.naBy?`By ${humanName(it.naBy)}`: seatLabel(it.seat);
+  const brs=brollReqs(); const quoted=brs.filter(r=>r.status==='quoted').length; const delivered=brs.filter(r=>r.status==='delivered').length;
+  const extra = it.id==='bgm' ? `<div class="s num">${bgm.length} candidate${bgm.length===1?'':'s'}${it.choiceTitle?` · <span style="color:var(--go)">chosen: ${esc(it.choiceTitle)}</span>`:''}</div>`
+              : it.id==='broll' ? `<div class="s num">${brs.length} request${brs.length===1?'':'s'}${quoted?` · <span style="color:var(--scrub)">${quoted} quoted, waiting on you</span>`:''}${delivered?` · ${delivered} delivered`:''}</div>`
+              : it.id==='mograph' ? `<div class="s num">${mograph.filter(m=>m.thumb).length}/${mograph.length} alpha${mograph.length===1?'':'s'} rendered${it.template?' · '+esc(it.template):''}</div>` : '';
+  const open = it.id==='bgm'?'candidates': it.id==='broll'?'requests': it.id==='mograph'?'alphas': null;
+  return `<div class="item ${st==='needs_review'?'nr':''} ${st==='running'?'working':''} ${gl}" data-item="${it.id}">
+    <div class="t"><h3>${esc(it.name)}${it.xx?'<span class="xx">XX</span>':''}</h3><span class="v">v${it.version||0}</span></div>
+    <div class="s">${esc(it.summary||it.produces)}</div>${extra}
+    ${st==='needs_review'&&it.changeNote?`<div class="s" style="color:var(--hold)">${esc(it.changeNote)}</div>`:''}
+    <div class="foot"><span class="pill ${shownStatus(it)}">${STATUS_LABEL[shownStatus(it)]||st}</span><span class="seat">${esc(who)}</span></div>
+    <div class="actions">
+      <button data-open-item="${it.id}">${ic('open')} Open</button>
+      ${it.status!=='pending'&&filesOf(it).length?`<button data-open-item="${it.id}" data-open-tab="files">${ic('copy')} Files <span class="cnt">${filesOf(it).length}</span></button>`:''}
+      ${open?`<button data-open-item="${it.id}" data-open-tab="${open}">${ic(it.id==='bgm'?'music':'film')} ${it.id==='bgm'?'Candidates':it.id==='broll'?'Requests':'Alphas'}</button>`:''}
+      ${canApprove?`<button data-approve="${it.id}" ${busy.has('ap'+it.id)?'disabled':''}>${ic('check')} Approve v${it.version||0}</button>`:''}
+      ${st!=='pending'?`<button class="ghost" data-change="${it.id}">${ic('change')} Change</button>`:''}
+      ${naAllowed?(isArmed('na'+it.id)?`<button class="primary" data-na="${it.id}">Confirm N/A</button>`:`<button class="ghost" data-na="${it.id}">N/A</button>`):''}
+    </div>
+  </div>`;
+}
+function brollReqs(){ return inbox.filter(r=>r.type==='generate'&&r.item==='broll'); }
+function reqHtml(r){
+  const opts = r.type==='question' && r.status==='open' ? `<div class="opts">${(r.options||[]).map(o=>`<button data-answer="${esc(r.id)}" data-value="${esc(o)}">${esc(o)}</button>`).join('')}<button class="ghost" data-answer-text="${esc(r.id)}">Type an answer</button></div>${answerFor===r.id?`<form class="opts" data-answer-form="${esc(r.id)}" style="width:100%"><input name="text" id="ans-${esc(r.id)}" aria-label="Your answer" placeholder="Your answer" style="flex:1;min-width:140px"><button type="submit" class="primary">Send</button></form>`:''}`
+             : r.type==='generate' && r.status==='quoted' ? `<div class="opts">${isArmed('q'+r.id)?`<button class="primary" data-approve-req="${esc(r.id)}">${ic('check')} Confirm: spend ${esc(r.credits||'?')} credit${r.credits===1?'':'s'}</button>`:`<button class="scrub" data-approve-req="${esc(r.id)}">${ic('gate')} Approve ${esc(r.credits||'?')} credit${r.credits===1?'':'s'}</button>`}<button class="ghost" data-decline-req="${esc(r.id)}">Decline</button></div>` : '';
+  const kind = {question:'Question',change:'Change note',gate:'Gate',generate:r.item==='broll'?'B-roll':'Motion graphics','bgm-choice':'BGM',export:'Export'}[r.type]||r.type||'';
+  const icon = r.type==='question'?'q':r.type==='change'?'change':r.type==='generate'?'film':r.type==='bgm-choice'?'music':'gate';
+  const stat = {requested:'Requested; waiting for the quote',quoted:`Quoted: ${r.credits||'?'} credit${r.credits===1?'':'s'}${r.quoteText?' · '+r.quoteText:''}`,open:r.approvedBy?`Approved by ${humanName(r.approvedBy)}; generating`:'',waiting:`Picked up by the pipeline · waiting on: ${r.waitingText||'a question in the inbox'}`,delivered:`Delivered${r.credits?' · '+r.credits+' credit'+(r.credits===1?'':'s'):''}${r.path?' · '+r.path:''}`,declined:`Declined by ${humanName(r.declinedBy)}`,answered:`${r.type==='question'?'Answered':'Handled'} by ${humanName(r.answeredBy)}: ${r.answer||''}`}[r.status];
+  const tail = stat ? `<div class="from">${esc(stat)}</div>` : '';
+  const thumb = r.thumb ? `<img class="thumb" src="${r.thumb}" alt="${esc(r.text||'')}">` : '';
+  return `<div class="req ${esc(r.type||'')} ${esc(r.status||'')}"><span class="ic">${ic(icon)}</span><div class="from">${esc(kind)}${r.item?` · ${esc(itemOf(r.item).name)}`:''} · ${esc(humanName(r.from))} · ${fmt(r.createdAt)}</div><div class="body">${esc(r.text)}</div>${tail}${thumb}${opts}</div>`;
+}
+function previewHtml(it){ const p=previews[it.id]; if(!p||(!p.thumb&&!p.video)) return ''; const shape = p.w>0&&p.h>0 ? ` style="aspect-ratio:${Number(p.w)}/${Number(p.h)}"` : ''; const media = p.video ? `<video controls playsinline preload="metadata" src="${esc(p.video)}"${p.poster?` poster="${p.poster}"`:''}${shape}></video>` : `<img src="${p.thumb}" alt="${esc(p.caption||it.name)}">`; return `<div class="preview">${media}<div class="cap"><span>${esc(p.caption||'')}</span><span>${p.video?''+ic('film')+' watch · ':''}${fmt(p.updatedAt)}</span></div></div>`; }
+function candidatesHtml(it){
+  if(!bgm.length) return `<p class="empty">The BGM supervisor pushes three candidates here once the first cut exists. Pick one; the sync stage will not start without a choice signed here.</p>`;
+  const chosen=bgm.find(c=>c.chosen);
+  return `<div class="runmeta"><span>${bgm.length} candidate${bgm.length===1?'':'s'}${chosen?' · chosen: '+esc(chosen.title||chosen.id)+' by '+esc(humanName(chosen.chosenBy)):' · none chosen yet'}</span><span>${it.status==='approved'?'BGM approved':''}</span></div>
+  <div class="cands">${bgm.map(c=>`<div class="cand ${c.chosen?'chosen':''}"><h4>${esc(c.title||c.id)}</h4><span class="tc">${tc(c.durationSec)}${c.bpm?' · '+esc(c.bpm)+' bpm':''}${c.source?' · '+esc(c.source):''}</span>${c.audio?`<audio controls preload="none" src="${esc(c.audio)}"></audio>`:''}${c.mood?`<p>${esc(c.mood)}</p>`:''}${c.note?`<p>${esc(c.note)}</p>`:''}<div class="foot">${c.file?`<span class="mono path" title="${esc(c.file)}">${esc(String(c.file).split(/[\\/]/).pop())}</span>`:''}${c.chosen?`<span class="tag">Chosen</span>`:(isArmed('bgm'+c.id)?`<button class="primary" data-choose-bgm="${esc(c.id)}">${ic('check')} Confirm ${esc(c.title||c.id)}</button>`:`<button data-choose-bgm="${esc(c.id)}">${ic('music')} Choose</button>`)}</div></div>`).join('')}</div>`;
+}
+function requestsHtml(it){
+  const rs=brollReqs(); const gateA=gateView('A').st==='passed';
+  const form = gateA ? `<form class="reqform" id="brollf"><label>The shot<textarea name="shot" id="br-shot" placeholder="Slow push-in on a rain-streaked window at night, neon reflections, no people"></textarea></label><div class="two"><label>Duration (s)<input name="duration" id="br-duration" type="number" min="2" max="15" value="5"></label><label>Aspect<select name="aspect" id="br-aspect">${ASPECTS.map(a=>`<option ${a===(project.aspectRatio||'16:9')?'selected':''}>${a}</option>`).join('')}</select></label></div><div style="display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap"><span class="meta">One shot per request. The pipeline quotes it here before anything is spent.</span><button class="primary" type="submit">${ic('send')} Request shot</button></div></form>` : `<p class="empty">B-roll requests open once Gate A is locked.</p>`;
+  const list = rs.length ? `<div class="brs">${rs.map(r=>`<div class="br"><span class="t">${esc(r.shot||r.text)}</span><span class="st" style="color:${r.status==='delivered'?'var(--go)':r.status==='quoted'?'var(--scrub)':r.status==='declined'?'var(--faint)':'var(--dim)'}">${esc({requested:'Awaiting quote',quoted:(r.credits||'?')+' credits · approve?',open:'Generating',waiting:'Waiting on a question',delivered:'Delivered',declined:'Declined'}[r.status]||r.status)}</span><span class="m"><span>${esc(r.durationSec||'')}s · ${esc(r.aspect||'')}</span><span>${esc(humanName(r.from))} · ${fmt(r.createdAt)}</span>${r.quoteText?`<span>${esc(r.quoteText)}</span>`:''}${r.path?`<span class="mono">${esc(r.path)}</span>`:''}</span>${r.thumb?`<img src="${r.thumb}" alt="${esc(r.shot||'')}">`:''}${r.status==='quoted'?`<span class="m"><span style="display:flex;gap:6px">${isArmed('q'+r.id)?`<button class="primary" data-approve-req="${esc(r.id)}">${ic('check')} Confirm: spend ${esc(r.credits||'?')} credits</button>`:`<button class="scrub" data-approve-req="${esc(r.id)}">${ic('gate')} Approve ${esc(r.credits||'?')} credits</button>`}<button class="ghost" data-decline-req="${esc(r.id)}">Decline</button></span></span>`:''}</div>`).join('')}</div>` : `<p class="empty">No B-roll requested yet.</p>`;
+  return form+list;
+}
+function alphasHtml(it){
+  if(!mograph.length) return `<p class="empty">Once Gate A is locked the motion-graphics director proposes a template through the inbox; the sample alpha appears here for approval before the batch renders.</p>`;
+  const sample=mograph.find(m=>m.sample); const drawn=mograph.filter(m=>m.thumb).length;
+  return `<div class="runmeta"><span>${drawn}/${mograph.length} rendered${it.template?' · '+esc(it.template):''}${sample?' · sample '+esc(sample.id)+(sample.approvedBy?' approved':''):''}</span></div>
+  <div class="alphas">${mograph.map(m=>`<div class="alpha ${m.sample?'sample':''}"><div class="th">${m.thumb?`<img src="${m.thumb}" alt="${esc(m.id)}">`:`<span>${esc(m.id)} · not rendered</span>`}</div><div class="cap"><b>${esc(m.id)}${m.sample?' · sample':''}</b><span class="meta">${esc(m.variant||'')}${m.durationSec?' · '+tc(m.durationSec):''}${m.approvedBy?' · approved by '+esc(humanName(m.approvedBy)):''}</span>${m.thumb&&!m.approvedBy?`<span><button class="primary" data-approve-alpha="${esc(m.id)}">${ic('check')} Approve${m.sample?' sample':''}</button></span>`:''}</div></div>`).join('')}</div>`;
+}
+// Every file a version produced, with where it sits on the pipeline's computer. record-version.js
+// lists them (a folder version lists every file inside it) and stamps jobDir, the job folder's
+// full path; older records carry only the one file, so they show that.
+function filesOf(it, v){
+  const rec = v || (versions[it.id]||[]).find(x=>Number(x.n)===Number(it.version)) || null;
+  const list = (rec&&rec.files) || it.files || [];
+  if(list.length) return list;
+  const p = (rec&&(rec.file||rec.path)) || it.file;
+  return p ? [{name:String(p).split('/').pop(), path:p, bytes:(rec&&rec.bytes)||it.bytes}] : [];
+}
+function fullPath(it, f, v){ const dir=(v&&v.jobDir)||it.jobDir||''; return dir?dir.replace(/\/+$/,'')+'/'+f.path:f.path; }
+function sizeLabel(b){ if(b==null) return ''; return b<1024?b+' B':b<1048576?(b/1024).toFixed(1)+' KB':(b/1048576).toFixed(1)+' MB'; }
+function filesHtml(it){
+  const vs=(versions[it.id]||[]).slice().sort((a,b)=>Number(b.n)-Number(a.n));
+  const groups = vs.length ? vs : (it.file?[null]:[]);
+  if(!groups.length) return '<p class="empty">Nothing has been written for this item yet.</p>';
+  return groups.map((v,i)=>{
+    const fl=filesOf(it, v); const n=v?v.n:it.version; const more=(v&&v.filesMore)||0;
+    const paths=fl.map(f=>fullPath(it,f,v));
+    const rows=fl.map((f,k)=>`<div class="seat-row" style="grid-template-columns:minmax(0,1fr) auto auto;cursor:default"><span style="min-width:0"><b>${esc(f.name||f.path.split('/').pop())}</b><br><span class="mono" style="font-size:11px;word-break:break-all;color:var(--faint)">${esc(paths[k])}</span></span><span class="num">${esc(sizeLabel(f.bytes))}</span><button class="ghost" data-copy-path="${esc(paths[k])}" aria-label="Copy the path of ${esc(f.name||f.path)}">${ic('copy')}</button></div>`).join('');
+    return `<details ${i===0?'open':''} style="margin-bottom:10px"><summary class="subh" style="cursor:pointer">v${esc(n)}${v&&v.note?' · '+esc(v.note):''} <span class="num" style="color:var(--faint)">${fl.length+more} file${fl.length+more===1?'':'s'}${v&&v.at?' · '+fmt(v.at):''}</span></summary>
+      <div style="display:flex;gap:6px;margin:6px 0"><button class="ghost" data-copy-path="${esc(paths.join('\n'))}">${ic('copy')} Copy all paths</button></div>
+      <div class="seats">${rows}${more?`<p class="empty">and ${more} more in the same folder</p>`:''}</div></details>`;
+  }).join('');
+}
+// Tokens as people read them: 287k, 1.2M.
+function tok(n){ n=Number(n)||0; return n>=1e6?(n/1e6).toFixed(n>=1e7?0:1)+'M':n>=1e3?Math.round(n/1e3)+'k':String(n); }
+function costLine(c){ if(!c) return ''; const parts=[]; if(c.runs) parts.push(tok(c.tokens)+' tokens'); if(c.creditsSpent!=null) parts.push(c.creditsSpent+' credit'+(c.creditsSpent===1?'':'s')); return parts.join(' · '); }
+// The project's cost from the runs this page already reads, with credits from the tally
+// tally-cost.js pushed onto the project.
+function costBox(){
+  const rows=ITEMS.map(i=>{ const rs=runs[i.id]||[]; if(!rs.length) return null;
+    let t=0,u=0,untr=0; const models=[]; rs.forEach(r=>{ if(r.tokens!=null) t+=Number(r.tokens)||0; else untr++; if(r.turns!=null) u+=Number(r.turns)||0; if(r.model&&!models.includes(r.model)) models.push(r.model); });
+    return {id:i.id,name:i.name,t,u,n:rs.length,untr,models}; }).filter(Boolean);
+  const total=rows.reduce((a,r)=>a+r.t,0), turns=rows.reduce((a,r)=>a+r.u,0), n=rows.reduce((a,r)=>a+r.n,0), untr=rows.reduce((a,r)=>a+r.untr,0);
+  const c=project&&project.cost||{};
+  const credits=c.creditsSpent!=null?`<div class="seat-row" style="grid-template-columns:1fr auto;cursor:default"><span>3echo credits</span><b class="num">${c.creditsSpent} of ${c.creditsCeiling??'?'}</b></div>`:'';
+  return `<div class="box"><h2>Cost <span>directors' runs; the orchestrator is not counted</span></h2>
+    ${n?`<div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap"><b style="font-size:24px" class="num">${total.toLocaleString('en-US')}</b><span class="meta">tokens · ${n} run${n===1?'':'s'} · ${turns} turns${untr?` · ${untr} without a count`:''}</span></div>`:'<p class="empty">No runs recorded yet.</p>'}
+    ${credits}
+    ${rows.length?`<div class="seats">${rows.map(r=>`<button class="seat-row" style="grid-template-columns:1fr auto" data-open-item="${r.id}" data-open-tab="trace" title="${esc(r.models.join(', '))} · ${r.u} turns"><span><b>${esc(r.name)}</b>${r.n>1?` · ${r.n} runs`:''}</span><span class="num">${tok(r.t)}${total?` · ${Math.round(r.t*100/total)}%`:''}</span></button>`).join('')}</div>`:''}
+  </div>`;
+}
+function drawerHtml(){
+  const it=itemOf(drawer); const vs=versions[it.id]||[]; const rs=runsOf(it.id);
+  const run = rs.find(r=>r.id===runSel) || rs[0] || null;
+  const special = it.id==='bgm'?[['candidates','Candidates']]: it.id==='broll'?[['requests','Requests']]: it.id==='mograph'?[['alphas','Alphas']]: [];
+  const tabs=[...special,['output','Output'],['files','Files'],['trace','Trace'],['about','About']];
+  const tab = tabs.some(t=>t[0]===drawerTab)?drawerTab:(special.length?special[0][0]:'output');
+  let body='';
+  if(tab==='candidates') body=candidatesHtml(it);
+  else if(tab==='requests') body=requestsHtml(it);
+  else if(tab==='alphas') body=alphasHtml(it);
+  else if(tab==='files') body=filesHtml(it);
+  else if(tab==='output') body = previewHtml(it) + (it.summary?`<div class="subh">Summary · v${it.version||0}</div>${md(it.summary)}`:'') + (it.file?`<div class="runmeta" style="margin-top:10px"><span class="mono">${esc(it.file)}</span><span class="mono">${it.sha256?esc(String(it.sha256).slice(0,12))+'…':''}${it.bytes?' · '+esc(it.bytes)+' B':''}</span></div>`:'') + (run&&run.output?`<div class="subh">Output of the last run</div><pre>${esc(run.output)}</pre>`:'') + (!it.summary&&!(run&&run.output)&&!previews[it.id]?`<p class="empty">Nothing delivered yet.</p>`:'') + (vs.length?`<div class="subh">Versions</div><div class="vlist">${vs.map(v=>`<div class="vrow"><span class="mono">v${v.n}</span><span>${esc(v.note||'')}${v.file?` <span class="mono" style="color:var(--faint)">${esc(v.file)}</span>`:''}</span><span class="meta">${fmt(v.at)} · ${esc(seatLabel(v.seat||''))}</span></div>`).join('')}</div>`:'');
+  else if(tab==='trace') body = rs.length ? `<div class="runmeta"><span>${rs.length} run${rs.length===1?'':'s'}</span><span>${run?fmt(run.startedAt):''}</span></div>${rs.map(r=>`<button class="seat-row" data-run="${esc(r.id)}" data-open-run="${esc(r.item)}" style="${r.id===(run&&run.id)?'color:var(--paper)':''}"><span class="mono">v${r.version}</span><span>${esc(seatLabel(r.seat))}${r.model?' · '+esc(r.model):''}${r.note?' · '+esc(r.note):''}</span><span class="st ${r.status==='running'?'working':'done'}">${r.status||'done'}</span></button>`).join('')}${run&&run.prompt?`<div class="subh">Prompt</div><pre>${esc(run.prompt)}</pre>`:''}${run&&run.trace?`<div class="subh">Trace</div><pre>${esc(run.trace)}</pre>`:''}` : `<p class="empty">No runs recorded for this item.</p>`;
+  else body = `<dl class="kv"><dt>Produces</dt><dd>${esc(it.produces)}</dd><dt>Seat</dt><dd>${esc(seatLabel(it.seat))}</dd><dt>Needs</dt><dd>${it.deps.length?it.deps.map(d=>esc(itemOf(d).name)).join(', '):'Nothing upstream'}</dd><dt>Gate</dt><dd>${gateOfItem(it.id)?'Gate '+gateOfItem(it.id)+' · '+esc(GATES[gateOfItem(it.id)].name):'Before both gates'}</dd><dt>Human</dt><dd>${it.xx?'A person declares or approves this item.':'Produced by the pipeline; a person approves the version.'}</dd></dl>`;
+  return `<div class="scrim" data-close></div><div class="drawer" role="dialog" aria-label="${esc(it.name)}">
+    <div class="dh"><div><h2>${esc(it.name)}${it.xx?'<span class="xx">XX</span>':''}</h2><div class="meta">v${it.version||0} · ${STATUS_LABEL[shownStatus(it)]}${it.approvedBy?' · approved by '+esc(humanName(it.approvedBy)):''}</div></div><button class="ghost" data-close aria-label="Close">${ic('x')}</button></div>
+    <div class="tabs">${tabs.map(t=>`<button data-tab="${t[0]}" class="${t[0]===tab?'on':''}">${t[1]}</button>`).join('')}</div>
+    <div class="dbody">${body}${changeFor===it.id?`<form class="note" data-change-form="${it.id}"><div class="subh">What should change</div><textarea name="text" id="chg-${it.id}" aria-label="Change note" placeholder="Say what is wrong and what right looks like."></textarea><div class="row"><button type="button" class="ghost" data-change-cancel>Cancel</button><button type="submit" class="primary">Send change</button></div></form>`:''}</div>
+  </div>`;
+}
+function footer(){ return `<div class="foot"><span>Post Control · the decision surface for the post-production pipeline</span><span>${dbState==='on'?'Live':'Model'}</span></div>`; }
+
+/* ---------- wiring ---------- */
+function wire(){
+  const app=$('#app');
+  const meSel=$('#me'); if(meSel) meSel.onchange=e=>{ me=e.target.value; try{ localStorage.setItem('postctl.me', me); }catch(x){} render(); };
+  app.onclick=async e=>{
+    const t=e.target.closest('[data-open],[data-gate],[data-open-item],[data-approve],[data-change],[data-na],[data-lock],[data-answer],[data-answer-text],[data-copy],[data-signal],[data-close],[data-tab],[data-run],[data-choose-bgm],[data-approve-req],[data-decline-req],[data-approve-alpha],[data-change-cancel],[data-copy-path],[data-home]');
+    if(t&&t.dataset.home!=null){ e.preventDefault(); drawer=null; changeFor=null; location.hash='#/'; return; }
+    if(t&&t.dataset.copyPath!=null){ try { await navigator.clipboard.writeText(t.dataset.copyPath); toast(t.dataset.copyPath.includes('\n')?'Paths copied':'Path copied', 'ok'); } catch { toast('Could not copy. Select the path and copy it by hand.'); } return; }
+    if(!t) return;
+    if(t.dataset.open){ location.hash='#/p/'+encodeURIComponent(t.dataset.open); return; }
+    if(t.dataset.gate!==undefined && !t.closest('[data-lock]')){ gateOpen = gateOpen===t.dataset.gate?null:t.dataset.gate; render(); return; }
+    if(t.dataset.openItem){ drawer=t.dataset.openItem; drawerTab=t.dataset.openTab||'output'; runSel=null; changeFor=null; render(); return; }
+    if(t.dataset.openRun){ drawer=t.dataset.openRun; drawerTab='trace'; runSel=t.dataset.run||null; render(); return; }
+    if(t.dataset.close!==undefined){ drawer=null; changeFor=null; render(); return; }
+    if(t.dataset.tab){ drawerTab=t.dataset.tab; render(); return; }
+    if(t.dataset.approve){ const id=t.dataset.approve; await guarded('ap'+id, ()=>approve(id)); return; }
+    if(t.dataset.change){ drawer=t.dataset.change; changeFor=t.dataset.change; drawerTab='output'; render(); setTimeout(()=>{ const ta=$('#chg-'+changeFor); if(ta) ta.focus(); },30); return; }
+    if(t.dataset.changeCancel!==undefined){ changeFor=null; render(); return; }
+    if(t.dataset.na){ const id=t.dataset.na; if(!isArmed('na'+id)){ arm('na'+id); return; } armed=null; await guarded('na'+id, ()=>markNA(id)); return; }
+    if(t.dataset.lock){ const g=t.dataset.lock; if(!isArmed('lock'+g)){ arm('lock'+g); return; } armed=null; await guarded('lock'+g, ()=>lockGate(g)); return; }
+    if(t.dataset.chooseBgm){ const id=t.dataset.chooseBgm; if(!isArmed('bgm'+id)){ arm('bgm'+id); return; } armed=null; await guarded('bgm'+id, ()=>chooseBgm(id)); return; }
+    if(t.dataset.approveReq){ const id=t.dataset.approveReq; const r=inbox.find(x=>x.id===id); if(!r) return; if(!isArmed('q'+id)){ arm('q'+id); return; } armed=null; await guarded('q'+id, ()=>approveBroll(r)); return; }
+    if(t.dataset.declineReq){ const id=t.dataset.declineReq; const r=inbox.find(x=>x.id===id); if(!r) return; await guarded('d'+id, async()=>{ await write('projects/'+project.id+'/inbox/'+id,{...strip(r),status:'declined',declinedBy:me,declinedAt:now()}); await log(`B-roll declined: ${r.shot||r.text}`, 'broll'); toast('Declined', 'ok'); await signalPipeline('B-roll declined: '+String(r.shot||'').slice(0,50)); }); return; }
+    if(t.dataset.approveAlpha){ const id=t.dataset.approveAlpha; await guarded('al'+id, ()=>approveMograph(id)); return; }
+    if(t.dataset.answer){ const r=inbox.find(x=>x.id===t.dataset.answer); if(r) await guarded('an'+r.id, ()=>answer(r, t.dataset.value)); return; }
+    if(t.dataset.answerText){ answerFor = answerFor===t.dataset.answerText?null:t.dataset.answerText; render(); setTimeout(()=>{ const i=$('#ans-'+answerFor); if(i) i.focus(); },30); return; }
+    if(t.dataset.copy!==undefined){ await copyForChat(); return; }
+    if(t.dataset.signal!==undefined){ await guarded('sig', ()=>signalPipeline('Signal from '+humanName(me))); return; }
+  };
+  app.onkeydown=e=>{ const g=e.target.closest&&e.target.closest('.gate[role=button]'); if(g&&(e.key==='Enter'||e.key===' ')){ e.preventDefault(); gateOpen=gateOpen===g.dataset.gate?null:g.dataset.gate; render(); } };
+  app.onsubmit=async e=>{
+    e.preventDefault(); const f=e.target;
+    if(f.id==='newp'){ await guarded('newp', ()=>createProject(f)); return; }
+    if(f.id==='msgf'){ const text=(f.querySelector('[name=text]').value||'').trim(); if(!text) return; await log(text); f.reset(); toast('Posted', 'ok'); return; }
+    if(f.id==='brollf'){ await guarded('brollf', ()=>requestBroll(f)); return; }
+    if(f.dataset.changeForm){ const id=f.dataset.changeForm; const note=f.querySelector('[name=text]').value; await guarded('chg'+id, ()=>requestChange(id, note)); changeFor=null; render(); return; }
+    if(f.dataset.answerForm){ const r=inbox.find(x=>x.id===f.dataset.answerForm); const v=(f.querySelector('[name=text]').value||'').trim(); if(r&&v){ await guarded('an'+r.id, ()=>answer(r, v)); answerFor=null; render(); } return; }
+  };
+}
+boot();
+</script>

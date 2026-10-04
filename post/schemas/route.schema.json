@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "RouteDecision v1 (creative-studio-post)",
+  "type": "object",
+  "required": ["schemaVersion", "jobId", "status", "requiredDisciplines", "riskFlags", "gates", "confidence", "missingFields", "unsupported", "rationale", "createdAt"],
+  "properties": {
+    "schemaVersion": { "const": "1.0" },
+    "jobId": { "type": ["string", "null"] },
+    "client": { "type": ["string", "null"] },
+    "status": { "enum": ["ROUTED", "NEEDS_CLARIFICATION", "UNSUPPORTED", "BLOCKED"] },
+    "workflowId": { "type": ["string", "null"] },
+    "workflowVersion": { "type": ["string", "null"] },
+    "requiredDisciplines": { "type": "array", "items": { "type": "string" } },
+    "owner": { "type": ["string", "null"] },
+    "support": { "type": "array", "items": { "type": "string" } },
+    "riskFlags": { "type": "array", "items": { "enum": ["ambiguous_request", "no_vo", "no_audio_files", "no_proxies", "long_deliverable", "credit_spend"] } },
+    "modelAddedRiskFlags": { "type": "array", "items": { "type": "string" } },
+    "tags": { "type": "array", "items": { "enum": ["audio_led", "picture_led", "has_reference_cut", "has_colour_direction", "no_vo", "vertical", "generated_footage", "hybrid_footage"] } },
+    "gates": { "type": "array", "items": { "enum": ["A", "B"] } },
+    "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+    "missingFields": { "type": "array", "items": { "type": "string" } },
+    "blockers": { "type": "array", "items": { "type": "string" } },
+    "unsupported": { "type": "array", "items": { "type": "string" } },
+    "rationale": { "type": "array", "items": { "type": "string" } },
+    "createdAt": { "type": "string" }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "workflows": [
+    {
+      "id": "post",
+      "file": "workflows/post.md",
+      "kinds": ["postproduction"],
+      "states": [
+        "intake",
+        "ingest",
+        "sequence",
+        "bgm",
+        "vo-drop",
+        "sync",
+        "cut-audio-review",
+        "gate-a",
+        "broll",
+        "mograph",
+        "package",
+        "gate-b"
+      ],
+      "gates": ["A", "B"]
+    }
+  ]
+}

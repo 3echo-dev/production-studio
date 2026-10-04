@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "RoughEDL v1 (creative-studio-post)",
+  "type": "object",
+  "required": ["schemaVersion", "jobId", "version", "aspectRatio", "fps", "cuts"],
+  "properties": {
+    "schemaVersion": { "const": "1.0" },
+    "jobId": { "type": "string" },
+    "version": { "type": "integer", "minimum": 1 },
+    "aspectRatio": { "type": "string" },
+    "fps": { "type": "number" },
+    "generatedBy": { "enum": ["clip-embedder", "human", "reference-cut", "panel-id"] },
+    "cuts": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["order", "panelId", "clipSha256", "inSec", "outSec"],
+        "properties": {
+          "order": { "type": "integer", "minimum": 1 },
+          "panelId": {
+            "type": "string",
+            "pattern": "^P\\d{2,3}$",
+            "description": "The storyboard panel this cut satisfies."
+          },
+          "clipSha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "inSec": { "type": "number", "minimum": 0 },
+          "outSec": { "type": "number", "minimum": 0 },
+          "matchScore": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+          "matchReason": { "type": ["string", "null"] },
+          "note": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "unmatchedPanels": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^P\\d{2,3}$" },
+      "description": "Storyboard panels with no confident clip match; surfaced for a human take-pick."
+    }
+  }
+}

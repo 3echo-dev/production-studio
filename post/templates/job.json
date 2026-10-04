@@ -1,0 +1,26 @@
+{
+  "schemaVersion": "1.0",
+  "jobId": "{job-id}",
+  "client": "{client}",
+  "title": "{title}",
+  "kind": "postproduction",
+  "driveFolder": "",
+  "prePipelineReleaseFolder": "",
+  "prePipelineReleaseHash": null,
+  "aspectRatio": null,
+  "deliverableDurationSec": null,
+  "audioLed": false,
+  "referenceCutPath": null,
+  "colourDirection": null,
+  "approvers": {
+    "cut": "creative-director",
+    "delivery": "lead"
+  },
+  "requestedAt": "{timestamp}",
+  "_enums": {
+    "kind": ["postproduction"],
+    "aspectRatio": ["16:9", "9:16", "1:1", "4:5", "2.39:1"],
+    "audioLed": "true when VO leads the cut (interview, doc); false when picture leads",
+    "approvers": "workspace.json values; cut locks Gate A, delivery approves Gate B"
+  }
+}

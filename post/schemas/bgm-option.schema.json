@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "BgmOptions v1 (creative-studio-post)",
+  "type": "object",
+  "required": ["schemaVersion", "jobId", "generatedAt", "candidates"],
+  "properties": {
+    "schemaVersion": { "const": "1.0" },
+    "jobId": { "type": "string" },
+    "generatedAt": { "type": "string" },
+    "brief": {
+      "type": "object",
+      "properties": {
+        "toneWords": { "type": "array", "items": { "type": "string" } },
+        "referenceTracks": { "type": "array", "items": { "type": "string" } },
+        "targetBpm": { "type": ["number", "null"] },
+        "energyCurve": { "enum": ["build", "flat", "peak-mid", "peak-end", "release"] }
+      }
+    },
+    "candidates": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "required": ["id", "source", "title", "durationSec", "bpm", "keyRoot", "keyMode", "licensing"],
+        "properties": {
+          "id": { "type": "string" },
+          "source": { "enum": ["suno", "musicbed", "artlist", "epidemic-sound", "library-local", "elevenlabs-music"] },
+          "title": { "type": "string" },
+          "artist": { "type": ["string", "null"] },
+          "durationSec": { "type": "number", "minimum": 0 },
+          "bpm": { "type": "number", "minimum": 0 },
+          "keyRoot": { "type": "string" },
+          "keyMode": { "enum": ["major", "minor"] },
+          "moodTags": { "type": "array", "items": { "type": "string" } },
+          "licensing": { "enum": ["royalty-free", "single-use", "unlimited", "custom"] },
+          "previewUrl": { "type": ["string", "null"] },
+          "localPath": { "type": ["string", "null"] },
+          "rationale": { "type": "string", "description": "Why this track fits the brief." }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,735 @@
+<title>Post-Production</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --ink:#0f1113;
+  --panel:#1a1d21;
+  --panel2:#22262c;
+  --line:#2e3339;
+  --line2:#3d434b;
+  --paper:#e8e6df;
+  --dim:#a49d8f;
+  --faint:#6e6a60;
+  --pencil:#8a7f6f;
+  --amber:#c98d3a;
+  --amber-dim:#7d5620;
+  --slate:#4a7a8c;
+  --slate-dim:#2b4954;
+  --green:#7ea87a;
+  --red:#c96547;
+
+  --mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  --sans:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --cond:'Barlow Condensed','Arial Narrow',Impact,sans-serif;
+
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{background:var(--ink)}
+body{
+  margin:0;
+  background:var(--ink);
+  color:var(--paper);
+  font-family:var(--sans);
+  font-size:14px;
+  line-height:1.55;
+  padding-block:0 64px;
+  padding-inline:clamp(20px,4vw,56px);
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--amber);color:var(--ink)}
+
+h1,h2,h3,h4{
+  font-family:var(--cond);
+  text-transform:uppercase;
+  letter-spacing:.03em;
+  margin:0;
+  text-wrap:balance;
+  font-weight:700;
+  color:var(--paper);
+}
+.mono{font-family:var(--mono);font-size:12px;color:var(--dim)}
+.num{font-variant-numeric:tabular-nums}
+p{margin:0}
+a{color:var(--amber);text-decoration:none;border-bottom:1px dotted var(--amber-dim)}
+
+/* Header */
+.slate-header{
+  border-bottom:1px solid var(--line2);
+  padding-block:28px 22px;
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:36px;
+  flex-wrap:wrap;
+}
+.slate-header .id{display:flex;flex-direction:column;gap:6px}
+.slate-header .kicker{
+  font-family:var(--cond);
+  font-size:12px;
+  letter-spacing:.22em;
+  color:var(--amber);
+  text-transform:uppercase;
+  font-weight:600;
+}
+.slate-header h1{font-size:52px;line-height:.95;letter-spacing:.01em}
+.slate-header .sub{color:var(--dim);font-size:15px;max-width:620px;margin-top:4px}
+.slate-plate{
+  display:grid;
+  grid-template-columns:auto 1fr;
+  gap:6px 18px;
+  font-size:12px;
+  align-content:start;
+  padding:14px 18px;
+  border:1px solid var(--line2);
+  background:var(--panel);
+  border-radius:2px;
+  min-width:260px;
+}
+.slate-plate dt{
+  font-family:var(--cond);
+  text-transform:uppercase;
+  letter-spacing:.12em;
+  color:var(--faint);
+  font-size:11px;
+  padding-top:1px;
+}
+.slate-plate dd{margin:0;color:var(--paper);font-family:var(--mono);font-size:12px}
+
+/* Section rhythm */
+section{padding-block:36px 8px;border-bottom:1px solid var(--line)}
+section:last-of-type{border-bottom:0}
+.sec-h{
+  display:flex;
+  align-items:baseline;
+  gap:14px;
+  margin-bottom:18px;
+  flex-wrap:wrap;
+}
+.sec-h .n{
+  font-family:var(--cond);
+  font-size:12px;
+  letter-spacing:.22em;
+  color:var(--amber);
+}
+.sec-h h2{font-size:26px}
+.sec-h .lede{color:var(--dim);font-size:13.5px;flex-basis:100%;max-width:780px;margin-top:2px}
+
+/* Intake grid */
+.intake{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:14px;
+}
+.crate{
+  background:var(--panel);
+  border:1px solid var(--line);
+  padding:14px 16px 16px;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+.crate .label{
+  display:flex;
+  justify-content:space-between;
+  align-items:baseline;
+  gap:10px;
+  padding-bottom:6px;
+  border-bottom:1px dashed var(--line2);
+}
+.crate .label h3{font-size:15px;letter-spacing:.06em}
+.crate .label .tag{
+  font-family:var(--mono);
+  font-size:10px;
+  color:var(--faint);
+  letter-spacing:.05em;
+}
+.crate ul{margin:0;padding-left:0;list-style:none;display:flex;flex-direction:column;gap:5px}
+.crate li{
+  display:grid;
+  grid-template-columns:auto 1fr;
+  gap:8px;
+  font-size:13px;
+  color:var(--dim);
+}
+.crate li::before{
+  content:"→";
+  color:var(--pencil);
+  font-family:var(--mono);
+  padding-top:1px;
+}
+.crate .caption{font-size:12px;color:var(--faint);margin-top:4px;font-style:italic}
+
+/* Workflow table */
+.wrap-scroll{overflow-x:auto;border:1px solid var(--line2);background:var(--panel)}
+table.workflow{
+  width:100%;
+  min-width:900px;
+  border-collapse:collapse;
+  font-size:13px;
+}
+table.workflow th,table.workflow td{
+  padding:9px 12px;
+  text-align:left;
+  vertical-align:top;
+  border-bottom:1px solid var(--line);
+}
+table.workflow th{
+  font-family:var(--cond);
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  color:var(--faint);
+  font-size:11px;
+  background:var(--panel2);
+  font-weight:600;
+  white-space:nowrap;
+  position:sticky;
+  top:0;
+}
+table.workflow td.n{font-family:var(--mono);color:var(--pencil);width:34px;font-size:12px}
+table.workflow td.state{font-family:var(--cond);text-transform:uppercase;letter-spacing:.05em;font-weight:600;font-size:14px;color:var(--paper);white-space:nowrap}
+table.workflow td.dir{color:var(--dim);font-size:12.5px;white-space:nowrap}
+table.workflow td.produces{color:var(--paper);font-size:12.5px}
+table.workflow td.hu{font-family:var(--mono);font-size:11px;color:var(--amber)}
+table.workflow tr.gate td{background:rgba(201,141,58,.06);border-top:1px solid var(--amber-dim);border-bottom:1px solid var(--amber-dim)}
+table.workflow tr.gate td.state{color:var(--amber);letter-spacing:.1em}
+table.workflow tr.review td.state{color:var(--slate)}
+table.workflow tr:last-child td{border-bottom:0}
+.xx{
+  font-family:var(--cond);
+  font-weight:700;
+  font-size:10px;
+  letter-spacing:.14em;
+  color:var(--ink);
+  background:var(--amber);
+  padding:1px 5px;
+  border-radius:2px;
+  display:inline-block;
+  line-height:1.4;
+}
+
+/* Agent + skill grids */
+.roster{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+  gap:10px;
+}
+.seat{
+  border:1px solid var(--line);
+  background:var(--panel);
+  padding:12px 14px;
+  display:grid;
+  grid-template-columns:auto 1fr;
+  gap:2px 14px;
+}
+.seat .num{
+  font-family:var(--mono);
+  font-size:11px;
+  color:var(--amber);
+  grid-row:1/3;
+  padding-top:2px;
+}
+.seat h4{
+  font-size:14px;
+  letter-spacing:.05em;
+  color:var(--paper);
+}
+.seat p{font-size:12px;color:var(--dim);line-height:1.5}
+
+/* Tools stack */
+.stack{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:12px;
+}
+.rack{
+  background:var(--panel);
+  border:1px solid var(--line);
+  padding:14px 16px 16px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+.rack .head{
+  display:flex;
+  justify-content:space-between;
+  align-items:baseline;
+  gap:10px;
+  padding-bottom:7px;
+  border-bottom:1px solid var(--line2);
+}
+.rack .head h4{font-size:14px;letter-spacing:.08em}
+.rack .head .badge{
+  font-family:var(--mono);
+  font-size:10px;
+  color:var(--slate);
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+.rack ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:4px}
+.rack li{
+  font-size:12.5px;
+  color:var(--paper);
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:8px;
+  align-items:baseline;
+  padding:2px 0;
+}
+.rack li span.role{
+  font-family:var(--mono);
+  font-size:10.5px;
+  color:var(--faint);
+  letter-spacing:.02em;
+}
+.rack .note{font-size:11.5px;color:var(--faint);font-style:italic;margin-top:2px}
+
+/* Editor Q&A callout */
+.qa{
+  border:1px solid var(--amber-dim);
+  background:linear-gradient(180deg,rgba(201,141,58,.08) 0%,rgba(201,141,58,.02) 100%);
+  padding:22px 24px 24px;
+  display:grid;
+  grid-template-columns:auto 1fr;
+  gap:6px 22px;
+  align-items:start;
+}
+.qa .stamp{
+  font-family:var(--cond);
+  font-size:11px;
+  letter-spacing:.24em;
+  color:var(--amber);
+  border:1px solid var(--amber);
+  padding:6px 10px 5px;
+  text-transform:uppercase;
+  white-space:nowrap;
+}
+.qa .head{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  padding-top:4px;
+}
+.qa h3{font-size:22px;letter-spacing:.02em}
+.qa .a{
+  grid-column:2;
+  color:var(--paper);
+  font-size:14.5px;
+  line-height:1.6;
+  max-width:720px;
+}
+.qa .a strong{color:var(--amber);font-weight:600}
+.qa .a p+p{margin-top:10px}
+.qa .why{
+  grid-column:2;
+  margin-top:12px;
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:10px;
+  padding-top:12px;
+  border-top:1px dashed var(--amber-dim);
+}
+.qa .why .r{
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+}
+.qa .why .r .k{
+  font-family:var(--cond);
+  font-size:11px;
+  letter-spacing:.14em;
+  color:var(--amber);
+  text-transform:uppercase;
+}
+.qa .why .r .v{font-size:12.5px;color:var(--dim);line-height:1.5}
+@media (max-width:600px){
+  .qa{grid-template-columns:1fr}
+  .qa .a,.qa .why{grid-column:1}
+}
+
+/* Handoff */
+.tree{
+  background:var(--panel);
+  border:1px solid var(--line);
+  padding:16px 20px;
+  font-family:var(--mono);
+  font-size:12.5px;
+  line-height:1.7;
+  color:var(--dim);
+  overflow-x:auto;
+}
+.tree .f{color:var(--paper)}
+.tree .d{color:var(--amber)}
+.tree .n{color:var(--pencil)}
+.tree .c{color:var(--faint);font-style:italic}
+
+/* Footer */
+.foot{
+  margin-top:30px;
+  padding-top:16px;
+  border-top:1px solid var(--line);
+  display:flex;
+  justify-content:space-between;
+  gap:20px;
+  flex-wrap:wrap;
+  font-size:11.5px;
+  color:var(--faint);
+  font-family:var(--mono);
+}
+</style>
+
+<header class="slate-header">
+  <div class="id">
+    <span class="kicker">3echo · Creative Studio · Blueprint</span>
+    <h1>Post-Production</h1>
+    <p class="mono" style="font-size:13px;color:var(--pencil);margin-top:2px;letter-spacing:.04em">Shoot day &nbsp;→&nbsp; editor's timeline</p>
+    <p class="sub">Sibling plugin to <a href="#">creative-studio-pipeline</a>. Turns shot footage and audio files into a Premiere-ready first cut with three BGM options, a synced audio track, on-demand B-roll and mograph alphas — reaching 70&nbsp;–&nbsp;80% of a first cut in one day, so the editor's Premiere Pro session starts already loaded.</p>
+  </div>
+  <dl class="slate-plate" aria-label="Plugin metadata">
+    <dt>Plugin</dt><dd>creative-studio-post</dd>
+    <dt>Version</dt><dd>0.1.0 · built, unproven on real footage</dd>
+    <dt>Repo</dt><dd>3echo-dev/CS-post-production</dd>
+    <dt>MCP</dt><dd>agentc (extended, not forked)</dd>
+    <dt>Editor target</dt><dd>Adobe Premiere Pro</dd>
+    <dt>Handoff format</dt><dd>FCPXML + asset bundle</dd>
+    <dt>Gates</dt><dd>2 · picture+audio, delivery</dd>
+    <dt>Board</dt><dd><a href="https://claude.ai/artifact/5q9DJ3KAjiZ6KQqapY5gzG">Post Control</a> · published, private</dd>
+    <dt>Tests</dt><dd>15 files · all green · 21 Sep 2026</dd>
+    <dt>Engine</dt><dd>3echo Motion + local scripts</dd>
+    <dt>Frame</dt><dd>our directors + gates</dd>
+    <dt>Video engine</dt><dd>SeeDance (via AgentC)</dd>
+    <dt>Image engine</dt><dd>GPT image (via AgentC)</dd>
+  </dl>
+</header>
+
+<section>
+  <div class="sec-h">
+    <span class="n">01</span>
+    <h2>What Enters Post</h2>
+    <p class="lede">Two arrivals converge in the intake bay: the release package from the pre-prod plugin (the paper trail) and the crew's Drive folder (the physical shoot output). Intake refuses to advance if either side is missing.</p>
+  </div>
+  <div class="intake">
+    <div class="crate">
+      <div class="label"><h3>From pre-prod release</h3><span class="tag">GATE C · CLOSED</span></div>
+      <ul>
+        <li>script.md — final approved</li>
+        <li>storyboard.json — shot list with frame refs</li>
+        <li>concept-breakdown.xlsx — talent, prop, location line items</li>
+        <li>call-sheet-day-*.pdf — one per shoot day</li>
+        <li>storyboard/v{n}/P*.png — the actual visual panels</li>
+      </ul>
+      <p class="caption">Bound by hash to the pre-prod release. A change upstream reopens Post at intake.</p>
+    </div>
+    <div class="crate">
+      <div class="label"><h3>From the shoot</h3><span class="tag">DRIVE FOLDER</span></div>
+      <ul>
+        <li>footage/day-*/A001_C*.mov — camera masters</li>
+        <li>footage/day-*/proxies/ — editing proxies (optional)</li>
+        <li>audio/lav/ — talent lavalier tracks</li>
+        <li>audio/boom/ — boom mic capture</li>
+        <li>audio/ambient/ — room tone, wild lines</li>
+        <li>slates/ — clapper reference frames</li>
+      </ul>
+      <p class="caption">Ingest computes checksums on every file. A missing take is a question, not a silent skip.</p>
+    </div>
+    <div class="crate">
+      <div class="label"><h3>Human declarations</h3><span class="tag">XX ITEMS</span></div>
+      <ul>
+        <li>Aspect ratio target (16:9 / 9:16 / 1:1)</li>
+        <li>Deliverable duration (30s / 60s / cutdowns)</li>
+        <li>Reference cut, if one exists</li>
+        <li>Colour direction — LUT / grade note</li>
+        <li>Audio hero — is this VO-led or picture-led?</li>
+      </ul>
+      <p class="caption">The pipeline never fills an <span class="xx">XX</span> for you. A blank stays a question.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-h">
+    <span class="n">02</span>
+    <h2>The Pipeline · 12 States</h2>
+    <p class="lede">One workflow, two gates, seven director agents. Picture and audio lock together — in agency post they go to the client in the same review, so one gate carries both. Human items are marked <span class="xx">XX</span>.</p>
+  </div>
+  <div class="wrap-scroll">
+    <table class="workflow">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>State</th>
+          <th>Director</th>
+          <th>Produces</th>
+          <th>Human</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="n">01</td><td class="state">Intake</td><td class="dir">post-intake-director</td><td class="produces">project.json + resolved paths to pre-prod release</td><td class="hu">XX</td></tr>
+        <tr><td class="n">02</td><td class="state">Ingest</td><td class="dir">ingest-director</td><td class="produces">manifest.json — clips, audio, checksums, shoot-day mapping</td><td class="hu">XX</td></tr>
+        <tr><td class="n">03</td><td class="state">Sequence</td><td class="dir">sequence-director</td><td class="produces">rough-edl.json + timeline.png — best takes matched to storyboard panels</td><td class="hu"></td></tr>
+        <tr><td class="n">04</td><td class="state">BGM</td><td class="dir">bgm-supervisor</td><td class="produces">3 candidate tracks with tempo, mood, licensing metadata</td><td class="hu">XX</td></tr>
+        <tr><td class="n">05</td><td class="state">VO drop</td><td class="dir">audio-engineer</td><td class="produces">vo-track.json placed against script markers</td><td class="hu">XX</td></tr>
+        <tr><td class="n">06</td><td class="state">Sync</td><td class="dir">audio-engineer</td><td class="produces">synced-track.wav + waveform.png — VO, BGM, SFX aligned to picture</td><td class="hu"></td></tr>
+        <tr class="review"><td class="n">07</td><td class="state">Cut + audio review</td><td class="dir">review-director</td><td class="produces">validation/review-a-{n}.md against the combined picture+audio rubric</td><td class="hu"></td></tr>
+        <tr class="gate"><td class="n">08</td><td class="state">Gate A · Picture + audio lock</td><td class="dir">orchestrator</td><td class="produces">approval.json — hash-bound to rough-edl + synced-track</td><td class="hu">XX</td></tr>
+        <tr><td class="n">09</td><td class="state">B-roll</td><td class="dir">broll-director</td><td class="produces">bundle/broll/*.mp4 — on-demand shot requests</td><td class="hu">XX</td></tr>
+        <tr><td class="n">10</td><td class="state">Mograph</td><td class="dir">mograph-director</td><td class="produces">bundle/mograph/*.mov — alpha-channel lower thirds and reveals</td><td class="hu">XX</td></tr>
+        <tr><td class="n">11</td><td class="state">Package</td><td class="dir">premiere-packager</td><td class="produces">project.fcpxml + bundle/ tree</td><td class="hu"></td></tr>
+        <tr class="gate"><td class="n">12</td><td class="state">Gate B · Delivery released</td><td class="dir">orchestrator</td><td class="produces">approval.json — editor handoff acknowledged</td><td class="hu">XX</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <div class="sec-h">
+    <span class="n">03</span>
+    <h2>Agents · Ten Seats</h2>
+    <p class="lede">Ten director agents, seven doing production work and three doing coordination. Same convention as pre-prod: each director wraps one or two skills; the orchestrator only walks the table and verifies files on disk.</p>
+  </div>
+  <div class="roster">
+    <div class="seat"><span class="num">00</span><div><h4>Orchestrator</h4><p>Walks the 12-state table, checks output artefacts exist, advances state through the two gates.</p></div></div>
+    <div class="seat"><span class="num">01</span><div><h4>Post-Intake Director</h4><p>Validates the pre-prod release package plus the shoot Drive folder plus the human declarations.</p></div></div>
+    <div class="seat"><span class="num">02</span><div><h4>Ingest Director</h4><p>Reads the Drive folder, catalogs clips and audio, computes checksums, emits manifest.</p></div></div>
+    <div class="seat"><span class="num">03</span><div><h4>Sequence Director</h4><p>Frame-matches the storyboard against the manifest, picks best takes, emits rough EDL.</p></div></div>
+    <div class="seat"><span class="num">04</span><div><h4>BGM Supervisor</h4><p>Reads script tone and storyboard beats, requests three candidates, presents to human.</p></div></div>
+    <div class="seat"><span class="num">05</span><div><h4>Audio Engineer</h4><p>Owns VO drop-in and the sync pass — VO, BGM and SFX aligned to picture.</p></div></div>
+    <div class="seat"><span class="num">06</span><div><h4>B-Roll Director</h4><p>Handles on-demand B-roll requests. Saves to folder. Does not auto-splice into cut.</p></div></div>
+    <div class="seat"><span class="num">07</span><div><h4>Mograph Director</h4><p>Infographic lower thirds and mograph reveals as alpha-channel exports via Remotion.</p></div></div>
+    <div class="seat"><span class="num">08</span><div><h4>Premiere Packager</h4><p>Builds the FCPXML timeline and the bundle folder tree for editor handoff.</p></div></div>
+    <div class="seat"><span class="num">09</span><div><h4>Review Director</h4><p>Runs the combined picture+audio rubric before Gate A. Blocks or clears. Never approves.</p></div></div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-h">
+    <span class="n">04</span>
+    <h2>Skills · Fourteen</h2>
+    <p class="lede">Skills are the leaf-level playbooks each director invokes. Grouped by workflow stage.</p>
+  </div>
+  <div class="roster">
+    <div class="seat"><span class="num">S1</span><div><h4>post</h4><p>Entry command. /creative-studio-post:post starts or resumes a job.</p></div></div>
+    <div class="seat"><span class="num">S2</span><div><h4>new-post-project</h4><p>Creates project.json from Drive path + pre-prod release path.</p></div></div>
+    <div class="seat"><span class="num">S3</span><div><h4>resume-post-project</h4><p>Reads state and artefacts on disk to resume a stalled job.</p></div></div>
+    <div class="seat"><span class="num">S4</span><div><h4>ingest-footage</h4><p>ffprobe over every clip + audio file. Writes manifest with checksums.</p></div></div>
+    <div class="seat"><span class="num">S5</span><div><h4>sequence-first-cut</h4><p>Storyboard-to-footage frame match. Emits rough EDL.</p></div></div>
+    <div class="seat"><span class="num">S6</span><div><h4>bgm-options</h4><p>Shortlists 3 candidates locally from the supplied tracks; the person picks one on the board. No MCP tool.</p></div></div>
+    <div class="seat"><span class="num">S7</span><div><h4>vo-drop-in</h4><p>Places VO tracks against script markers on the timeline.</p></div></div>
+    <div class="seat"><span class="num">S8</span><div><h4>audio-sync</h4><p>Local ffmpeg sync. Emits synced WAV + waveform PNG. No MCP tool.</p></div></div>
+    <div class="seat"><span class="num">S9</span><div><h4>broll-generate</h4><p>One B-roll request, quoted on the board, then create_video_job on AgentC. Saves to bundle.</p></div></div>
+    <div class="seat"><span class="num">S10</span><div><h4>mograph-generate</h4><p>Remotion render for infographic or motion-graphic alpha.</p></div></div>
+    <div class="seat"><span class="num">S11</span><div><h4>export-premiere-bundle</h4><p>build-bundle.js: Gate A lock check, FCPXML 1.10, README, hash manifest.</p></div></div>
+    <div class="seat"><span class="num">S12</span><div><h4>board-sync</h4><p>Push batches to the Post Control board, land decisions, hash-bound gate pull.</p></div></div>
+    <div class="seat"><span class="num">S14</span><div><h4>board-setup</h4><p>Publishes this account's own Post Control board and records its address.</p></div></div>
+    <div class="seat"><span class="num">S13</span><div><h4>review-pass</h4><p>Runs the rubric against a gate. Emits review verdict.</p></div></div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-h">
+    <span class="n">05</span>
+    <h2>Tools · What Actually Does the Work</h2>
+    <p class="lede">Each rack lists the tool by name with its role. Video and image generation go through the existing 3echo AgentC MCP (no new server-side tools required — every call is against an endpoint pre-prod already uses). Everything else is local execution — ffmpeg, remotion, python.</p>
+  </div>
+  <div class="stack">
+    <div class="rack">
+      <div class="head"><h4>Video generation</h4><span class="badge">MCP · 3echo AgentC</span></div>
+      <ul>
+        <li>SeeDance <span class="role">B-roll · main engine</span></li>
+        <li>9 image refs / job <span class="role">continuity</span></li>
+        <li>3 video refs, 3 audio refs <span class="role">per job</span></li>
+      </ul>
+      <p class="note">create_video_job on the same AgentC MCP pre-prod uses. The B-roll skill tags the output in the manifest; there is no separate server tool. Whatever engines AgentC adds later, we inherit for free.</p>
+    </div>
+    <div class="rack">
+      <div class="head"><h4>Image generation</h4><span class="badge">MCP · 3echo AgentC</span></div>
+      <ul>
+        <li>GPT image models <span class="role">stills · plates</span></li>
+        <li>16 image refs / job <span class="role">continuity</span></li>
+        <li>flat 1 credit / image <span class="role">no per-model quote</span></li>
+      </ul>
+      <p class="note">create_image_job on the AgentC MCP. Slate frames, mograph plate art, storyboard-continuity thumbnails. Same tool pre-prod's make-image skill uses today.</p>
+    </div>
+    <div class="rack">
+      <div class="head"><h4>Audio generation</h4><span class="badge">MCP · external</span></div>
+      <ul>
+        <li>ElevenLabs <span class="role">VO · scratch + final</span></li>
+        <li>Suno / Musicbed / Artlist <span class="role">not wired · client supplies BGM</span></li>
+      </ul>
+      <p class="note">ElevenLabs is connected for scratch VO and transcription; final VO uses talent takes from the shoot. No music service is wired: the client supplies the BGM files and the supervisor shortlists three.</p>
+    </div>
+    <div class="rack">
+      <div class="head"><h4>Sequence retrieval</h4><span class="badge">OM · lib/clip_embedder</span></div>
+      <ul>
+        <li>CLIP ViT-L/14 <span class="role">frame embedding</span></li>
+        <li>storyboard → footage <span class="role">semantic match</span></li>
+        <li>best-take ranking <span class="role">per storyboard panel</span></li>
+      </ul>
+      <p class="note">CLIP matching, pointed at shoot footage instead of stock libraries. Beats naive frame diff.</p>
+    </div>
+    <div class="rack">
+      <div class="head"><h4>Motion graphics</h4><span class="badge">OM · remotion-composer</span></div>
+      <ul>
+        <li>Cinematic <span class="role">titles · reveals</span></li>
+        <li>Explainer <span class="role">infographic</span></li>
+        <li>TalkingHead <span class="role">lower thirds</span></li>
+        <li>CollageBurst, LyricOverlay <span class="role">extras</span></li>
+      </ul>
+      <p class="note">Templates ship with the 3echo Motion composer. Alpha exports (ProRes 4444) drop into Premiere. Not a rewrite.</p>
+    </div>
+    <div class="rack">
+      <div class="head"><h4>Assembly + sync</h4><span class="badge">LOCAL · ffmpeg</span></div>
+      <ul>
+        <li>ffmpeg <span class="role">transcode · concat · sync</span></li>
+        <li>ffprobe <span class="role">clip metadata · timecode</span></li>
+        <li>lib/media_profiles <span class="role">codec presets · OM</span></li>
+        <li>librosa <span class="role">tempo · planned, not wired</span></li>
+      </ul>
+      <p class="note">Runs on your machine. No cloud round-trip. The money shot Ken flagged.</p>
+    </div>
+    <div class="rack">
+      <div class="head"><h4>Gate records</h4><span class="badge">LOCAL · ours</span></div>
+      <ul>
+        <li>record-approval.js <span class="role">verdict → approvals/*.json</span></li>
+        <li>board-sync.js pull <span class="role">board lock → hash-bound record</span></li>
+        <li>check-approval.js <span class="role">refuses a changed file</span></li>
+      </ul>
+      <p class="note">Hash-bound records survive a resume.</p>
+    </div>
+    <div class="rack">
+      <div class="head"><h4>Delivery format</h4><span class="badge">LOCAL · python (ours)</span></div>
+      <ul>
+        <li>FCPXML 1.10 <span class="role">Premiere-importable</span></li>
+        <li>build-fcpxml.py <span class="role">EDL + synced track → timeline</span></li>
+        <li>opentimelineio, rsync <span class="role">planned, not built</span></li>
+      </ul>
+      <p class="note">Written by us — a rendered MP4 is not enough; we need a Premiere project.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-h">
+    <span class="n">05·5</span>
+    <h2>Frame vs Engine</h2>
+    <p class="lede">Where the code comes from. Honest split so we don't rewrite work that already exists, and we don't inherit shapes that fight JGN's workflow.</p>
+  </div>
+  <div class="stack" style="grid-template-columns:repeat(auto-fit,minmax(300px,1fr))">
+    <div class="rack">
+      <div class="head"><h4>The Frame</h4><span class="badge">WE BUILD</span></div>
+      <ul>
+        <li>Intake + release-package validation <span class="role">agency-specific</span></li>
+        <li>10 director agents <span class="role">match pre-prod</span></li>
+        <li>2-gate structure + board-sync <span class="role">team reviews</span></li>
+        <li>Storyboard-driven sequencing <span class="role">from pre-prod</span></li>
+        <li>FCPXML packager <span class="role">editor handoff</span></li>
+        <li>Post Control artifact board <span class="role">sibling to the Pre-production board</span></li>
+        <li>Runtime scripts (22) <span class="role">route, plan, state, records, bundle</span></li>
+      </ul>
+      <p class="note">The shape agency post actually has. Not autonomous — the editor keeps control.</p>
+    </div>
+    <div class="rack">
+      <div class="head"><h4>The Engine</h4><span class="badge">OM · REUSED</span></div>
+      <ul>
+        <li>lib/clip_embedder <span class="role">semantic retrieval</span></li>
+        <li>remotion-composer <span class="role">5 mograph templates</span></li>
+        <li>lib/media_profiles <span class="role">codec awareness</span></li>
+      </ul>
+      <p class="note">Proven, working code. Footage-repurpose plugin already runs on this pattern.</p>
+    </div>
+    <div class="rack">
+      <div class="head"><h4>What we do NOT lift</h4><span class="badge">OM · SKIP</span></div>
+      <ul>
+        <li>executive-producer autonomy <span class="role">too hands-off</span></li>
+        <li>documentary-montage pipeline <span class="role">CLIP-thematic, not storyboard</span></li>
+        <li>retrieval from Pexels / NASA <span class="role">we shoot our own</span></li>
+        <li>delivery renderer → MP4 <span class="role">we need FCPXML</span></li>
+        <li>lib/checkpoint, delivery_promise <span class="role">present, not called</span></li>
+      </ul>
+      <p class="note">Other pipelines' opinions fit their use case; they'd fight ours. Take the libs, leave the doctrine.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="qa">
+    <span class="stamp">Direct answer</span>
+    <div class="head">
+      <span class="n mono" style="color:var(--amber);font-size:11px;letter-spacing:.22em">Q</span>
+      <h3>Does it have a locally-executed editor?</h3>
+    </div>
+    <div class="a">
+      <p><strong>No — and that's deliberate.</strong> The pipeline does not open a video editor of its own. It produces an FCPXML timeline and an asset bundle that Premiere Pro imports in one step, and the human editor finishes the pass there.</p>
+      <p>What runs locally is the <em>assembly engine</em> — ffmpeg for the sync pass, the 3echo Motion composer for mograph, a CLIP matcher for storyboard-to-footage matching, our own python for the FCPXML build. These do the mechanical work: transcode proxies, align VO to picture, retrieve best takes, build alpha-channel overlays, write the timeline XML. They do not render a final master.</p>
+    </div>
+    <div class="why">
+      <div class="r"><span class="k">Why not build an editor</span><span class="v">Premiere Pro is where the editor's craft lives. Replacing it means competing with three decades of workflow. Wrong fight.</span></div>
+      <div class="r"><span class="k">Why FCPXML</span><span class="v">Premiere, DaVinci Resolve and Final Cut all import it losslessly. One handoff format, three possible editors, no lock-in.</span></div>
+      <div class="r"><span class="k">Why local execution</span><span class="v">Sync passes on multi-gigabyte footage don't survive a cloud round-trip. ffmpeg and CLIP retrieval on your machine are a hundred times faster than a hosted job.</span></div>
+      <div class="r"><span class="k">The 70&nbsp;–&nbsp;80% rule</span><span class="v">Pipeline reaches a rough cut with sync and BGM. Editor picks up from there — punch-ins, slow-mo, colour, titles, the touch work only a human should do.</span></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-h">
+    <span class="n">06</span>
+    <h2>Handoff Bundle</h2>
+    <p class="lede">What lands in the editor's Drive folder at Gate B. One FCPXML, one folder tree, one README that names what still needs a human pass.</p>
+  </div>
+  <div class="tree" aria-label="Handoff folder tree">
+<span class="d">bundle/</span>
+├── <span class="f">project.fcpxml</span>              <span class="c"># Premiere-importable timeline</span>
+├── <span class="f">README.md</span>                    <span class="c"># what the editor picks up, what still needs a pass</span>
+├── <span class="d">footage/</span>
+│   ├── <span class="d">day-01/</span>
+│   │   ├── <span class="n">A001_C001_sel.mov</span>     <span class="c"># selected takes only, transcoded to proxy</span>
+│   │   └── <span class="n">A001_C003_sel.mov</span>
+│   └── <span class="d">day-02/</span>
+├── <span class="d">audio/</span>
+│   ├── <span class="n">synced-track.wav</span>          <span class="c"># VO, BGM and SFX mixed, music ducked under voice</span>
+│   └── <span class="n">waveform.png</span>
+├── <span class="d">broll/</span>
+│   ├── <span class="n">shot-01_walking-road_v2.mp4</span> <span class="c"># slate frame embedded</span>
+│   └── <span class="n">shot-02_hands-typing_v1.mp4</span>
+├── <span class="d">mograph/</span>
+│   ├── <span class="n">lower-third-01.mov</span>       <span class="c"># alpha channel — ProRes 4444</span>
+│   └── <span class="n">stat-reveal-2k-to-5k.mov</span>
+└── <span class="d">.pipeline/</span>
+    ├── <span class="n">manifest.json</span>         <span class="c"># sha256 of every file, the Gate A approval id</span>
+    └── <span class="n">fcpxml.sha256</span>
+  </div>
+</section>
+
+<section>
+  <div class="sec-h">
+    <span class="n">07</span>
+    <h2>Audit · Built vs Proven</h2>
+    <p class="lede">What exists in the repo, what a test has proven, and what has never been run for real. "Proven" means a test file in scripts/test passes on a fixture; "live" means it ran against the real service or a real file. Nothing below has run on client footage yet.</p>
+  </div>
+  <div class="wrap-scroll">
+    <table class="workflow">
+      <thead><tr><th>Component</th><th>Built</th><th>Proven</th><th>Not yet</th></tr></thead>
+      <tbody>
+        <tr><td class="state">Post Control board</td><td class="produces">Page, published as a private artifact with database, comments and self-republish; two-mode board-sync</td><td class="produces">Real database writes and read-back (demo project on the slate); landing and hash-bound pull on a fixture</td><td class="hu">The bell (a board decision waking the run) not proven live</td></tr>
+        <tr><td class="state">Runtime scripts</td><td class="produces">root, scaffold, route, plan, state, versions, runs, approvals, collect, check, bundle</td><td class="produces">One end-to-end test drives all of them on a temp root, including a tamper after the lock</td><td class="hu">A live orchestrator walk of a real job</td></tr>
+        <tr><td class="state">Ingest</td><td class="produces">ffprobe manifest with size, hash, probe data</td><td class="produces">Live on three ffmpeg-generated clips (15 Sep); orphan and hash-drift refusals on a fixture</td><td class="hu">Real camera masters, proxies, audio trees</td></tr>
+        <tr><td class="state">Sequence (CLIP)</td><td class="produces">Skill and playbook; open_clip and PyTorch installed 21 Sep</td><td class="produces">Nothing beyond import</td><td class="hu">Storyboard-to-footage matching on real footage; falls back to a human EDL</td></tr>
+        <tr><td class="state">BGM</td><td class="produces">Three-candidate cards and the signed pick on the board; sync guard refuses without it</td><td class="produces">Choice landing and the signed file on a fixture</td><td class="hu">No music service wired; the client supplies the files</td></tr>
+        <tr><td class="state">VO drop + sync</td><td class="produces">Skills, playbook, synced-track contract bound to the EDL hash</td><td class="produces">Contract check (gate-a-check) on a fixture</td><td class="hu">A real VO track through ffmpeg</td></tr>
+        <tr class="review"><td class="state">Review pass</td><td class="produces">Rubric with critical / major / minor scoring</td><td class="produces">Rubric presence and depth</td><td class="hu">A reviewer run on a real cut</td></tr>
+        <tr><td class="state">B-roll (SeeDance)</td><td class="produces">Request → quote → approve on the board; spend guard; create_video_job on AgentC</td><td class="produces">Spend guard refusals on a fixture</td><td class="hu">No video job submitted yet (credits)</td></tr>
+        <tr><td class="state">Motion graphics</td><td class="produces">Sample-then-batch on the board; Remotion dependencies installed 21 Sep</td><td class="produces">One GPT image plate landed live (1 credit, 15 Sep)</td><td class="hu">A Remotion alpha render</td></tr>
+        <tr><td class="state">FCPXML bundle</td><td class="produces">build-fcpxml.py + build-bundle.js: lock check, FCPXML 1.10, README, hash manifest</td><td class="produces">Round-trip and bundle build on a fixture</td><td class="hu">Opened in Premiere Pro by an editor</td></tr>
+        <tr><td class="state">Function hooks</td><td class="produces">Five refusing guards</td><td class="produces">Unit-tested refusals</td><td class="hu">Off unless the folder arms them</td></tr>
+        <tr><td class="state">Source control</td><td class="produces">Local commits, org remote set</td><td class="produces">—</td><td class="hu">The org repo does not exist yet; push pending</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="mono" style="margin-top:12px;font-size:12px">Run the evidence yourself: <span style="color:var(--paper)">node scripts/test/run-all.js</span> in the repo. GATES.md lists each gate with its check command and the date it last passed; docs/AUDIT.md is the reading order.</p>
+</section>
+
+<div class="foot">
+  <span>creative-studio-post · v0.1.0 · blueprint v7 · audit copy</span>
+  <span>3echo · 21 Sep 2026</span>
+</div>

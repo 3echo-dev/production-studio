@@ -1,0 +1,30 @@
+{
+  "schemaVersion": "1.0",
+  "approvalId": "{approval-id}",
+  "jobId": "{job-id}",
+  "brand": "{brand}",
+  "client": "{client}",
+  "gate": "A",
+  "round": 1,
+  "decision": "approved",
+  "edited": false,
+  "artifacts": [
+    {
+      "path": "rough-edl.json",
+      "sha256": "{sha256}",
+      "bytes": 0
+    }
+  ],
+  "decidedBy": "creative-director",
+  "decidedAt": "{timestamp}",
+  "channel": "board",
+  "comment": "",
+  "scope": {
+    "maxSpendCredits": null
+  },
+  "_enums": {
+    "gate": ["A", "B"],
+    "decision": ["approved", "changes_requested", "rejected"],
+    "channel": ["board", "chat", "file"]
+  }
+}

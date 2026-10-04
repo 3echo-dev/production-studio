@@ -1,0 +1,9 @@
+{
+  "schemaVersion": "1.0",
+  "jobId": "{job-id}",
+  "createdAt": "{timestamp}",
+  "shootDays": [],
+  "clips": [],
+  "audio": [],
+  "warnings": []
+}

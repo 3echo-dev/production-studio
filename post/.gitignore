@@ -1,0 +1,22 @@
+# User data lives in the working directory, never in the plugin
+workspaces/
+inputs/
+.board/
+.creative-studio-post/
+node_modules/
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db
+desktop.ini
+scripts/test/.out/
+
+# Internal planning stays local
+GATES.md
+.claude/settings.json
+.claude/settings.local.json
+.social-pipeline/
+.creative-studio-pipeline/
+# Local tool folders (session logs, caches); the plugin's own manifest stays tracked
+/.*/
+!/.claude-plugin/

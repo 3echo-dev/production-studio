@@ -1,0 +1,99 @@
+{
+  "skills": [
+    {
+      "id": "post",
+      "file": "skills/post/SKILL.md",
+      "role": "Entry command. Starts or resumes a post-production project. Invoked as /creative-studio-post:post."
+    },
+    {
+      "id": "install",
+      "file": "skills/install/SKILL.md",
+      "role": "First-run setup: checks the tools this computer needs, asks, installs them and checks again; says how to connect AgentC."
+    },
+    {
+      "id": "new-post-project",
+      "file": "skills/new-post-project/SKILL.md",
+      "role": "Creates a project.json from a Drive folder + pre-prod release package path + project id."
+    },
+    {
+      "id": "resume-post-project",
+      "file": "skills/resume-post-project/SKILL.md",
+      "role": "Resumes a stalled project by reading state + artefacts on disk."
+    },
+    {
+      "id": "ingest-footage",
+      "file": "skills/ingest-footage/SKILL.md",
+      "role": "Catalogs footage + audio from the Drive folder, writes manifest.json with checksums."
+    },
+    {
+      "id": "sequence-first-cut",
+      "file": "skills/sequence-first-cut/SKILL.md",
+      "role": "Frame-matches storyboard against manifest, emits rough EDL."
+    },
+    {
+      "id": "bgm-options",
+      "file": "skills/bgm-options/SKILL.md",
+      "role": "Shortlists three BGM candidates locally from the supplied tracks (no MCP tool); the person picks one on the board."
+    },
+    {
+      "id": "vo-drop-in",
+      "file": "skills/vo-drop-in/SKILL.md",
+      "role": "Places VO tracks on timeline against script markers."
+    },
+    {
+      "id": "audio-sync",
+      "file": "skills/audio-sync/SKILL.md",
+      "role": "Runs the local ffmpeg sync (no MCP tool). Emits synced-track.json + waveform.png."
+    },
+    {
+      "id": "broll-generate",
+      "file": "skills/broll-generate/SKILL.md",
+      "role": "Handles a single B-roll request, quoted on the board, via create_video_job on AgentC. Saves to bundle/broll/."
+    },
+    {
+      "id": "mograph-generate",
+      "file": "skills/mograph-generate/SKILL.md",
+      "role": "Builds an infographic or motion-graphic alpha via Remotion, saves to bundle/mograph/."
+    },
+    {
+      "id": "export-premiere-bundle",
+      "file": "skills/export-premiere-bundle/SKILL.md",
+      "role": "Runs scripts/build-bundle.js (local; no MCP tool). Emits project.fcpxml + bundle/ tree."
+    },
+    {
+      "id": "board-setup",
+      "file": "skills/board-setup/SKILL.md",
+      "role": "Publishes this account's own Post Control board artifact (db, artifact, comments) and records its address."
+    },
+    {
+      "id": "board-sync",
+      "file": "skills/board-sync/SKILL.md",
+      "role": "Keeps the Post Control board and the job folder agreeing: push batches, land decisions, hash-bound gate pull."
+    },
+    {
+      "id": "review-pass",
+      "file": "skills/review-pass/SKILL.md",
+      "role": "Runs a rubric against a gate. Emits review.md verdict."
+    },
+    {
+      "id": "generate-clips",
+      "file": "skills/generate-clips/SKILL.md",
+      "role": "Generated jobs only: one AI clip per storyboard panel via AgentC create_video_job, sample then batch, every credit approved on the board; lands under footage/generated."
+    },
+    {
+      "id": "hybrid-plates",
+      "file": "skills/hybrid-plates/SKILL.md",
+      "role": "Hybrid jobs: briefs plates, locations and backgrounds (hybrid.js), cuts the actor out of every plate (cutout.py): chroma key or rembg."
+    },
+    {
+      "id": "hybrid-motion",
+      "file": "skills/hybrid-motion/SKILL.md",
+      "role": "Hybrid jobs, moving-camera plates: motion transfer on AgentC (plate as [Video 1], background as [Image 1]); the plate's actor is pasted back by composite."
+    },
+    {
+      "id": "hybrid-composite",
+      "file": "skills/hybrid-composite/SKILL.md",
+      "role": "Hybrid jobs: backgrounds per location (library, or AgentC create_image_job after a yes), composite.py lays the actor over them and checks the performance is kept."
+    }
+  ]
+}
