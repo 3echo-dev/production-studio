@@ -3,11 +3,11 @@
     {
       "id": "post",
       "file": "skills/post/SKILL.md",
-      "role": "Entry command. Starts or resumes a post-production project. Invoked as /creative-studio-post:post."
+      "role": "Entry command. Starts or resumes a post-production project. Invoked as /production-studio:post."
     },
     {
-      "id": "install",
-      "file": "skills/install/SKILL.md",
+      "id": "post-install",
+      "file": "skills/post-install/SKILL.md",
       "role": "First-run setup: checks the tools this computer needs, asks, installs them and checks again; says how to connect AgentC."
     },
     {
@@ -61,18 +61,13 @@
       "role": "Runs scripts/build-bundle.js (local; no MCP tool). Emits project.fcpxml + bundle/ tree."
     },
     {
-      "id": "board-setup",
-      "file": "skills/board-setup/SKILL.md",
-      "role": "Publishes this account's own Post Control board artifact (db, artifact, comments) and records its address."
-    },
-    {
-      "id": "board-sync",
-      "file": "skills/board-sync/SKILL.md",
+      "id": "post-board-sync",
+      "file": "skills/post-board-sync/SKILL.md",
       "role": "Keeps the Post Control board and the job folder agreeing: push batches, land decisions, hash-bound gate pull."
     },
     {
-      "id": "review-pass",
-      "file": "skills/review-pass/SKILL.md",
+      "id": "post-review-pass",
+      "file": "skills/post-review-pass/SKILL.md",
       "role": "Runs a rubric against a gate. Emits review.md verdict."
     },
     {

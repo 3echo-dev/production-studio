@@ -20,7 +20,7 @@ metadata:
 
    The id is the board's project id, so open its page now, before reading anything: `pane.js "{job-id}" "{title}"` (`${CLAUDE_PLUGIN_ROOT}/docs/SHARED-RULES.md`); never print the web address, then watch it ("Watching the board" in SHARED-RULES) and say in one line whether the board can wake this run. The title is the client and the film in the words `status.md` uses today.
 
-2. **Read the board first, every time.** Follow the `board-sync` skill: read the gate documents, the open inbox rows and the registers into a JSON file, then:
+2. **Read the board first, every time.** Follow the `pre-board-sync` skill: read the gate documents, the open inbox rows and the registers into a JSON file, then:
 
    ```bash
    node "${CLAUDE_PLUGIN_ROOT}/scripts/board-sync.js" land {client} {job-id} "{file.json}"

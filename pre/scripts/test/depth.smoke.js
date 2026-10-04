@@ -75,12 +75,12 @@ for (const g of ['A', 'B', 'C']) {
 }
 
 // 5. The skill exists and is registered; the orchestrator runs it.
-if (!fs.existsSync(path.join(ROOT, 'skills', 'review-pass', 'SKILL.md'))) problems.push('skills/review-pass/SKILL.md is missing');
+if (!fs.existsSync(path.join(ROOT, 'skills', 'pre-review-pass', 'SKILL.md'))) problems.push('skills/pre-review-pass/SKILL.md is missing');
 const reg = JSON.parse(read('registry/skills.json')).skills;
-const entry = reg.find(s => s.skillId === 'review-pass');
-if (!entry) problems.push('review-pass is not in registry/skills.json');
+const entry = reg.find(s => s.skillId === 'pre-review-pass');
+if (!entry) problems.push('pre-review-pass is not in registry/skills.json');
 else if (!(entry.invokedBy || []).includes('orchestrator')) problems.push('review-pass is not invoked by the orchestrator in the registry');
-const orch = read('agents/orchestrator.md');
+const orch = read('agents/pre-orchestrator.md');
 if (!/review-pass/.test(orch)) problems.push('orchestrator.md does not mention review-pass');
 if (!/review-rubrics\.md/.test(orch)) problems.push('orchestrator.md does not name the rubric');
 

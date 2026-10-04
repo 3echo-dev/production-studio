@@ -59,5 +59,5 @@ let hooksArmed = 'off';
 try { if (JSON.parse(fs.readFileSync(path.join(PLUGIN_ROOT, 'hooks/hooks.json'), 'utf8')).modules) hooksArmed = 'armed'; } catch {}
 const line = CHECKS.map(c => c.name + ': ' + (c.ok ? 'ok' : c.need === 'required' ? 'MISSING' : 'missing')).join(' | ') + ' | function_hooks: ' + hooksArmed;
 const miss = CHECKS.filter(c => !c.ok);
-console.log('[creative-studio-post] ' + line + (miss.length ? '\n[creative-studio-post] ' + miss.map(c => c.name + (c.need === 'required' ? ' (REQUIRED)' : '') + ' is needed for ' + c.for).join('; ') + '. Run /creative-studio-post:install to set them up.' : ''));
+console.log('[creative-studio-post] ' + line + (miss.length ? '\n[creative-studio-post] ' + miss.map(c => c.name + (c.need === 'required' ? ' (REQUIRED)' : '') + ' is needed for ' + c.for).join('; ') + '. Run /production-studio:install to set them up.' : ''));
 process.exit(0);

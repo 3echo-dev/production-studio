@@ -1,5 +1,5 @@
 ---
-name: install
+name: post-install
 description: >
   Checks what this plugin needs on this computer (Node.js, Python, ffmpeg, Pillow, and the
   optional mograph composer, CLIP matcher and rembg), asks the person which missing ones to
@@ -23,7 +23,7 @@ user-invocable: true
    node --version
    ```
 
-   If it fails: on Windows, offer to run `winget install -e --id OpenJS.NodeJS.LTS --accept-package-agreements --accept-source-agreements`; on a Mac, `brew install node`. After it installs, the person must **quit and reopen the Claude desktop app** (a new PATH reaches only new processes), start a new chat and run `/creative-studio-post:install` again. Stop here until then.
+   If it fails: on Windows, offer to run `winget install -e --id OpenJS.NodeJS.LTS --accept-package-agreements --accept-source-agreements`; on a Mac, `brew install node`. After it installs, the person must **quit and reopen the Claude desktop app** (a new PATH reaches only new processes), start a new chat and run `/production-studio:install` again. Stop here until then.
 
 2. **See what is missing.**
 
@@ -36,7 +36,7 @@ user-invocable: true
 3. **Ask once.** One question, multi-select, listing only what is missing, required ones first and ticked as recommended, each with its `why`. Recommend `mograph` too (titles, captions and end tags need it; a few minutes and a download). Say plainly what the others are for: `clip-matcher` only matters for shoot jobs matched by picture and is a large download (about 2 GB); `rembg` only for hybrid jobs whose actors were not shot on a green or blue screen. Install nothing the person did not pick.
 
 4. **Install, one command at a time,** exactly the `install` commands from step 2, in this order: Python, ffmpeg, Pillow, then mograph, clip-matcher, rembg. Allow several minutes each. Then:
-   - **Python or ffmpeg was just installed** and its `--version` still fails: Windows has not handed the new PATH to this session. Tell the person to quit and reopen the Claude desktop app, then run `/creative-studio-post:install` again for the rest.
+   - **Python or ffmpeg was just installed** and its `--version` still fails: Windows has not handed the new PATH to this session. Tell the person to quit and reopen the Claude desktop app, then run `/production-studio:install` again for the rest.
    - **pip refuses** with a permission error: run the same command again with `--user`. With "externally managed environment" (Linux, some Macs): say so and give them the command; do not pass `--break-system-packages`.
    - **A command needs `sudo`** (Linux): never run it. Give the person the line to run themselves.
    - **winget is missing** (older Windows): say "App Installer" from the Microsoft Store provides it, and stop.
@@ -50,7 +50,7 @@ user-invocable: true
 
    Cutting, syncing and packaging the client's own footage work without it; nothing is ever generated without a price and a yes first.
 
-6. **What next,** in one line: `/creative-studio-post:board-setup` once to get their board, then `/creative-studio-post:post` to start or continue a job.
+6. **What next,** in one line: `/production-studio:board-setup` once to get their board, then `/production-studio:post` to start or continue a job.
 
 ## Rules
 

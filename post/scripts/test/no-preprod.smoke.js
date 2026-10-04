@@ -21,7 +21,7 @@ const BAD_TERMS = [
 // Whitelist explicit mentions in the post-intake and new-post-project contexts.
 const WHITELIST = new Set([
   'agents/post-intake-director.md',
-  'agents/orchestrator.md',
+  'agents/post-orchestrator.md',
   'agents/sequence-director.md',
   'skills/new-post-project/SKILL.md',
   'workflows/post.md',

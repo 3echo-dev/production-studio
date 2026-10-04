@@ -9,7 +9,7 @@ For whoever reviews this plugin without having built it. Everything here is chec
 3. `CONFIG.md`: the settings a person may change, and how each rule is enforced (mechanical, structural, or an instruction the model follows).
 4. `docs/SHARED-RULES.md`: the rules every agent and skill obeys.
 5. `GATES.md`: fifteen gates, each with the command that checks it and the date it last passed.
-6. `agents/orchestrator.md`: the one agent that walks the table, spends credits, and stops at gates.
+6. `agents/post-orchestrator.md`: the one agent that walks the table, spends credits, and stops at gates.
 
 ## Run the evidence
 

@@ -83,7 +83,7 @@ File length is not a setting. `scripts/test/structure.smoke.js` enforces 900 wor
 
 ## The board
 
-Gates, human XX declarations and BGM choices are decided on the Post Control board, an artifact whose database only the orchestrator reaches through the Artifact tool. Scripts queue what they have to say in `.board/outbox.jsonl`; the orchestrator pushes it as one batch after every row and lands what the person did before every decision. `docs/SHARED-RULES.md` has the procedure; the `board-sync` skill has the exact calls.
+Gates, human XX declarations and BGM choices are decided on the Post Control board, an artifact whose database only the orchestrator reaches through the Artifact tool. Scripts queue what they have to say in `.board/outbox.jsonl`; the orchestrator pushes it as one batch after every row and lands what the person did before every decision. `docs/SHARED-RULES.md` has the procedure; the `post-board-sync` skill has the exact calls.
 
 ## Function hooks
 

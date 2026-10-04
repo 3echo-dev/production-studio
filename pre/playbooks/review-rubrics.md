@@ -1,6 +1,6 @@
 # Review rubrics, one section per gate
 
-Read by the reviewer the orchestrator spawns before a gate (`skills/review-pass`). Every item is a yes or no question and names the file to look in. A no is a finding; the reviewer places it (line, cell, panel id, shot id) and proposes the fix. Sources of each item: the manifest's review focus lines, the definition's acceptance tests T1 to T5 and A16 to A20, and the rules the check scripts enforce.
+Read by the reviewer the orchestrator spawns before a gate (`skills/pre-review-pass`). Every item is a yes or no question and names the file to look in. A no is a finding; the reviewer places it (line, cell, panel id, shot id) and proposes the fix. Sources of each item: the manifest's review focus lines, the definition's acceptance tests T1 to T5 and A16 to A20, and the rules the check scripts enforce.
 
 ## Gate A, creative sign-off
 

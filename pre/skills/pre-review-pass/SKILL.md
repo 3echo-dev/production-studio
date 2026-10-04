@@ -1,5 +1,5 @@
 ---
-name: review-pass
+name: pre-review-pass
 description: >
   A fresh-context review of everything a gate covers, run before the gate is opened. The
   orchestrator spawns a reviewer with these instructions and the rubric; the reviewer reads,

@@ -108,7 +108,7 @@ Before each row, say one plain line in the chat: "Writing the script.", "Drawing
 node "${CLAUDE_PLUGIN_ROOT}/scripts/board-sync.js" push {client} {job-id}
 ```
 
-Hand the printed batch to the board (`board-sync` skill), then `--ack`. A version on disk the board does not show is a person waiting for nothing. Before deciding anything on a resume or at a gate, read the board and run `board-sync.js land`; the decision is probably already there.
+Hand the printed batch to the board (`pre-board-sync` skill), then `--ack`. A version on disk the board does not show is a person waiting for nothing. Before deciding anything on a resume or at a gate, read the board and run `board-sync.js land`; the decision is probably already there.
 
 ### The board keeps a pulse of its own
 

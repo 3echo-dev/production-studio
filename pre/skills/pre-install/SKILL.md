@@ -1,5 +1,5 @@
 ---
-name: install
+name: pre-install
 description: >
   Checks what this plugin needs on this computer (Node.js, Python, Pillow, openpyxl, and the
   optional ffmpeg and yt-dlp), asks the person which missing ones to install, runs the
@@ -23,7 +23,7 @@ user-invocable: true
    node --version
    ```
 
-   If it fails: on Windows, offer to run `winget install -e --id OpenJS.NodeJS.LTS --accept-package-agreements --accept-source-agreements`; on a Mac, `brew install node`. After it installs, the person must **quit and reopen the Claude desktop app** (a new PATH reaches only new processes), start a new chat and run `/cs-pre-production:install` again. Stop here until then.
+   If it fails: on Windows, offer to run `winget install -e --id OpenJS.NodeJS.LTS --accept-package-agreements --accept-source-agreements`; on a Mac, `brew install node`. After it installs, the person must **quit and reopen the Claude desktop app** (a new PATH reaches only new processes), start a new chat and run `/production-studio:install` again. Stop here until then.
 
 2. **See what is missing.**
 
@@ -36,7 +36,7 @@ user-invocable: true
 3. **Ask once.** One question, multi-select, listing only what is missing, required ones first and ticked as recommended, each with its `why`. Optional ones say that without them a reference video is read from its captions only. ffmpeg and ffprobe are one install; show them as one choice. Install nothing the person did not pick.
 
 4. **Install, one command at a time,** exactly the `install` commands from step 2, in this order: Python, then the pip packages (Pillow and openpyxl can go in one `pip install`), then ffmpeg, then yt-dlp. Allow several minutes each. Then:
-   - **Python was just installed** and `python --version` still fails: Windows has not handed the new PATH to this session. Tell the person to quit and reopen the Claude desktop app, then run `/cs-pre-production:install` again for the rest.
+   - **Python was just installed** and `python --version` still fails: Windows has not handed the new PATH to this session. Tell the person to quit and reopen the Claude desktop app, then run `/production-studio:install` again for the rest.
    - **pip refuses** with a permission error: run the same command again with `--user`. With "externally managed environment" (Linux, some Macs): say so and give them the command; do not pass `--break-system-packages`.
    - **A command needs `sudo`** (Linux): never run it. Give the person the line to run themselves.
    - **winget is missing** (older Windows): say "App Installer" from the Microsoft Store provides it, and stop.
@@ -50,7 +50,7 @@ user-invocable: true
 
    Everything except storyboard pictures works without it.
 
-6. **What next,** in one line: `/cs-pre-production:board-setup` once to get their board, then `/cs-pre-production:1-22` to start.
+6. **What next,** in one line: `/production-studio:board-setup` once to get their board, then `/production-studio:1-22` to start.
 
 ## Rules
 

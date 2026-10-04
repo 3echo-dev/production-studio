@@ -77,7 +77,7 @@ File length is not a setting. `scripts/test/size.smoke.js` enforces 900 words pe
 
 ## The board
 
-Gates, XX registers and questions are decided on the Pre-production board, an artifact whose database only the orchestrator reaches through the Artifact tool. Scripts queue what they have to say in `.board/outbox.jsonl`; the orchestrator pushes it as one batch after every row and lands what the person did before every decision. `docs/SHARED-RULES.md` has the procedure; the `board-sync` skill has the exact calls.
+Gates, XX registers and questions are decided on the Pre-production board, an artifact whose database only the orchestrator reaches through the Artifact tool. Scripts queue what they have to say in `.board/outbox.jsonl`; the orchestrator pushes it as one batch after every row and lands what the person did before every decision. `docs/SHARED-RULES.md` has the procedure; the `pre-board-sync` skill has the exact calls.
 
 In the desktop app's Code tab the board opens in the pane beside the chat: `pane.js` returns the address, `preview_start` opens it, and the address never appears in the chat. Without the pane the fallback file is the way in. In Cowork and the CLI the board is still the decision surface; the person opens it themselves.
 

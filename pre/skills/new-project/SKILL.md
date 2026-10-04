@@ -45,7 +45,7 @@ metadata:
    node "${CLAUDE_PLUGIN_ROOT}/scripts/board-sync.js" push {client} {job-id}
    ```
 
-   Hand the printed batch to the board (`board-sync` skill), then `push --ack`.
+   Hand the printed batch to the board (`pre-board-sync` skill), then `push --ack`.
 
 7. **Run the plan.** Follow `plan.md` row by row as the `orchestrator`, which owns narration, versions, runs and pushes.
 

@@ -98,9 +98,9 @@ const GETTING_STARTED = [
   'No client has been set up here yet. If the user asks how to begin, or seems unsure what to do',
   'first, tell them:',
   '',
-  '  1. /cs-pre-production:1-22                       opens the board and asks whether to start or resume a project',
-  '  2. /cs-pre-production:new-project {client}       pulls the Drive folder, reads the brief, runs to Gate A',
-  '  3. /cs-pre-production:review {job} approve       or "change ..." or "start over", at any gate, when the board is not to hand',
+  '  1. /production-studio:1-22                       opens the board and asks whether to start or resume a project',
+  '  2. /production-studio:new-project {client}       pulls the Drive folder, reads the brief, runs to Gate A',
+  '  3. /production-studio:review {job} approve       or "change ..." or "start over", at any gate, when the board is not to hand',
   '',
   'Nothing costs credits until a storyboard sample panel is approved. Nothing is sent to a',
   'client: the release is a folder of documents the production lead hands over.',
@@ -112,7 +112,7 @@ const LEARNED = learned.length
   : '';
 
 const board = require('./lib-board.js');
-const boardLine = board.boardUrl() ? '' : 'No board is set here yet: /cs-pre-production:board-setup publishes this account\'s copy of the board page, once.\n';
+const boardLine = board.boardUrl() ? '' : 'No board is set here yet: /production-studio:board-setup publishes this account\'s copy of the board page, once.\n';
 let out = 'Pre-production. ' + rootLine + '\n' + boardLine;
 if (missing.length) {
   out += '\n' + missing.length + ' thing(s) not installed:\n\n';
@@ -120,8 +120,8 @@ if (missing.length) {
     out += '- ' + name + (req ? ' (required)' : ' (optional)') + ' - needed for ' + why + '\n    ' + cmd + '\n';
   }
   out += '\n' + (missing.some(m => m[4])
-    ? 'The storyboard image steps will fail until the required ones are installed. In your first reply, tell the user what is missing and offer to install it for them: the /cs-pre-production:install skill asks which ones, runs the commands and checks them. Install nothing before they say yes.\n'
-    : 'Everything runs. Say which step is degraded rather than claiming it ran. If they want the optional tools, /cs-pre-production:install installs them.\n');
+    ? 'The storyboard image steps will fail until the required ones are installed. In your first reply, tell the user what is missing and offer to install it for them: the /production-studio:install skill asks which ones, runs the commands and checks them. Install nothing before they say yes.\n'
+    : 'Everything runs. Say which step is degraded rather than claiming it ran. If they want the optional tools, /production-studio:install installs them.\n');
 }
 // The guards in hooks/hooks.mjs can refuse a wrong step outright, but only when function hooks
 // are switched on. In a folder that is already the pipeline's, arming them is not a decision

@@ -1,5 +1,5 @@
 ---
-name: board-sync
+name: pre-board-sync
 description: >
   How the orchestrator keeps the Pre-production board and the job folder agreeing: push the
   outbox as one write batch after every row, and land gate records, answers, change notes and

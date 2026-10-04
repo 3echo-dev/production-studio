@@ -23,7 +23,7 @@ When a file will not fit, the answer is almost never to cut a rule:
 |---|---|
 | A rule every agent repeats | `docs/SHARED-RULES.md`, referenced in one line |
 | A procedure two directors share | A skill they both preload, like `client-skill-wrap` |
-| The exact board calls | The `board-sync` skill, referenced by name |
+| The exact board calls | The `pre-board-sync` skill, referenced by name |
 | A template's column list | The template itself under `templates/`, or the client's file under `client/templates/` |
 | Backend or protocol design | `docs/`, not a skill |
 

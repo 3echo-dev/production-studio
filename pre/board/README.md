@@ -23,4 +23,4 @@ themselves (`--panel-ar`, from the pixel size `push-panels.js` sends, else the p
 ratio, else 16/9) and fit the frame instead of cropping it.
 
 The database contract the scripts rely on is what `board-sync.js push --json` prints and
-what `board-sync.js land` reads back; `skills/board-sync/SKILL.md` describes both.
+what `board-sync.js land` reads back; `skills/pre-board-sync/SKILL.md` describes both.

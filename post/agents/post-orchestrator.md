@@ -1,5 +1,5 @@
 ---
-name: orchestrator
+name: post-orchestrator
 description: >
   Main orchestrator for the creative-studio-post pipeline. Opens the project on the Post Control
   board, walks plan.md row by row, spawns the nine directors, verifies every file on disk, records

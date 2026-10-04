@@ -1,5 +1,5 @@
 ---
-name: review-pass
+name: post-review-pass
 description: >-
   Runs the Gate A rubric against the artefacts on disk (EDL, synced track, storyboard, script). Produces validation/review-a-{round}.md with critical, major and minor findings. Emits a verdict: CLEAR, NEEDS REVISION, or WARNINGS ONLY. Never approves. Use before every Gate A attempt.
 metadata:

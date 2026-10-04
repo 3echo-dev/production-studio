@@ -22,7 +22,7 @@ Three verdicts: **approve** (ok, yes, go, sign off, lock, release) moves the pro
 
 1. **Identify the open gate** with `list-jobs.js {client}`; if none is waiting, say so and stop. What each gate covers is the table in `${CLAUDE_PLUGIN_ROOT}/docs/SHARED-RULES.md`.
 
-2. **Land the board first** (`board-sync` skill). The decision may already be there. If the gate record is `passed`:
+2. **Land the board first** (`pre-board-sync` skill). The decision may already be there. If the gate record is `passed`:
 
    ```bash
    node "${CLAUDE_PLUGIN_ROOT}/scripts/board-sync.js" pull {client} {job-id} --gate {g}

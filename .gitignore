@@ -1,0 +1,17 @@
+# User data lives in the working directory, never in the plugin
+workspaces/
+inputs/
+.board/
+.pane/
+.creative-studio-pipeline/
+.creative-studio-post/
+.3echo-1-22/
+node_modules/
+__pycache__/
+*.pyc
+scripts/test/.out/
+.claude/settings.json
+.claude/settings.local.json
+.DS_Store
+Thumbs.db
+desktop.ini

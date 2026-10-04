@@ -1,5 +1,5 @@
 ---
-name: orchestrator
+name: pre-orchestrator
 description: >
   Main orchestrator for the pre-production pipeline. Opens the project on the board, walks
   plan.md row by row, spawns the ten directors, verifies every file on disk, records every

@@ -238,7 +238,7 @@ function land() {
   try { got = readJson(path.resolve(file)); } catch (e) { console.error('cannot read ' + file + ': ' + e.message); process.exit(3); }
   // Any of the shapes a read is saved in: one document; one collection read ({collection,
   // documents}); an array of documents; or an array of collection reads, which is the shape the
-  // board-sync skill asks for and which used to land as a single row with no id and exit 0.
+  // pre-board-sync skill asks for and which used to land as a single row with no id and exit 0.
   const docs = [];
   for (const g of (Array.isArray(got) ? got : [got])) {
     const inner = g && (Array.isArray(g.documents) ? g.documents : Array.isArray(g.docs) ? g.docs : null);

@@ -1,0 +1,33 @@
+{
+  "name": "production-studio",
+  "displayName": "Production Studio",
+  "description": "One plugin for the studio's pre-production and post-production pipelines. /1-22 takes a client folder to call sheets (ten director agents, three sign-off gates); /post takes shot footage and the release package to a Premiere bundle (nine director agents, two gates). Both run on one Production Studio board where every decision is a person's.",
+  "version": "0.1.0",
+  "keywords": [
+    "pre-production",
+    "post-production",
+    "call sheet",
+    "storyboard",
+    "first cut",
+    "audio sync",
+    "fcpxml",
+    "production",
+    "creative studio",
+    "pipeline"
+  ],
+  "author": {
+    "name": "3echo"
+  },
+  "homepage": "https://github.com/3echo-dev/production-studio",
+  "repository": "https://github.com/3echo-dev/production-studio",
+  "license": "MIT",
+  "skills": [
+    "./pre/skills",
+    "./post/skills"
+  ],
+  "agents": [
+    "./pre/agents",
+    "./post/agents"
+  ],
+  "hooks": "./hooks/hooks.json"
+}

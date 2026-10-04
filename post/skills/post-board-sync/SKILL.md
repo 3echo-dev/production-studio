@@ -1,5 +1,5 @@
 ---
-name: board-sync
+name: post-board-sync
 description: >-
   How the orchestrator keeps the Post Control board and the job folder agreeing: push the outbox after every row, land what the person decided at every gate and on every resume, bind a locked gate to the file hashes. Orchestrator only.
 metadata:

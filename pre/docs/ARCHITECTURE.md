@@ -38,7 +38,7 @@ Three rules fall out of this and hold everywhere:
 3. **No agent writes a register row, an approval, or a gate document.** Those are a person's,
    entered on the board and landed by a script.
 4. **No gate opens without a review.** Before each gate row the orchestrator spawns a
-   fresh-context reviewer on `skills/review-pass` against `playbooks/review-rubrics.md`; its
+   fresh-context reviewer on `skills/pre-review-pass` against `playbooks/review-rubrics.md`; its
    findings name a place and a fix, and two revision rounds is the ceiling.
 
 ---

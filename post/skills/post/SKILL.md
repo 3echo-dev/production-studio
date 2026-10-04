@@ -1,7 +1,7 @@
 ---
 name: post
 description: >-
-  Entry command for creative-studio-post. Starts a new post-production job or resumes an existing one. Reads job.json where it exists; otherwise routes to new-post-project. Invoke as /creative-studio-post:post.
+  Entry command for creative-studio-post. Starts a new post-production job or resumes an existing one. Reads job.json where it exists; otherwise routes to new-post-project. Invoke as /production-studio:post.
 metadata:
   version: 0.1.0
 user-invocable: true

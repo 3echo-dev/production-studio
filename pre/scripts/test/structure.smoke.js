@@ -13,9 +13,12 @@ const agents = readJson('registry/agents.json').agents;
 const skills = readJson('registry/skills.json').skills;
 const workflows = readJson('registry/workflows.json').workflows;
 
+// The orchestrator's file carries the pipeline's name (pre-orchestrator.md): both pipelines in the
+// production-studio plugin have one, and agent names must differ. Its seat id stays orchestrator.
+const fileOf = id => id === 'orchestrator' ? 'pre-orchestrator' : id;
 const missing = [];
 for (const agent of agents.filter(a => a.status === 'active')) {
-  const file = path.join('agents', agent.agentId + '.md');
+  const file = path.join('agents', fileOf(agent.agentId) + '.md');
   if (!fs.existsSync(path.join(ROOT, file))) missing.push(file);
 }
 for (const skill of skills) {
@@ -43,13 +46,13 @@ assert.ok(owner && owner.agentId === 'orchestrator', 'orchestrator owns preprodu
 
 // Every agent on disk is registered, and every agent's skills: line is a subset of what the
 // registry preloads for it.
-const onDisk = fs.readdirSync(path.join(ROOT, 'agents')).filter(f => f.endsWith('.md')).map(f => f.replace(/\.md$/, ''));
+const onDisk = fs.readdirSync(path.join(ROOT, 'agents')).filter(f => f.endsWith('.md')).map(f => f.replace(/\.md$/, '').replace(/^pre-orchestrator$/, 'orchestrator'));
 assert.deepStrictEqual(onDisk.filter(a => !active.includes(a)), [], 'agent files with no registry entry');
 const preloaded = id => skills.filter(s => (s.preloadedBy || []).includes(id)).map(s => s.skillId);
 const skillIds = new Set(skills.map(s => s.skillId));
 const problems = [];
 for (const id of active) {
-  const text = fs.readFileSync(path.join(ROOT, 'agents', id + '.md'), 'utf8');
+  const text = fs.readFileSync(path.join(ROOT, 'agents', fileOf(id) + '.md'), 'utf8');
   const fm = (text.match(/^---\r?\n([\s\S]*?)\r?\n---/) || [])[1] || '';
   const line = (fm.match(/^skills:\s*(.*)$/m) || [])[1];
   const listed = line ? line.split(',').map(s => s.trim()).filter(Boolean) : [];

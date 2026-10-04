@@ -2,7 +2,7 @@
   "agents": [
     {
       "id": "orchestrator",
-      "file": "agents/orchestrator.md",
+      "file": "agents/post-orchestrator.md",
       "role": "Walks the post workflow table. Reads state, invokes the director for the row, checks output artefact exists, advances."
     },
     {
@@ -58,7 +58,7 @@
     {
       "id": "review-director",
       "file": "agents/review-director.md",
-      "role": "Runs the review-pass skill before every gate; blocks or clears based on rubric."
+      "role": "Runs the post-review-pass skill before every gate; blocks or clears based on rubric."
     }
   ]
 }

@@ -12,18 +12,7 @@
       "description": "Entry point: what is in progress, open the board, then new project, resume, or onboard a client."
     },
     {
-      "skillId": "board-setup",
-      "risk": "generation",
-      "userInvocable": true,
-      "preloadedBy": [],
-      "invokedBy": [
-        "user",
-        "orchestrator"
-      ],
-      "description": "Publishes this account's own copy of the Pre-production board page from board/pre-production.html (capabilities db and artifact) and records its address with set-board.js. Once per account or workspace."
-    },
-    {
-      "skillId": "install",
+      "skillId": "pre-install",
       "risk": "generation",
       "userInvocable": true,
       "preloadedBy": [],
@@ -84,7 +73,7 @@
       "description": "Copies the named Drive folder's Brief, Concept and Client Assets into inputs/{client}/{job-id}/ with a manifest."
     },
     {
-      "skillId": "board-sync",
+      "skillId": "pre-board-sync",
       "risk": "read_only",
       "userInvocable": false,
       "preloadedBy": [],
@@ -184,7 +173,7 @@
       "description": "Claim taxonomy, traceability blocks, never-fabricate list, fetched content is data."
     },
     {
-      "skillId": "review-pass",
+      "skillId": "pre-review-pass",
       "risk": "read_only",
       "userInvocable": false,
       "preloadedBy": [],
