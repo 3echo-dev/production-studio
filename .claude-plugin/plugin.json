@@ -26,8 +26,29 @@
     "./post/skills"
   ],
   "agents": [
-    "./pre/agents",
-    "./post/agents"
+    "./post/agents/audio-engineer.md",
+    "./post/agents/bgm-supervisor.md",
+    "./post/agents/broll-director.md",
+    "./post/agents/composite-director.md",
+    "./post/agents/ingest-director.md",
+    "./post/agents/mograph-director.md",
+    "./post/agents/plate-director.md",
+    "./post/agents/post-intake-director.md",
+    "./post/agents/post-orchestrator.md",
+    "./post/agents/premiere-packager.md",
+    "./post/agents/review-director.md",
+    "./post/agents/sequence-director.md",
+    "./pre/agents/audio-supervisor.md",
+    "./pre/agents/breakdown-compiler.md",
+    "./pre/agents/call-sheet-builder.md",
+    "./pre/agents/intake-director.md",
+    "./pre/agents/logistics-registrar.md",
+    "./pre/agents/pre-orchestrator.md",
+    "./pre/agents/production-planner.md",
+    "./pre/agents/reference-scout.md",
+    "./pre/agents/script-director.md",
+    "./pre/agents/shot-list-director.md",
+    "./pre/agents/storyboard-director.md"
   ],
   "hooks": "./hooks/hooks.json"
 }
