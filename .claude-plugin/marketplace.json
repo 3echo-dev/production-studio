@@ -10,7 +10,7 @@
       "displayName": "Production Studio",
       "source": "./",
       "description": "Pre-production and post-production in one plugin, on one board: a client folder in, call sheets out; footage in, a Premiere bundle out. Every gate is signed off by a person.",
-      "version": "0.1.1",
+      "version": "0.1.2",
       "author": {
         "name": "3echo"
       }

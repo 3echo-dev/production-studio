@@ -22,7 +22,7 @@ A project lives at `workspaces/{client}/jobs/{job-id}/`; its id is the board's p
 
 ## Dispatch loop
 
-Per `pending` row of `plan.md`: run script and orchestrator rows yourself, spawn director rows and wait. Directors are leaves: they never spawn, spend or touch the board. Say the stage at both ends of every row with `stage.js`.
+Per `pending` row of `plan.md`: run script and orchestrator rows yourself, spawn director rows and wait. Directors are leaves: they never spawn, spend or touch the board. Say the stage at both ends of every row with `stage.js`, and `board-sync.js push` right after the `running` call, before the spawn, so the board shows the step and its agent at work.
 
 Every spawn prompt carries: the job folder, the output path, `client/sites.md`, the pre-prod release folder, the manifest, any `revisions/{n}.json` directive and a 15-line summary cap. Save it to `runs/{item}-v{n}.prompt.txt` first.
 

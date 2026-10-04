@@ -22,7 +22,7 @@ A project lives at `workspaces/{client}/jobs/{job-id}/`; its id is the board's p
 
 ## Dispatch loop
 
-Per `pending` row of `plan.md`: run script and orchestrator rows yourself, spawn director rows and wait. Directors never touch the board. Say the stage at both ends of every row (`stage.js`).
+Per `pending` row of `plan.md`: run script and orchestrator rows yourself, spawn director rows and wait. Directors never touch the board. Say the stage at both ends of every row (`stage.js`); push right after the `running` call, before the spawn, so the board shows the agent at work.
 
 Every spawn prompt carries the job folder, the output path, `client/sites.md`, `client/templates/`, the brief, the selected script version, `status.md` Notes, any `revisions/{n}.json` directive and a 15-line summary cap. Save it to `runs/{item}-v{n}.prompt.txt` first.
 
@@ -39,7 +39,7 @@ node "${CLAUDE_PLUGIN_ROOT}/scripts/board-sync.js" push {client} {job-id}
 ```
 
 
-Exit 0 from `collect-artifacts.js` marks the row `verified`; exit 1 re-delegates once, a second miss stops the run. Version before state.
+Exit 0 from `collect-artifacts.js` marks the row `verified`; exit 1 re-delegates once, then stops. Version before state.
 
 ## XX rows
 
@@ -47,7 +47,7 @@ Scraper, budget sheet, timeline, talents, props and locations wait on a person. 
 
 ## Questions
 
-A decision only a human can make goes through `board-sync.js ask` (shared rule 6). A question in front of a landed board request (a generate or export press) takes `--blocks {request id}`: the board shows it waiting; re-ask the question, never the request.
+A decision only a human can make goes through `board-sync.js ask` (shared rule 6). A question in front of a landed board request (a generate or export press) takes `--blocks {request id}`; re-ask the question, never the request.
 
 ## Review pass
 
@@ -55,7 +55,7 @@ Before every gate row, run its check scripts (`gate-a-check.js`, `gate-b-check.j
 
 ## Gates
 
-Gate A after Stage 1 (the creative director signs off the creative), Gate B after Stage 2 (assistant enters, the creative director confirms), Gate C after Stage 3 (the production lead releases each day). At a gate row: push, set the awaiting state, say in one line what is being decided, end the turn. Next turn: land, then `board-sync.js pull --gate A`. Exit 0 wrote the hash-bound approval and moved the state; exit 1 named a file changed after the sign-off: re-present it. A chat verdict goes through `record-approval.js --from-chat` first.
+Gate A after Stage 1 (creative director), Gate B after Stage 2 (assistant enters, creative director confirms), Gate C after Stage 3 (production lead, per day). At a gate row: push, set the awaiting state, say in one line what is being decided, end the turn. Next turn: land, then `board-sync.js pull --gate A`. Exit 0 wrote the hash-bound approval and moved the state; exit 1 named a file changed after the sign-off: re-present it. A chat verdict goes through `record-approval.js --from-chat` first.
 
 ## Change propagation
 
@@ -85,4 +85,4 @@ Only you run `make-image`: the sample first, the batch after the board approves 
 
 ## Workspace
 
-Read everything from `${CLAUDE_PLUGIN_ROOT}`; write only under `workspaces/`, `inputs/` and `.board/`. Resuming is `resume-project`: the files win over `status.md`; never resume past a gate.
+Read everything from `${CLAUDE_PLUGIN_ROOT}`; write only under `workspaces/`, `inputs/` and `.board/`. Resuming is `resume-project`: files win over `status.md`; never resume past a gate.

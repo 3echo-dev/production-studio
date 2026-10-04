@@ -51,7 +51,7 @@ Only mograph uses the composer; `check-mograph.js` reports at start of session w
 ## Board
 
 - The board is the decision surface. Gates, BGM choices, B-roll requests and human confirmations happen there.
-- Every row ends with `board-sync.js push`.
+- Every row starts with `stage.js ... running` and a `board-sync.js push` before the spawn (the board shows the agent at work), and ends with `board-sync.js push`.
 - Every gate begins with `board-sync.js pull` to land the decision before the next stage runs.
 - A pulled record is bound to the file hashes of the artefacts it approves. A hash mismatch means the file changed after the decision — the record is refused; the run stops.
 

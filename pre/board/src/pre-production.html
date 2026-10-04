@@ -864,6 +864,7 @@ let sheetOpen = false, sheetEnter = false, chatJump = false;
 // Browser popups (confirm, prompt) are blocked inside the artifact sandbox and return nothing,
 // so every consequential action confirms in the page: a second press within a few seconds.
 let armed = null; // {key, until}
+let told = null; // {at, why}: the bell rang and nothing has come back yet
 function isArmed(key){ return armed && armed.key===key && Date.now()<armed.until; }
 function arm(key){ armed={key, until:Date.now()+8000}; render(); setTimeout(()=>{ if(armed&&armed.key===key&&Date.now()>=armed.until){ armed=null; render(); } }, 8200); }
 let changeFor = null; // item id whose change form is open
@@ -1114,6 +1115,8 @@ async function bellLog(why, outcome, detail){ if(!db) return; const rec={at:now(
 function slateOrderFor(d, id){ return kindOf(d)==='post'?slateOrderPost(d, id):slateOrderPre(d, id); }
 function slateOrderPost(d, id){ return 'This is a slate project with no job folder yet'+(id?', slate id '+id:'')+'. Run the new-post-project skill for it now, in this turn, with these answers already given: client '+(d.client||'not given, ask for it')+', title '+(d.title||'')+', footage folder '+(d.driveFolder||'not given, ask for it')+', pre-prod release folder '+(d.preRelease||'not given, ask for it')+', aspect ratio '+(d.aspectRatio||'not given')+', duration '+(d.deliverableDurationSec?d.deliverableDurationSec+' s':'not given, ask for it')+', '+(d.audioLed?'voice-over leads the cut (audioLed true)':'picture leads the cut (audioLed false)')+', references folder '+(d.referencesFolder||'the references/ folder inside the footage folder, if there is one')+', footage '+(d.footageSource==='hybrid'?'hybrid: real actors kept as shot, backgrounds replaced (footageSource hybrid; actor plates under the footage/plates folder, one per panel)':d.footageSource==='generated'?'generated per storyboard panel (footageSource generated; the footage folder is where the clips land)':'shot rushes (footageSource shoot)')+'. Ask nothing these answer. Scaffold the client if it does not exist, scaffold the job, write these into job.json, route, plan, run scan-references.js and put its summary on the Intake item (ask only about what must be drawn from text), board-sync.js open and push; when the job id exists run board-sync.js adopt with --from the slate id, push, and carry on to Gate A. Do not reply asking whether to start.'; }
 function slateOrderPre(d, id){ return 'This is a slate project with no job folder yet'+(id?', slate id '+id:'')+'. Run the new-project skill for it now, in this turn, with these answers already given: client '+(d.client||'not given')+', folder '+(d.driveFolder||'not given, ask for it')+', title '+(d.title||'')+', script format '+(d.scriptFormat||'')+', storyboard style '+(d.storyboardStyle||'')+'. Ask nothing these answer. When the job id exists run board-sync.js adopt with --from the slate id, push, and carry on to Gate A. Do not reply asking whether to start.'; }
+// What the bell says for a note written in an agent's chat: the whole message, which agent and step it was about, and where the reply belongs.
+function noteOrder(it, v, fs){ const so=slateOrder(); return (so?so+' ':'')+humanName(me)+' wrote to '+seatLabel(it.seat)+' in its chat about '+it.name+(it.status==='pending'?' (not started yet)':'')+': "'+v+'". Land the board (board-sync.js land), read it, act on it if it asks for something, then reply in that same chat in one line: board-say.js {job} --as '+it.seat+' --item '+it.id+' "...", then board-sync.js push.'+filesOrder(fs); }
 function slateOrder(){ return project&&project.createdBy&&project.createdBy!=='pipeline'&&project.status!=='moved'&&project.driveFolder!=null ? slateOrderFor(project, project.id) : null; }
 // Consent is per board and per viewer; asking for it here, on the person's own press, holds the
 // dialog open instead of letting the first send fail with consent_required and fall back.
@@ -1129,7 +1132,7 @@ async function signalPipeline(why, order){
         const el=document.querySelector('[data-signal-anchor]')||document.body.firstElementChild||document.body;
         const anchor=await cm.anchorFor(el);
         await cm.sendToClaude({anchor, text:PIPE.label+' board: '+what+'. '+(order||slateOrder()||'Land the board (board-sync.js land) and carry on; reply here in one line, and put the same reply in the agent chat (board-say.js, then board-sync.js push).')});
-        await bellLog(why,'sent'); toast(why+'. The run has been told.', 'ok'); return true;
+        await bellLog(why,'sent'); told={at:Date.now(), why}; setTimeout(queue, TOLD_MS+500); toast(why+'. The run has been told.', 'ok'); return true;
       }catch(e){ await bellLog(why,'send_failed',(e&&(e.code+' '+e.message))||e); if(e&&e.code==='consent_required') toast(why+'. Allow this page to send comments to Claude, or the run has to be told in chat.'); }
     } else if(can==='no_session'){ await bellLog(why,'no_session'); toast(why+'. No run is watching the board right now; say it in chat when one is.'); }
     else if(can==='writers_only'){ await bellLog(why,'writers_only'); toast(why+'. Only an editor of the board can send it to the run; say it in chat.'); }
@@ -1320,9 +1323,18 @@ function agentsInScope(){ return SEATS.filter(s=>s.kind!=='human' && (s.id==='or
 const AGENT_MOOD = {working:'thinking', ask:'surprised', review:'sad', draft:'idle', done:'happy', idle:'sleepy'};
 const AGENT_PILL = {working:'running', ask:'needs_input', review:'needs_review', draft:'draft', done:'approved', idle:'pending'};
 // What a row says: the state of the seat's steps, the step it is on, and its last delivery.
+const TOLD_MS = 10*60*1000;
+// The bell rang; nothing the run would write (a run record, an agent reply, a heartbeat, a project update) has arrived since.
+function toldLive(){
+  if(!told) return null; if(Date.now()-told.at>TOLD_MS){ told=null; return null; }
+  const since=t=>!!t&&Date.parse(t)>told.at-2000;
+  const alive=Object.values(runs).some(rs=>rs.some(r=>since(r.startedAt)||since(r.finishedAt)))||messages.some(m=>isAgentSeat(m.by)&&since(m.at))||(project&&(since(project.heartbeatAt)||since(project.updatedAt)));
+  if(alive){ told=null; return null; } return told;
+}
 function agentState(seat){
   if(seat==='orchestrator'){
-    const m=messages[0]; const act=project&&project.activity&&!['released','killed'].includes(project.status);
+    const m=messages[0]; const act=project&&project.activity&&!['released','killed'].includes(project.status); const t=toldLive(); if(act) told=null;
+    if(t&&!act) return {st:'working', word:'Told, waiting for the run', line:'The run has been told: '+t.why+'. It shows here as soon as it starts; if nothing comes, say it in the chat of the session that watches the board.', at:new Date(t.at).toISOString(), item:null, q:0};
     return {st:act?'working':'idle', word:act?'Working':'Standing by', line:act?project.activity:(m?m.text:'Walks the plan, checks every file, stops at every gate.'), at:act?(project.heartbeatAt||null):(m?m.at:null), item:null, q:0};
   }
   const its=seatItems(seat); const r=lastRunOfSeat(seat); const sh=its.map(shownStatus);
@@ -1914,8 +1926,8 @@ function composerHtml(seat, its, cur){
   const clip=`<button type="button" class="ghost icon" data-attach aria-label="Attach files" title="Attach files, or drop them on the chat">${ic('clip')}</button>`;
   const held=attach.length||attachBusy?fileChips(attach, true):'';
   if(cur&&changeFor===cur.id) return `<form id="changef" data-item="${cur.id}" class="composer chg"><div class="cmp-tag">${ic('change')} Change request on ${esc(cur.name)}<button type="button" class="ghost sm" data-change-cancel>Cancel</button></div>${held}<div class="cmp-row">${clip}<textarea name="text" id="change-${cur.id}" rows="2" aria-label="What should change" placeholder="What should change on ${esc(cur.name)}? Steps that read from it go back for review and the gate reopens."></textarea>${send('Send change request')}</div></form>`;
-  if(orch||!cur||cur.status==='pending') return `<form id="msgf" class="composer">${about}${held}<div class="cmp-row">${clip}<textarea name="text" id="msg-text" rows="1" aria-label="Message the run" placeholder="${orch?'Message the run':esc((cur?cur.name:seat.label)+' has not started. Message the run instead')}"></textarea>${send('Send')}</div>${orch?`<div class="cmp-f"><button type="button" class="ghost sm" data-signal title="Wake the run now, for example after answering questions">${ic('send')} Wake the run</button></div>`:''}</form>`;
-  return `<form id="notef" data-item="${cur.id}" class="composer">${about}${held}<div class="cmp-row">${clip}<textarea name="text" id="note-${cur.id}" rows="1" aria-label="Note to ${esc(seat.label)}" placeholder="Message ${esc(seat.label)} about ${esc(cur.name)}"></textarea>${send('Send')}</div></form>`;
+  if(orch||!cur) return `<form id="msgf" class="composer">${about}${held}<div class="cmp-row">${clip}<textarea name="text" id="msg-text" rows="1" aria-label="Message the run" placeholder="${orch?'Message the run':esc('Message the run about '+seat.label)}"></textarea>${send('Send')}</div>${orch?`<div class="cmp-f"><button type="button" class="ghost sm" data-signal title="Wake the run now, for example after answering questions">${ic('send')} Wake the run</button></div>`:''}</form>`;
+  return `<form id="notef" data-item="${cur.id}" class="composer">${about}${held}<div class="cmp-row">${clip}<textarea name="text" id="note-${cur.id}" rows="1" aria-label="Note to ${esc(seat.label)}" placeholder="${esc(cur.status==='pending'?'Message '+seat.label+' about '+cur.name+' (not started; the run reads it first)':'Message '+seat.label+' about '+cur.name)}"></textarea>${send('Send')}</div></form>`;
 }
 function chatHtml(){
   const seat=SEATS.find(s=>s.id===agentOpen); if(!seat) return inboxHtml();
@@ -2111,8 +2123,8 @@ function wire(){
     if(f.id==='changef'){ if(attachBusy){ toast('Still uploading; send in a moment'); return; } const v=f.text.value.trim(); if(!v) return; changeFor=null; await requestChange(f.dataset.item, v, takeFiles()); return; }
     if(f.dataset.answerForm){ const r=inbox.find(x=>x.id===f.dataset.answerForm); const v=f.text.value.trim(); if(r&&v){ await answer(r, v); } return; }
     if(f.id==='notef'){ if(attachBusy){ toast('Still uploading; send in a moment'); return; } const v=f.text.value.trim()||(attach.length?'See the attached file'+(attach.length>1?'s':''):''); if(!v||!project) return; const fs=takeFiles(); f.reset(); const id=f.dataset.item; const it=itemOf(id);
-      await write('projects/'+project.id+'/inbox/'+Date.now().toString(36),{type:'change',item:id,text:v,from:me,status:'open',createdAt:now(), ...(fs.length?{files:fs}:{})});
-      await log(`Note to ${seatLabel(it.seat)} on ${it.name} v${it.version||0}: ${v}`, id, fs); toast('Sent to '+seatLabel(it.seat), 'ok'); await signalPipeline('Note to '+seatLabel(it.seat)+' on '+it.name+': '+v.slice(0,80), fs.length?'Land the board (board-sync.js land) and carry on; reply here in one line, and put the same reply in the agent chat (board-say.js, then board-sync.js push).'+filesOrder(fs):undefined); return; }
+      if(it.status!=='pending') await write('projects/'+project.id+'/inbox/'+Date.now().toString(36),{type:'change',item:id,text:v,from:me,status:'open',createdAt:now(), ...(fs.length?{files:fs}:{})});
+      await log(`Note to ${seatLabel(it.seat)} on ${it.name} v${it.version||0}: ${v}`, id, fs); toast('Sent to '+seatLabel(it.seat), 'ok'); await signalPipeline('Note to '+seatLabel(it.seat)+' on '+it.name+': '+v.slice(0,80), noteOrder(it, v, fs)); return; }
   };
   const sel=$('#me'); if(sel) sel.onchange=()=>{ me=sel.value; try{localStorage.setItem('c122.me',me);}catch(e){} render(); };
   // Enter sends a chat message; Shift+Enter starts a new line.

@@ -12,9 +12,8 @@ description: >
 
 **Purpose:** give the account that runs the pipelines one board it owns. The plugin carries the
 page; the artifact belongs to whoever publishes it, only an owner's session can write its
-database, and only a session watching it is woken by its decisions. Pre-production and
-post-production share the page: the home page has a door for each, and a project is drawn from
-the model of the pipeline it belongs to.
+database, and only a session watching it is woken by its decisions. Both pipelines share the
+page: the home page has a door for each.
 
 ## Steps
 
@@ -60,6 +59,11 @@ the model of the pipeline it belongs to.
    then ask the person to press **Signal pipeline** on the board once and approve the prompt that
    lets the page message this session. Never repeat the address.
 
+7. **Say how the session must run.** Auto permission mode refuses a turn that only a board
+   comment asked for, so a board-driven run needs allow rules for the plugin's scripts,
+   `Bash(node:*)` and `Bash(python:*)` in the workspace's `.claude/settings.local.json`, or the
+   go-ahead typed in this chat each time. Offer to write them; write on a yes.
+
 ## Rules
 
 1. One board per workspace root, shared by both pipelines. A second `board-setup` without
@@ -81,4 +85,5 @@ assets; `boardUrl` and `boardSetAt` in both `<root>/.creative-studio-pipeline/co
 |---|---|
 | Publish refused for the capabilities | Say which; the page needs all five |
 | A decision on the board wakes nobody | Press Signal pipeline and approve the prompt |
+| The run says the permission check blocked it | Auto mode refused a board-driven action: add the two allow rules (step 7) or type the go-ahead in chat |
 | The consent for the first write is declined | Stop; the board stays published but unused |
