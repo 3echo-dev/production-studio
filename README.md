@@ -36,6 +36,12 @@ suites green at every step.
 Allow the plugin's scripts for the workspace: `Bash(node:*)` and `Bash(python:*)` in its
 `.claude/settings.local.json`.
 
+## Adding a pipeline
+
+`docs/CONNECT-A-PIPELINE.md` is the instruction for connecting a third plugin (the social
+pipeline) to this board: the page model, the write shapes, the bell both ways, wiring, and the
+live proof in order.
+
 ## Tests
 
 ```
